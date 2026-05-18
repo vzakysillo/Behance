@@ -5,6 +5,7 @@ import { errorHandler } from "./middlewares/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import "./config/db.js";
+import "dotenv/config";
 
 
 const app = new Koa();
@@ -12,7 +13,7 @@ const app = new Koa();
 app.use(cors());
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: process.env.FRONTEND_URI,
   allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
 }));
 
