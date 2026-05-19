@@ -2,7 +2,7 @@ import crypto from "crypto";
 import mongoose from "mongoose";
 import { VerificationToken } from "../models/verificationToken.model.js";
 
-const TOKEN_TTL_MS = 24 * 60 * 60 * 1000;
+const TOKEN_TTL_MS = 60 * 60 * 1000;
 
 export async function createVerificationToken(
   userId: mongoose.Types.ObjectId

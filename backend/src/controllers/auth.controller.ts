@@ -1,8 +1,7 @@
-import type { Context } from "koa";
 import { registerUser, loginUser, verifyUser } from "../services/auth.service.js";
-import type { RegisterBody, LoginBody } from "../types/koa.js";
+import type { AuthContext, RegisterBody, LoginBody } from "../types/koa.js";
 
-export const register = async (ctx: Context): Promise<void> => {
+export const register = async (ctx: AuthContext): Promise<void> => {
   const body = ctx.request.body as RegisterBody;
   const user = await registerUser(body);
 
@@ -10,20 +9,22 @@ export const register = async (ctx: Context): Promise<void> => {
   ctx.body = { user };
 };
 
-export const login = async (ctx: Context): Promise<void> => {
+export const login = async (ctx: AuthContext): Promise<void> => {
   const body = ctx.request.body as LoginBody;
   const token = await loginUser(body);
 
   ctx.body = { token };
 };
 
-export const verify = async (ctx: Context) => {
+export const verify = async (ctx: AuthContext): Promise<void> => {
   const { token } = ctx.query as { token: string };
+
   if (!token) {
     ctx.status = 400;
     ctx.body = { error: "Token is required" };
     return;
   }
+
   await verifyUser(token);
   ctx.status = 200;
   ctx.body = { message: "Email verified successfully. You can now log in." };

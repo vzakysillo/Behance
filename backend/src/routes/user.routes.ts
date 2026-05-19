@@ -1,4 +1,4 @@
-import Router from "koa-router";
+import Router from "@koa/router";
 import { authMiddleware } from "../middlewares/auth.js";
 import type { AuthContext } from "../types/koa.js";
 

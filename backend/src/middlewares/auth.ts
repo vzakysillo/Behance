@@ -1,6 +1,7 @@
-import type { Context, Next } from "koa";
+import type { Next } from "koa";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
+import type { AuthContext } from "../types/koa.js";
 
 interface JwtPayload {
   id: string;
@@ -8,7 +9,7 @@ interface JwtPayload {
   email: string;
 }
 
-export const authMiddleware = async (ctx: Context, next: Next): Promise<void> => {
+export const authMiddleware = async (ctx: AuthContext, next: Next): Promise<void> => {
   const authHeader = ctx.headers.authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
@@ -28,7 +29,6 @@ export const authMiddleware = async (ctx: Context, next: Next): Promise<void> =>
 
   try {
     const decoded = jwt.verify(token, secret) as JwtPayload;
-
     const user = await User.findById(decoded.id);
 
     if (!user) {

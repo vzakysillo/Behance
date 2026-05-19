@@ -1,4 +1,4 @@
-import Router from "koa-router";
+import Router from "@koa/router";
 import { register, login, verify } from "../controllers/auth.controller.js";
 
 const router = new Router({ prefix: "/auth" });

@@ -16,12 +16,10 @@ export const registerUser = async ({ username, email, password }: RegisterBody) 
   }
 
   const hashed = await bcrypt.hash(password, SALT_ROUNDS);
-
   const user = await User.create({ username, email, password: hashed });
 
   const token = await createVerificationToken(user._id);
   await sendVerificationEmail(email, token);
-
 
   return {
     id: user._id,

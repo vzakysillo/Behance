@@ -1,4 +1,4 @@
-import type { Context, DefaultContext, DefaultState } from "koa";
+import type { Context, DefaultState } from "koa";
 import type { Types } from "mongoose";
 
 export interface AuthState extends DefaultState {
