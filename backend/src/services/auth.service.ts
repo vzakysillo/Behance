@@ -8,22 +8,22 @@ import { sendVerificationEmail } from "./email.service.js";
 
 const SALT_ROUNDS = 12;
 
-export const registerUser = async ({ username, email, password }: RegisterBody) => {
-  const existing = await User.findOne({ $or: [{ email }, { username }] });
+export const registerUser = async ({ userName, email, password }: RegisterBody) => {
+  const existing = await User.findOne({ $or: [{ email }, { userName }] });
 
   if (existing) {
     throw new ApiError(409, "Username or email already in use");
   }
 
   const hashed = await bcrypt.hash(password, SALT_ROUNDS);
-  const user = await User.create({ username, email, password: hashed });
+  const user = await User.create({ userName, email, password: hashed });
 
   const token = await createVerificationToken(user._id);
   await sendVerificationEmail(email, token);
 
   return {
     id: user._id,
-    username: user.username,
+    username: user.userName,
     email: user.email,
     isVerified: user.isVerified,
   };

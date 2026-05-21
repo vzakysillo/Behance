@@ -5,6 +5,7 @@ import { connectDB } from "./config/db.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import uploadRoutes from "./routes/upload.routes.js";
 
 const app = new Koa();
 
@@ -23,6 +24,9 @@ app.use(authRoutes.allowedMethods());
 
 app.use(userRoutes.routes());
 app.use(userRoutes.allowedMethods());
+
+app.use(uploadRoutes.routes());
+app.use(uploadRoutes.allowedMethods());
 
 connectDB();
 
