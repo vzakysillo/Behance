@@ -1,80 +1,54 @@
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 import { AuthApi } from "../api/auth.api";
 
+interface LoginFormProps {
+  onSuccess?: () => void;
+}
+
 interface LoginValues {
-    email: string;
-    password: string;
+  email: string;
+  password: string;
 }
 
 const initialValues: LoginValues = {
-    email: "",
-    password: "",
+  email: "",
+  password: "",
 };
 
 const validationSchema = Yup.object({
-    email: Yup.string()
-        .email("Invalid email")
-        .required("Required"),
-
-    password: Yup.string()
-        .min(6, "Too short")
-        .required("Required"),
+  email: Yup.string().email("Invalid email").required("Required"),
+  password: Yup.string().min(6, "Too short").required("Required"),
 });
 
-export default function LoginForm() {
-    const handleSubmit = async (
-        values: LoginValues,
-        { resetForm }: { resetForm: () => void }
-    ) => {
-        try {
-            await AuthApi.post("/auth/login", values);
+export default function LoginForm({ onSuccess }: LoginFormProps) {
+  const handleSubmit = async (values: LoginValues, { resetForm }: { resetForm: () => void }) => {
+    try {
+      const response = await AuthApi.post<{ token: string }>("/auth/login", values);
 
-            console.log("Success");
+      localStorage.setItem("token", response.data.token);
+      resetForm();
+      onSuccess?.();
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
-            resetForm();
-        } catch (error) {
-            console.error(error);
-        }
-    };
+  return (
+    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
+      <Form>
+        <div>
+          <Field type="email" name="email" placeholder="Email" />
+          <ErrorMessage name="email" component="div" />
+        </div>
 
-    return (
-        <Formik
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            onSubmit={handleSubmit}
-        >
-            <Form>
-                <div>
-                    <Field
-                        type="email"
-                        name="email"
-                        placeholder="Email"
-                    />
+        <div>
+          <Field type="password" name="password" placeholder="Password" />
+          <ErrorMessage name="password" component="div" />
+        </div>
 
-                    <ErrorMessage
-                        name="email"
-                        component="div"
-                    />
-                </div>
-
-                <div>
-                    <Field
-                        type="password"
-                        name="password"
-                        placeholder="Password"
-                    />
-
-                    <ErrorMessage
-                        name="password"
-                        component="div"
-                    />
-                </div>
-
-                <button type="submit">
-                    Login
-                </button>
-            </Form>
-        </Formik>
-    );
+        <button type="submit">Login</button>
+      </Form>
+    </Formik>
+  );
 }

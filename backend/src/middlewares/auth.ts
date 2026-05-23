@@ -5,7 +5,7 @@ import type { AuthContext } from "../types/koa.js";
 
 interface JwtPayload {
   id: string;
-  username: string;
+  userName: string;
   email: string;
 }
 
@@ -39,8 +39,15 @@ export const authMiddleware = async (ctx: AuthContext, next: Next): Promise<void
 
     ctx.state.user = {
       _id: user._id,
-      username: user.username,
+      userName: user.userName,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
+      socials: user.socials,
+      skills: user.skills,
+      avatar: user.avatar,
+      isVerified: user.isVerified,
+      portfolios: user.portfolios,
     };
 
     await next();

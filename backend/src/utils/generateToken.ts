@@ -1,7 +1,12 @@
 import jwt from "jsonwebtoken";
+import type { Types } from "mongoose";
 import type { IUser } from "../models/user.model.js";
 
-export const generateToken = (user: IUser): string => {
+type TokenUser = IUser & {
+  _id: Types.ObjectId;
+};
+
+export const generateToken = (user: TokenUser): string => {
   const secret = process.env.JWT_SECRET;
 
   if (!secret) {
@@ -11,7 +16,7 @@ export const generateToken = (user: IUser): string => {
   return jwt.sign(
     {
       id: user._id,
-      username: user.username,
+      userName: user.userName,
       email: user.email,
     },
     secret,

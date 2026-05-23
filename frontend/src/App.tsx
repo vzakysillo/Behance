@@ -1,55 +1,19 @@
-import './App.css'
-import LoginForm from './components/LoginForm';
-import RegisterForm from './components/RegisterForm';
+import { Navigate, Route, Routes } from "react-router-dom";
+import "./App.css";
+import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
+import RegisterPage from "./pages/RegisterPage";
+import { routes } from "./routes";
 
 function App() {
-  // const [email, setEmail] = useState("");
-  // const [password, setPassword] = useState("");
-
-  // const handleClick = async () => {
-  //   try {
-  //     const res = await AuthApi.post("/auth/login", {
-  //       email,
-  //       password,
-  //     });
-
-  //     console.log(res.data);
-      
-  //   } 
-    
-  //   catch (error) {
-  //     console.error(error);
-  //   } 
-    
-  //   finally {
-  //     setEmail("");
-  //     setPassword("");
-  //   }
-  // };
-
-  return ( 
-    // <>
-    //   <label>Username</label>
-    //   <input
-    //       type="text"
-    //       value={email}
-    //       placeholder="Enter email"
-    //       onChange={(e) => setEmail(e.target.value)}
-    //     />
-    //     <input
-    //       type="password"
-    //       value={password}
-    //       placeholder="Enter password"
-    //       onChange={(e) => setPassword(e.target.value)}
-    //     />
-
-    //     <button onClick={() => handleClick()}>Submit</button>
-    // </>
-    <>
-      <LoginForm></LoginForm>
-      <RegisterForm></RegisterForm>
-    </>
-  )
+  return (
+    <Routes>
+      <Route path={routes.login} element={<LoginPage />} />
+      <Route path={routes.register} element={<RegisterPage />} />
+      <Route path={routes.profile} element={<ProfilePage />} />
+      <Route path="*" element={<Navigate to={routes.profile} replace />} />
+    </Routes>
+  );
 }
 
-export default App
+export default App;

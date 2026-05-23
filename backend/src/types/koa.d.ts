@@ -6,7 +6,14 @@ export interface AuthState extends DefaultState {
   user: {
     _id: Types.ObjectId;
     userName: string;
+    firstName?: string;
+    lastName?: string;
     email: string;
+    socials: string[];
+    skills: string[];
+    avatar?: string;
+    isVerified: boolean;
+    portfolios: Types.ObjectId[];
   };
 }
 

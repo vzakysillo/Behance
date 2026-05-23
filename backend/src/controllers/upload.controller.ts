@@ -2,6 +2,7 @@ import type { File } from "formidable";
 import { uploadImageToCloudinary, type UploadedFile } from "../services/upload.service.js";
 import { ApiError } from "../utils/ApiError.js";
 import type { AuthContext } from "../types/koa.js";
+import User from "../models/user.model.js";
 
 
 export const uploadImage = async (ctx: AuthContext): Promise<void> => {
@@ -23,7 +24,16 @@ export const uploadImage = async (ctx: AuthContext): Promise<void> => {
   };
 
   const url = await uploadImageToCloudinary(uploadedFile);
+  const user = await User.findByIdAndUpdate(
+    ctx.state.user._id,
+    { avatar: url },
+    { new: true }
+  );
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
 
   ctx.status = 201;
-  ctx.body = { url };
+  ctx.body = { url, user };
 };

@@ -2,15 +2,15 @@ import mongoose, { Model } from "mongoose";
 
 export interface IUser {
   userName: string;
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 
   socials: string[];
   skills: string[];
 
-  avatar?: string;
+  avatar: string;
   isVerified: boolean;
 
   portfolios: mongoose.Types.ObjectId[];
@@ -19,8 +19,8 @@ export interface IUser {
 const userSchema = new mongoose.Schema<IUser>(
   {
     userName: { type: String, required: true, unique: true },
-    firstName: { type: String },
-    lastName: { type: String },
+    firstName: { type: String, default: "" },
+    lastName: { type: String, default: "" },
 
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, select: false },
@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema<IUser>(
     socials: { type: [String], default: [] },
     skills: { type: [String], default: [] },
 
-    avatar: { type: String },
+    avatar: { type: String, default: "" },
 
     isVerified: { type: Boolean, default: false },
 
