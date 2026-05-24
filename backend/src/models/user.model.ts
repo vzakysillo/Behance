@@ -19,8 +19,8 @@ export interface IUser {
 const userSchema = new mongoose.Schema<IUser>(
   {
     userName: { type: String, required: true, unique: true },
-    firstName: { type: String, default: "" },
-    lastName: { type: String, default: "" },
+    firstName: { type: String, default: null },
+    lastName: { type: String, default: null },
 
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, select: false },
@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema<IUser>(
     socials: { type: [String], default: [] },
     skills: { type: [String], default: [] },
 
-    avatar: { type: String, default: "" },
+    avatar: { type: String, default: null },
 
     isVerified: { type: Boolean, default: false },
 

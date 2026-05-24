@@ -2,15 +2,11 @@ import fs from "fs";
 import type { UploadApiResponse } from "cloudinary";
 import cloudinary from "../config/cloudinary.js";
 import { ApiError } from "../utils/ApiError.js";
-
-const ALLOWED_MIME_TYPES = new Set([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-  "image/gif",
-]);
-
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+import {
+  ALLOWED_IMAGE_MIME_TYPES,
+  MAX_IMAGE_FILE_SIZE_BYTES,
+  isAllowedImageMimeType,
+} from "../utils/uploadFile.js";
 
 export interface UploadedFile {
   filepath: string;
@@ -20,14 +16,14 @@ export interface UploadedFile {
 }
 
 export async function uploadImageToCloudinary(file: UploadedFile): Promise<string> {
-  if (!file.mimetype || !ALLOWED_MIME_TYPES.has(file.mimetype)) {
+  if (!isAllowedImageMimeType(file.mimetype)) {
     throw new ApiError(
       415,
-      `Unsupported file type. Allowed: ${[...ALLOWED_MIME_TYPES].join(", ")}`
+      `Unsupported file type. Allowed: ${ALLOWED_IMAGE_MIME_TYPES.join(", ")}`
     );
   }
 
-  if (file.size > MAX_FILE_SIZE_BYTES) {
+  if (file.size > MAX_IMAGE_FILE_SIZE_BYTES) {
     throw new ApiError(413, "File too large. Maximum size is 10 MB");
   }
 

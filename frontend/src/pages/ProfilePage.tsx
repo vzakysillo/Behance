@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthApi } from "../api/auth.api";
+import axios from "axios";
+import { AuthApi, type ApiResponse } from "../api/auth.api";
 import { routes } from "../routes";
 
 interface UserProfile {
   _id: string;
   userName: string;
-  firstName?: string;
-  lastName?: string;
+  firstName: string;
+  lastName: string;
   email: string;
   socials: string[];
   skills: string[];
-  avatar?: string;
+  avatar: string;
   portfolios: string[];
 }
 
@@ -28,18 +29,23 @@ export default function ProfilePage() {
       return;
     }
 
-    AuthApi.get<{ user: UserProfile }>("/users/me", {
+    AuthApi.get<ApiResponse<{ user: UserProfile }>>("/users/me", {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     })
       .then((response) => {
-        setUser(response.data.user);
+        setUser(response.data.data?.user ?? null);
         setStatus("");
       })
-      .catch(() => {
-        localStorage.removeItem("token");
-        setStatus("Your session expired. Please login again.");
+      .catch((error) => {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+          localStorage.removeItem("token");
+          setStatus("Your session expired. Please login again.");
+          return;
+        }
+
+        setStatus("Could not load your profile. Please try again.");
       });
   }, []);
 

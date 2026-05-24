@@ -2,6 +2,7 @@ import Router from "@koa/router";
 import { koaBody } from "koa-body";
 import { authMiddleware } from "../middlewares/auth.js";
 import { uploadImage } from "../controllers/upload.controller.js";
+import { isAllowedImageMimeType, MAX_IMAGE_FILE_SIZE_BYTES } from "../utils/uploadFile.js";
 
 const router = new Router({ prefix: "/upload" });
 
@@ -11,9 +12,8 @@ const multipartParser = koaBody({
   json: false,
   text: false,
   formidable: {
-    maxFileSize: 10 * 1024 * 1024, // 10 MB
-    filter: ({ mimetype }) =>
-      !!mimetype && ["image/jpeg", "image/png", "image/webp", "image/gif"].includes(mimetype),
+    maxFileSize: MAX_IMAGE_FILE_SIZE_BYTES,
+    filter: ({ mimetype }) => isAllowedImageMimeType(mimetype),
   },
 });
 

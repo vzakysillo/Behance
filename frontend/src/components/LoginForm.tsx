@@ -1,6 +1,7 @@
 import { ErrorMessage, Field, Form, Formik } from "formik";
 import * as Yup from "yup";
-import { AuthApi } from "../api/auth.api";
+import { AuthApi, type ApiResponse } from "../api/auth.api";
+
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -24,14 +25,19 @@ const validationSchema = Yup.object({
 export default function LoginForm({ onSuccess }: LoginFormProps) {
   const handleSubmit = async (values: LoginValues, { resetForm }: { resetForm: () => void }) => {
     try {
-      const response = await AuthApi.post<{ token: string }>("/auth/login", values);
+      const response = await AuthApi.post<ApiResponse<{ token: string }>>("/auth/login", values);
+      const token = response.data.data?.token;
 
-      localStorage.setItem("token", response.data.token);
-      resetForm();
+      if (!token) {
+        throw new Error("Login response did not include a token");
+      }
+
+      localStorage.setItem("token", token);
       onSuccess?.();
     } catch (error) {
       console.error(error);
     }
+    resetForm();
   };
 
   return (

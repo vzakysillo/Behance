@@ -2,17 +2,17 @@ import mongoose, { Model } from "mongoose";
 
 export interface IPortfolio {
   name: string;
-  description?: string;
-  cover?: string;
+  description: string;
+  cover: string;
   photos: string[];
 }
 
 const portfolioSchema = new mongoose.Schema<IPortfolio>(
   {
     name: { type: String, required: true, unique: true },
-    description: { type: String },
+    description: { type: String, default: null },
 
-    cover: { type: String },
+    cover: { type: String, default: null},
 
     photos: { type: [String], default: [] },
   },
