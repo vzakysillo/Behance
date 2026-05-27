@@ -13,7 +13,7 @@ export interface IUser {
   avatar: string;
   isVerified: boolean;
 
-  portfolios: mongoose.Types.ObjectId[];
+  projects: mongoose.Types.ObjectId[];
 }
 
 const userSchema = new mongoose.Schema<IUser>(
@@ -32,10 +32,10 @@ const userSchema = new mongoose.Schema<IUser>(
 
     isVerified: { type: Boolean, default: false },
 
-    portfolios: [
+    projects: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Portfolio",
+        ref: "Project",
       },
     ],
   },

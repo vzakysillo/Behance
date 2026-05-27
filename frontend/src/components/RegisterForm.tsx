@@ -1,61 +1,71 @@
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
+import { useState } from "react";
 import { AuthApi } from "../api/auth.api";
 
 interface RegisterFormProps {
   onSuccess?: () => void;
 }
 
-interface RegisterValues {
-  userName: string;
-  email: string;
-  password: string;
-}
-
-const initialValues: RegisterValues = {
-  userName: "",
-  email: "",
-  password: "",
-};
-
-const validationSchema = Yup.object({
-  userName: Yup.string().required("Required"),
-  email: Yup.string().email("Invalid email").required("Required"),
-  password: Yup.string().min(6, "Too short").required("Required"),
-});
-
 export default function RegisterForm({ onSuccess }: RegisterFormProps) {
-  const handleSubmit = async (values: RegisterValues, { resetForm }: { resetForm: () => void }) => {
-    try {
-      await AuthApi.post("/auth/register", values);
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-      resetForm();
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+
+    try {
+      await AuthApi.post("/auth/register", {
+        userName,
+        email,
+        password,
+      });
+
+      setUserName("");
+      setEmail("");
+      setPassword("");
       onSuccess?.();
-    } catch (error) {
-      console.error(error);
+    } catch {
+      setError("Could not create account");
     }
   };
 
   return (
-    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-      <Form>
-        <div>
-          <Field type="text" name="userName" placeholder="Username" />
-          <ErrorMessage name="userName" component="div" />
-        </div>
+    <form onSubmit={handleSubmit}>
+      <div>
+        <input
+          type="text"
+          placeholder="Username"
+          value={userName}
+          onChange={(event) => setUserName(event.target.value)}
+          required
+        />
+      </div>
 
-        <div>
-          <Field type="email" name="email" placeholder="Email" />
-          <ErrorMessage name="email" component="div" />
-        </div>
+      <div>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          required
+        />
+      </div>
 
-        <div>
-          <Field type="password" name="password" placeholder="Password" />
-          <ErrorMessage name="password" component="div" />
-        </div>
+      <div>
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          required
+        />
+      </div>
 
-        <button type="submit">Register</button>
-      </Form>
-    </Formik>
+      {error && <p>{error}</p>}
+
+      <button type="submit">Register</button>
+    </form>
   );
 }

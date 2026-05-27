@@ -1,7 +1,12 @@
 import fs from "fs";
 import type { UploadApiResponse } from "cloudinary";
 import cloudinary from "../config/cloudinary.js";
-import { ApiError } from "../utils/ApiError.js";
+import {
+  BadGatewayError,
+  InternalServerError,
+  PayloadTooLargeError,
+  UnsupportedMediaTypeError,
+} from "../utils/ApiError.js";
 import {
   ALLOWED_IMAGE_MIME_TYPES,
   MAX_IMAGE_FILE_SIZE_BYTES,
@@ -17,14 +22,13 @@ export interface UploadedFile {
 
 export async function uploadImageToCloudinary(file: UploadedFile): Promise<string> {
   if (!isAllowedImageMimeType(file.mimetype)) {
-    throw new ApiError(
-      415,
+    throw new UnsupportedMediaTypeError(
       `Unsupported file type. Allowed: ${ALLOWED_IMAGE_MIME_TYPES.join(", ")}`
     );
   }
 
   if (file.size > MAX_IMAGE_FILE_SIZE_BYTES) {
-    throw new ApiError(413, "File too large. Maximum size is 10 MB");
+    throw new PayloadTooLargeError("File too large. Maximum size is 10 MB");
   }
 
   return new Promise<string>((resolve, reject) => {
@@ -32,11 +36,11 @@ export async function uploadImageToCloudinary(file: UploadedFile): Promise<strin
       { folder: "uploads", resource_type: "image" },
       (error, result: UploadApiResponse | undefined) => {
         if (error) {
-          reject(new ApiError(502, `Cloudinary upload failed: ${error.message}`));
+          reject(new BadGatewayError(`Cloudinary upload failed: ${error.message}`));
           return;
         }
         if (!result) {
-          reject(new ApiError(502, "Cloudinary returned an empty response"));
+          reject(new BadGatewayError("Cloudinary returned an empty response"));
           return;
         }
         resolve(result.secure_url);
@@ -44,7 +48,9 @@ export async function uploadImageToCloudinary(file: UploadedFile): Promise<strin
     );
 
     fs.createReadStream(file.filepath)
-      .on("error", (err) => reject(new ApiError(500, `Failed to read temp file: ${err.message}`)))
+      .on("error", (err) =>
+        reject(new InternalServerError(`Failed to read temp file: ${err.message}`))
+      )
       .pipe(stream);
   });
 }

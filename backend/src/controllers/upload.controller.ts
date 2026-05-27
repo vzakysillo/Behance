@@ -1,6 +1,6 @@
 import { uploadImageToCloudinary, type UploadedFile } from "../services/upload.service.js";
-import { ApiError } from "../utils/ApiError.js";
-import { sendSuccess } from "../utils/httpResponse.js";
+import { NotFoundError } from "../utils/ApiError.js";
+import { created } from "../utils/httpResponse.js";
 import { getSingleUploadedFile, toUploadedFile } from "../utils/uploadFile.js";
 import type { AuthContext } from "../types/koa.js";
 import User from "../models/user.model.js";
@@ -17,8 +17,8 @@ export const uploadImage = async (ctx: AuthContext): Promise<void> => {
   );
 
   if (!user) {
-    throw new ApiError(404, "User not found");
+    throw new NotFoundError("User not found");
   }
 
-  sendSuccess(ctx, 201, "Image uploaded successfully", { url, user });
+  created(ctx, "Image uploaded successfully", { url, user });
 };

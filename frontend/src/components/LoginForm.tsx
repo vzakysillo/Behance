@@ -1,60 +1,64 @@
-import { ErrorMessage, Field, Form, Formik } from "formik";
-import * as Yup from "yup";
+import { useState } from "react";
 import { AuthApi, type ApiResponse } from "../api/auth.api";
-
 
 interface LoginFormProps {
   onSuccess?: () => void;
 }
 
-interface LoginValues {
-  email: string;
-  password: string;
-}
-
-const initialValues: LoginValues = {
-  email: "",
-  password: "",
-};
-
-const validationSchema = Yup.object({
-  email: Yup.string().email("Invalid email").required("Required"),
-  password: Yup.string().min(6, "Too short").required("Required"),
-});
-
 export default function LoginForm({ onSuccess }: LoginFormProps) {
-  const handleSubmit = async (values: LoginValues, { resetForm }: { resetForm: () => void }) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+
     try {
-      const response = await AuthApi.post<ApiResponse<{ token: string }>>("/auth/login", values);
+      const response = await AuthApi.post<ApiResponse<{ token: string }>>("/auth/login", {
+        email,
+        password,
+      });
+
       const token = response.data.data?.token;
 
       if (!token) {
-        throw new Error("Login response did not include a token");
+        setError("Login failed");
+        return;
       }
 
       localStorage.setItem("token", token);
       onSuccess?.();
-    } catch (error) {
-      console.error(error);
+    } catch {
+      setError("Invalid email or password");
     }
-    resetForm();
   };
 
   return (
-    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-      <Form>
-        <div>
-          <Field type="email" name="email" placeholder="Email" />
-          <ErrorMessage name="email" component="div" />
-        </div>
+    <form onSubmit={handleSubmit}>
+      <div>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(event) => setEmail(event.target.value)}
+          required
+        />
+      </div>
 
-        <div>
-          <Field type="password" name="password" placeholder="Password" />
-          <ErrorMessage name="password" component="div" />
-        </div>
+      <div>
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(event) => setPassword(event.target.value)}
+          required
+        />
+      </div>
 
-        <button type="submit">Login</button>
-      </Form>
-    </Formik>
+      {error && <p>{error}</p>}
+
+      <button type="submit">Login</button>
+    </form>
   );
 }

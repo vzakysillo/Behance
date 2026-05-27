@@ -2,7 +2,7 @@ import type { Next } from "koa";
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import type { AuthContext } from "../types/koa.js";
-import { ApiError } from "../utils/ApiError.js";
+import { InternalServerError, UnauthorizedError } from "../utils/ApiError.js";
 
 interface JwtPayload {
   id: string;
@@ -14,14 +14,14 @@ export const authMiddleware = async (ctx: AuthContext, next: Next): Promise<void
   const authHeader = ctx.headers.authorization;
 
   if (!authHeader?.startsWith("Bearer ")) {
-    throw new ApiError(401, "Unauthorized");
+    throw new UnauthorizedError();
   }
 
   const token = authHeader.slice(7);
   const secret = process.env.JWT_SECRET;
 
   if (!secret) {
-    throw new ApiError(500, "Server misconfiguration");
+    throw new InternalServerError("Server misconfiguration");
   }
 
   let decoded: JwtPayload;
@@ -29,13 +29,13 @@ export const authMiddleware = async (ctx: AuthContext, next: Next): Promise<void
   try {
     decoded = jwt.verify(token, secret) as JwtPayload;
   } catch {
-    throw new ApiError(401, "Invalid or expired token");
+    throw new UnauthorizedError("Invalid or expired token");
   }
 
   const user = await User.findById(decoded.id);
 
   if (!user) {
-    throw new ApiError(401, "Unauthorized");
+    throw new UnauthorizedError();
   }
 
   ctx.state.user = {
@@ -48,7 +48,7 @@ export const authMiddleware = async (ctx: AuthContext, next: Next): Promise<void
     skills: user.skills,
     avatar: user.avatar,
     isVerified: user.isVerified,
-    portfolios: user.portfolios,
+    projects: user.projects,
   };
 
   await next();

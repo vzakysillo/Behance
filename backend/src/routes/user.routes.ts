@@ -1,12 +1,11 @@
 import Router from "@koa/router";
+import { getMe, updateMe } from "../controllers/user.controller.js";
 import { authMiddleware } from "../middlewares/auth.js";
-import type { AuthContext } from "../types/koa.js";
-import { sendSuccess } from "../utils/httpResponse.js";
 
 const router = new Router({ prefix: "/users" });
 
-router.get("/me", authMiddleware, (ctx: AuthContext) => {
-  sendSuccess(ctx, 200, "User profile fetched successfully", { user: ctx.state.user });
-});
+router.get("/me", authMiddleware, getMe);
+router.put("/me", authMiddleware, updateMe);
+router.patch("/me", authMiddleware, updateMe);
 
 export default router;

@@ -13,7 +13,7 @@ export interface AuthState extends DefaultState {
     skills: string[];
     avatar: string;
     isVerified: boolean;
-    portfolios: Types.ObjectId[];
+    projects: Types.ObjectId[];
   };
 }
 
