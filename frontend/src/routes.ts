@@ -1,7 +1,12 @@
 export const routes = {
-  login: "/login",
-  register: "/register",
-  profile: "/profile",
+  auth: {
+    login: () => "/login",
+    register: () => "/register",
+  },
+  profile: {
+    root: () => "/profile",
+    projects: () => "/profile/projects",
+    projectNew: () => "/profile/projects/new",
+    projectDetail: (id: string) => `/profile/projects/${id}`,
+  },
 } as const;
-
-export type AppRoute = (typeof routes)[keyof typeof routes];

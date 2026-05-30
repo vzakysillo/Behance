@@ -12,10 +12,10 @@ export default function RegisterPage() {
         <h1>Register</h1>
       </div>
 
-      <RegisterForm onSuccess={() => navigate(routes.login)} />
+      <RegisterForm onSuccess={() => navigate(routes.auth.login())} />
 
       <p>
-        Already have an account? <Link to={routes.login}>Login</Link>
+        Already have an account? <Link to={routes.auth.login()}>Login</Link>
       </p>
     </section>
   );

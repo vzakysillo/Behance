@@ -12,10 +12,10 @@ export default function LoginPage() {
         <h1>Login</h1>
       </div>
 
-      <LoginForm onSuccess={() => navigate(routes.profile)} />
+      <LoginForm onSuccess={() => navigate(routes.profile.root())} />
 
       <p>
-        Need an account? <Link to={routes.register}>Register</Link>
+        Need an account? <Link to={routes.auth.register()}>Register</Link>
       </p>
     </section>
   );

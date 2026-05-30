@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AuthApi } from "../api/auth.api";
+import { register } from "../api/auth.api";
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -16,18 +16,13 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
     setError("");
 
     try {
-      await AuthApi.post("/auth/register", {
-        userName,
-        email,
-        password,
-      });
-
+      await register(userName, email, password);
       setUserName("");
       setEmail("");
       setPassword("");
       onSuccess?.();
-    } catch {
-      setError("Could not create account");
+    } catch (err) {
+      setError(err as string);
     }
   };
 
@@ -38,7 +33,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           type="text"
           placeholder="Username"
           value={userName}
-          onChange={(event) => setUserName(event.target.value)}
+          onChange={(e) => setUserName(e.target.value)}
           required
         />
       </div>
@@ -48,7 +43,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
       </div>
@@ -58,7 +53,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(event) => setPassword(event.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
       </div>

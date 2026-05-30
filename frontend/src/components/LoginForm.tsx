@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AuthApi, type ApiResponse } from "../api/auth.api";
+import { login } from "../api/auth.api";
 
 interface LoginFormProps {
   onSuccess?: () => void;
@@ -15,22 +15,11 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     setError("");
 
     try {
-      const response = await AuthApi.post<ApiResponse<{ token: string }>>("/auth/login", {
-        email,
-        password,
-      });
-
-      const token = response.data.data?.token;
-
-      if (!token) {
-        setError("Login failed");
-        return;
-      }
-
+      const token = await login(email, password);
       localStorage.setItem("token", token);
       onSuccess?.();
-    } catch {
-      setError("Invalid email or password");
+    } catch (err) {
+      setError(err as string);
     }
   };
 
@@ -41,7 +30,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={(e) => { setEmail(e.target.value); setError(""); }}
           required
         />
       </div>
@@ -51,7 +40,7 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(event) => setPassword(event.target.value)}
+          onChange={(e) => { setPassword(e.target.value); setError(""); }}
           required
         />
       </div>
