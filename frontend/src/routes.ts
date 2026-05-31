@@ -1,4 +1,6 @@
 export const routes = {
+  home: () => "/",
+  projectDetail: (id: string) => `/projects/${id}`,
   auth: {
     login: () => "/login",
     register: () => "/register",

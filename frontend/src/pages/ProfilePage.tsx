@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { getProjects } from "../api/project.api";
 import { getMe, updateMe } from "../api/user.api";
 import ProfileForm from "../components/ProfileForm";
 import { routes } from "../routes";
@@ -10,12 +11,17 @@ export default function ProfilePage() {
   const token = localStorage.getItem("token");
 
   const [user, setUser] = useState<IUser | null>(null);
+  const [projectCount, setProjectCount] = useState(0);
   const [message, setMessage] = useState(token ? "Loading..." : "Please login.");
 
   useEffect(() => {
     if (!token) return;
-    getMe()
-      .then((profile) => { setUser(profile); setMessage(""); })
+    Promise.all([getMe(), getProjects()])
+      .then(([profile, projects]) => {
+        setUser(profile);
+        setProjectCount(projects.length);
+        setMessage("");
+      })
       .catch(() => {
         localStorage.removeItem("token");
         setMessage("Session expired. Please login again.");
@@ -42,7 +48,7 @@ export default function ProfilePage() {
       <h1>Profile</h1>
 
       <nav>
-        <Link to={routes.profile.projects()}>My Projects ({user.projects.length})</Link>
+        <Link to={routes.profile.projects()}>My Projects ({projectCount})</Link>
       </nav>
 
       <ProfileForm

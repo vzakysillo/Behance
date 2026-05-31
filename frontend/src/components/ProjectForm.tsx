@@ -1,7 +1,7 @@
 import { useState } from "react";
-import type { IProject } from "../types";
+import type { ProjectPayload } from "../api/project.api";
 
-type ProjectFormData = Omit<IProject, "_id">;
+type ProjectFormData = ProjectPayload;
 
 interface ProjectFormProps {
   initial?: Partial<ProjectFormData>;

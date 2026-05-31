@@ -1,7 +1,10 @@
+import type { Context } from "koa";
 import type { AuthContext } from "../types/koa.js";
 import {
   createProjectForUser,
   deleteProjectForUser,
+  getAllProjects,
+  getProjectById,
   getProjectForUser,
   getProjectsForUser,
   updateProjectForUser,
@@ -21,6 +24,19 @@ export const getProjects = async (ctx: AuthContext): Promise<void> => {
   const projects = await getProjectsForUser(ctx.state.user._id);
 
   ok(ctx, "Projects fetched successfully", { projects });
+};
+
+export const getFeedProjects = async (ctx: Context): Promise<void> => {
+  const projects = await getAllProjects();
+
+  ok(ctx, "Projects fetched successfully", { projects });
+};
+
+export const getFeedProject = async (ctx: Context): Promise<void> => {
+  const { id } = ctx.params;
+  const project = await getProjectById(id);
+
+  ok(ctx, "Project fetched successfully", { project });
 };
 
 export const getProject = async (ctx: AuthContext): Promise<void> => {

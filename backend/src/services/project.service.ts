@@ -94,6 +94,22 @@ export const getProjectsForUser = async (userId: Types.ObjectId) => {
   return Project.find({ userId });
 };
 
+export const getAllProjects = async () => {
+  return Project.find().sort({ _id: -1 });
+};
+
+export const getProjectById = async (projectId: string) => {
+  validateProjectId(projectId);
+
+  const project = await Project.findById(projectId);
+
+  if (!project) {
+    throw new NotFoundError("Project not found");
+  }
+
+  return project;
+};
+
 export const getProjectForUser = async (
   userId: Types.ObjectId,
   projectId: string

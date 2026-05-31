@@ -50,6 +50,9 @@ export default function ProjectsPage() {
           {projects.map((project) => (
             <li key={project._id}>
               <Link to={routes.profile.projectDetail(project._id)}>{project.name}</Link>
+              <button type="button" onClick={() => handleDelete(project._id)}>
+                Delete
+              </button>
             </li>
           ))}
         </ul>
