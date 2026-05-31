@@ -7,6 +7,8 @@ import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
 import projectRoutes from "./routes/project.routes.js";
+import likeRoutes from "./routes/like.routes.js";
+import commentRoutes from "./routes/comment.routes.js";
 
 const app = new Koa();
 
@@ -31,6 +33,12 @@ app.use(uploadRoutes.allowedMethods());
 
 app.use(projectRoutes.routes());
 app.use(projectRoutes.allowedMethods());
+
+app.use(likeRoutes.routes());
+app.use(likeRoutes.allowedMethods());
+
+app.use(commentRoutes.routes());
+app.use(commentRoutes.allowedMethods());
 
 connectDB();
 

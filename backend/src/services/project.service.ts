@@ -1,6 +1,7 @@
 import mongoose, { type Types } from "mongoose";
 import Project, { type IProject } from "../models/project.model.js";
-import User from "../models/user.model.js";
+import Comment from "../models/comment.model.js";
+import Like from "../models/like.model.js";
 import {
   BadRequestError,
   ConflictError,
@@ -38,9 +39,9 @@ const ensureUserOwnsProject = async (
 ): Promise<void> => {
   validateProjectId(projectId);
 
-  const user = await User.findOne({ _id: userId, projects: projectId });
+  const project = await Project.exists({ _id: projectId, userId });
 
-  if (!user) {
+  if (!project) {
     throw new NotFoundError("Project not found");
   }
 };
@@ -78,10 +79,9 @@ export const createProjectForUser = async (
   }
 
   try {
-    const project = await Project.create(getProjectPayload(body));
-
-    await User.findByIdAndUpdate(userId, {
-      $addToSet: { projects: project._id },
+    const project = await Project.create({
+      ...getProjectPayload(body),
+      userId,
     });
 
     return project;
@@ -91,13 +91,7 @@ export const createProjectForUser = async (
 };
 
 export const getProjectsForUser = async (userId: Types.ObjectId) => {
-  const user = await User.findById(userId).populate("projects");
-
-  if (!user) {
-    throw new NotFoundError("User not found");
-  }
-
-  return user.projects;
+  return Project.find({ userId });
 };
 
 export const getProjectForUser = async (
@@ -151,9 +145,10 @@ export const deleteProjectForUser = async (
     throw new NotFoundError("Project not found");
   }
 
-  await User.findByIdAndUpdate(userId, {
-    $pull: { projects: project._id },
-  });
+  await Promise.all([
+    Like.deleteMany({ projectId: project._id }),
+    Comment.deleteMany({ projectId: project._id }),
+  ]);
 
   return project;
 };

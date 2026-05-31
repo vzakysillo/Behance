@@ -12,8 +12,6 @@ export interface IUser {
 
   avatar: string;
   isVerified: boolean;
-
-  projects: mongoose.Types.ObjectId[];
 }
 
 const userSchema = new mongoose.Schema<IUser>(
@@ -31,13 +29,6 @@ const userSchema = new mongoose.Schema<IUser>(
     avatar: { type: String, default: null },
 
     isVerified: { type: Boolean, default: false },
-
-    projects: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Project",
-      },
-    ],
   },
   { versionKey: false }
 );
