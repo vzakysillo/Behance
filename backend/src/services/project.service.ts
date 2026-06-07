@@ -95,7 +95,29 @@ export const getProjectsForUser = async (userId: Types.ObjectId) => {
 };
 
 export const getAllProjects = async () => {
-  return Project.find().sort({ _id: -1 });
+  return Project.aggregate([
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "projectId",
+        as: "likes",
+      },
+    },
+    {
+      $addFields: {
+        likesCount: { $size: "$likes" },
+      },
+    },
+    {
+      $project: {
+        likes: 0,
+      },
+    },
+    {
+      $sort: { _id: -1 },
+    },
+  ]);
 };
 
 export const getProjectById = async (projectId: string) => {

@@ -11,7 +11,7 @@ export default function ProjectCard({ project, onEdit, onDelete }: Props) {
     <div>
       <h3>{project.name}</h3>
       {project.cover && <img src={project.cover} alt={project.name} />}
-      {project.description && <p>{project.description}</p>}
+      {/* {project.description && <p>{project.description}</p>} */}
       {(project.photos ?? []).length > 0 && (
         <div>
           {(project.photos ?? []).map((photo, i) => (

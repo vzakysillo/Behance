@@ -13,7 +13,22 @@ import { sendVerificationEmail } from "./email.service.js";
 
 const SALT_ROUNDS = 12;
 
-export const registerUser = async ({ userName, email, password }: RegisterBody) => {
+type RegisterInput = RegisterBody & {
+  username?: string;
+};
+
+const isDuplicateKeyError = (err: unknown): err is { code: number } =>
+  typeof err === "object" && err !== null && "code" in err && err.code === 11000;
+
+export const registerUser = async (body: RegisterInput) => {
+  const userName = (body.userName ?? body.username ?? "").trim();
+  const email = body.email?.trim().toLowerCase();
+  const password = body.password;
+
+  if (!userName || !email || !password) {
+    throw new BadRequestError("Username, email, and password are required");
+  }
+
   const existing = await User.findOne({ $or: [{ email }, { userName }] });
 
   if (existing) {
@@ -21,7 +36,17 @@ export const registerUser = async ({ userName, email, password }: RegisterBody) 
   }
 
   const hashed = await bcrypt.hash(password, SALT_ROUNDS);
-  const user = await User.create({ userName, email, password: hashed });
+  let user;
+
+  try {
+    user = await User.create({ userName, email, password: hashed });
+  } catch (err) {
+    if (isDuplicateKeyError(err)) {
+      throw new ConflictError("Username or email already in use");
+    }
+
+    throw err;
+  }
 
   const token = await createVerificationToken(user._id);
   await sendVerificationEmail(email, token);

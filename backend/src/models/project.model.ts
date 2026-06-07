@@ -6,6 +6,8 @@ export interface IProject {
   description: string;
   cover: string;
   photos: string[];
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 const projectSchema = new mongoose.Schema<IProject>(
@@ -23,7 +25,7 @@ const projectSchema = new mongoose.Schema<IProject>(
 
     photos: { type: [String], default: [] },
   },
-  { versionKey: false }
+  { versionKey: false, timestamps: true }
 );
 
 const Project: Model<IProject> = mongoose.model<IProject>(

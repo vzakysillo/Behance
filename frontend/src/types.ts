@@ -17,6 +17,9 @@ export interface IProject {
   description?: string;
   cover?: string;
   photos?: string[];
+  likesCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface ILike {

@@ -22,6 +22,7 @@ export default function RegisterForm({ onSuccess }: RegisterFormProps) {
       setPassword("");
       onSuccess?.();
     } catch (err) {
+      console.log(err);
       setError(err as string);
     }
   };
