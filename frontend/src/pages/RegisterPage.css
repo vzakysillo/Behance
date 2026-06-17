@@ -1,0 +1,314 @@
+.register-page {
+  min-height: 100svh;
+  width: min(100vw, 1920px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(420px, 49.74%) minmax(460px, 1fr);
+  overflow: hidden;
+  background: #ffffff;
+  color: #525252;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  text-align: left;
+}
+
+#root:has(.register-page) {
+  width: 100%;
+  max-width: none;
+  border-inline: 0;
+}
+
+.register-visual {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  background: #71717a;
+}
+
+.register-visual p {
+  color: #525252;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.register-back {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.register-back-icon {
+  width: 8px;
+  height: 16px;
+  border-left: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.register-panel {
+  width: min(600px, calc(100% - 80px));
+  min-height: 100svh;
+  margin-left: clamp(56px, 8.49vw, 163px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 112px 0 64px;
+  box-sizing: border-box;
+}
+
+.register-intro {
+  margin-bottom: 45px;
+}
+
+.register-intro h1 {
+  margin: 0 0 25px;
+  color: #525252;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.register-intro p {
+  max-width: 594px;
+  color: #525252;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.register-field {
+  display: grid;
+  gap: 10px;
+  color: #525252;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.register-field input {
+  width: 100%;
+  height: 44px;
+  padding: 10px 14px;
+  box-sizing: border-box;
+  border: 1px solid #525252;
+  border-radius: 0;
+  background: #ffffff;
+  color: #525252;
+  font: 500 14px/1.2 Inter, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  outline: none;
+}
+
+.register-field input::placeholder {
+  color: #525252;
+  opacity: 1;
+}
+
+.register-field input[type="password"] {
+  font-size: 26px;
+  letter-spacing: 1px;
+}
+
+.register-field input:focus-visible,
+.register-options input:focus-visible,
+.register-submit:focus-visible,
+.register-socials button:focus-visible,
+.register-login a:focus-visible,
+.register-back:focus-visible {
+  outline: 2px solid #525252;
+  outline-offset: 3px;
+}
+
+.register-options {
+  display: grid;
+  gap: 13px;
+  padding-top: 4px;
+}
+
+.register-options label {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  align-items: start;
+  gap: 16px;
+  color: #525252;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.register-options input {
+  width: 14px;
+  height: 14px;
+  margin: 1px 0 0;
+  appearance: none;
+  border: 1.5px solid #525252;
+  border-radius: 0;
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.register-options input:checked {
+  background:
+    linear-gradient(45deg, transparent 58%, #ffffff 58%),
+    linear-gradient(-45deg, transparent 48%, #ffffff 48%),
+    #525252;
+}
+
+.register-options a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.register-error {
+  color: #b42318;
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.register-submit {
+  width: 100%;
+  height: 44px;
+  margin-top: 16px;
+  border: 0;
+  border-radius: 0;
+  background: #a1a1aa;
+  color: #000000;
+  font: 500 16px/1.2 Inter, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  cursor: pointer;
+}
+
+.register-submit:hover {
+  filter: brightness(0.96);
+}
+
+.register-divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 7px;
+  margin-top: 75px;
+  color: #525252;
+}
+
+.register-divider span {
+  height: 1px;
+  background: #525252;
+}
+
+.register-divider p {
+  padding: 0 2px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.register-socials {
+  display: flex;
+  justify-content: center;
+  gap: 31px;
+  margin-top: 34px;
+}
+
+.register-socials button {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: #a1a1aa;
+  color: #000000;
+  font: 700 15px/1 Inter, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  cursor: pointer;
+}
+
+.register-socials button:hover {
+  filter: brightness(0.96);
+}
+
+.register-login {
+  margin-top: 31px;
+  color: #525252;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.register-login a {
+  color: inherit;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+@media (max-width: 1024px) {
+  .register-page {
+    grid-template-columns: 1fr;
+    overflow: visible;
+  }
+
+  .register-visual {
+    min-height: 240px;
+  }
+
+  .register-back {
+    top: 28px;
+    left: 28px;
+  }
+
+  .register-panel {
+    width: min(600px, calc(100% - 40px));
+    min-height: auto;
+    margin: 0 auto;
+    padding: 52px 0 48px;
+  }
+
+  .register-intro h1 {
+    font-size: clamp(34px, 8vw, 48px);
+  }
+}
+
+@media (max-width: 560px) {
+  .register-visual {
+    min-height: 180px;
+  }
+
+  .register-visual p {
+    font-size: 24px;
+  }
+
+  .register-intro {
+    margin-bottom: 36px;
+  }
+
+  .register-intro h1 {
+    margin-bottom: 18px;
+  }
+
+  .register-options label {
+    gap: 12px;
+    font-size: 14px;
+  }
+
+  .register-divider {
+    margin-top: 56px;
+  }
+}
