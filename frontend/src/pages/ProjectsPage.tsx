@@ -1,56 +1,67 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useAsync } from "../hooks/useAsync";
 import { getProjects, deleteProject } from "../api/project.api";
+import { Spinner, ErrorMessage } from "../components/ui";
 import { routes } from "../routes";
-import type { IProject } from "../types";
 
 export default function ProjectsPage() {
-  const navigate = useNavigate();
-  const token = localStorage.getItem("token");
-
-  const [projects, setProjects] = useState<IProject[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (!token) { navigate(routes.auth.login()); return; }
-    getProjects()
-      .then(setProjects)
-      .catch((err) => setError(err as string))
-      .finally(() => setLoading(false));
-  }, [token]);
+  const { data: projects, loading, error, reload } = useAsync(getProjects);
+  const [actionError, setActionError] = useState("");
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this project?")) return;
+    setActionError("");
     try {
       await deleteProject(id);
-      setProjects(projects.filter((p) => p._id !== id));
+      reload();
     } catch (err) {
-      setError(err as string);
+      setActionError(err instanceof Error ? err.message : "Could not delete project.");
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>{error}</p>;
+  if (loading) return <Spinner />;
+  if (error) return <ErrorMessage message={error} />;
 
   return (
-    <div>
-      <nav>
-        <Link to={routes.profile.root()}>Profile</Link>
+    <div className="p-8 max-w-3xl mx-auto">
+      <nav className="mb-4">
+        <Link to={routes.profile.root()} className="text-sm text-blue-600 hover:underline">
+          Profile
+        </Link>
       </nav>
 
-      <h1>My Projects</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-4">My Projects</h1>
 
-      <Link to={routes.profile.projectNew()}>New project</Link>
+      <Link
+        to={routes.profile.projectNew()}
+        className="inline-block mb-6 px-4 py-2 text-sm bg-gray-800 text-white rounded hover:bg-gray-700"
+      >
+        New project
+      </Link>
 
-      {projects.length === 0 ? (
-        <p>No projects yet.</p>
+      {actionError && <p className="text-red-600 text-sm mb-4">{actionError}</p>}
+
+      {(projects?.length ?? 0) === 0 ? (
+        <p className="text-gray-500">No projects yet.</p>
       ) : (
-        <ul>
-          {projects.map((project) => (
-            <li key={project._id}>
-              <Link to={routes.profile.projectDetail(project._id)}>{project.name}</Link>
-              <button type="button" onClick={() => handleDelete(project._id)}>
+        <ul className="flex flex-col gap-3">
+          {projects!.map((project) => (
+            <li
+              key={project._id}
+              className="flex items-center justify-between border border-gray-200 rounded px-4 py-3"
+            >
+              <Link
+                to={routes.profile.projectDetail(project._id)}
+                className="text-gray-800 font-medium hover:underline"
+              >
+                {project.name}
+              </Link>
+              <button
+                type="button"
+                onClick={() => handleDelete(project._id)}
+                className="text-sm text-red-600 hover:text-red-800"
+              >
                 Delete
               </button>
             </li>

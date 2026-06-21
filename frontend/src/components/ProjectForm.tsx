@@ -23,9 +23,13 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel = "Sav
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true); setError("");
-    try { await onSubmit({ name, description, cover, photos }); }
-    catch (err) { setError(err as string); }
-    finally { setSaving(false); }
+    try {
+      await onSubmit({ name, description, cover, photos });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not save project.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const inputClass = "border border-gray-300 rounded px-3 py-2 w-full text-sm outline-none focus:border-gray-500";

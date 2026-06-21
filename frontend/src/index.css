@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Base resets preserved from original index.css */
 @layer base {
   body {
     margin: 0;

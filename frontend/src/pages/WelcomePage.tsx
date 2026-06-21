@@ -4,14 +4,13 @@ import { routes } from "../routes";
 export default function WelcomePage() {
   return (
     <main className="min-h-svh w-[min(100vw,1920px)] mx-auto relative overflow-hidden bg-white text-[#575656] font-['Inter',system-ui,sans-serif]">
-      {/* Header */}
       <header
         className="absolute top-[clamp(24px,4.63vw,50px)] left-[clamp(24px,4.64vw,89px)] z-10"
         aria-label="Site header"
       >
         <Link
           to={routes.home()}
-          className="inline-flex items-center gap-[clamp(16px,1.98vw,38px)] text-[#575656] text-[clamp(24px,1.67vw,32px)] font-bold leading-[1.2] no-underline"
+          className="inline-flex items-center gap-[clamp(16px,1.98vw,38px)] text-[#575656] text-[clamp(24px,1.67vw,32px)] font-bold leading-[1.2] no-underline focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]"
           aria-label="Home"
         >
           <span className="w-8 h-8 shrink-0 border-4 border-[#575656] rounded-full box-border" aria-hidden="true" />
@@ -19,7 +18,6 @@ export default function WelcomePage() {
         </Link>
       </header>
 
-      {/* Content */}
       <section
         className="w-[min(936px,calc(100%-48px))] min-h-svh mx-auto flex flex-col items-center justify-center px-0 pt-[120px] pb-[72px] box-border text-center"
         aria-labelledby="welcome-title"
@@ -42,7 +40,6 @@ export default function WelcomePage() {
           unchanged.
         </p>
 
-        {/* Actions */}
         <div className="w-full grid grid-cols-[minmax(220px,440px)_auto_minmax(220px,440px)] items-center justify-center gap-7 mt-[clamp(40px,4.07vw,78px)]
                         max-[720px]:grid-cols-1 max-[720px]:gap-4 max-[720px]:mt-10">
           <Link

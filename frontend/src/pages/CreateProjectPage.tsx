@@ -7,12 +7,14 @@ export default function CreateProjectPage() {
   const navigate = useNavigate();
 
   return (
-    <div>
-      <nav>
-        <Link to={routes.profile.projects()}>← Projects</Link>
+    <div className="p-8 max-w-2xl mx-auto">
+      <nav className="mb-4">
+        <Link to={routes.profile.projects()} className="text-sm text-blue-600 hover:underline">
+          ← Projects
+        </Link>
       </nav>
 
-      <h1>New Project</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-6">New Project</h1>
 
       <ProjectForm
         submitLabel="Create project"

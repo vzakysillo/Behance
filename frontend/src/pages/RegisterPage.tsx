@@ -1,9 +1,15 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 import RegisterForm from "../components/RegisterForm";
 import { routes } from "../routes";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
+  const { user, token, loading } = useAuth();
+
+  if (!loading && token && user) {
+    return <Navigate to={user.skills?.length ? routes.home() : routes.auth.interests()} replace />;
+  }
 
   return (
     <main className="min-h-svh w-[min(100vw,1920px)] mx-auto grid grid-cols-[minmax(420px,49.74%)_minmax(460px,1fr)] overflow-hidden bg-white text-[#525252] font-['Inter',system-ui,sans-serif] text-left
@@ -14,9 +20,8 @@ export default function RegisterPage() {
         aria-label="Featured project preview"
       >
         <Link
-          to={routes.home()}
-          className="absolute top-[50px] left-[50px] inline-flex items-center gap-[14px] text-white text-base font-medium leading-[1.2] no-underline
-                     max-[1024px]:top-7 max-[1024px]:left-7"
+          to={routes.welcome()}
+          className="absolute top-[50px] left-[50px] inline-flex items-center gap-[14px] text-white text-base font-medium leading-[1.2] no-underline max-[1024px]:top-7 max-[1024px]:left-7 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-[3px]"
           aria-label="Back to home"
         >
           <span className="w-2 h-4 border-l-2 border-b-2 border-current rotate-45" aria-hidden="true" />
@@ -34,8 +39,7 @@ export default function RegisterPage() {
         <div className="mb-[45px] max-[560px]:mb-9">
           <h1
             id="register-title"
-            className="mt-0 mb-[25px] text-[#525252] text-[48px] font-bold leading-[1.2]
-                       max-[1024px]:text-[clamp(34px,8vw,48px)] max-[560px]:mb-[18px]"
+            className="mt-0 mb-[25px] text-[#525252] text-[48px] font-bold leading-[1.2] max-[1024px]:text-[clamp(34px,8vw,48px)] max-[560px]:mb-[18px]"
           >
             Create an account
           </h1>
@@ -47,10 +51,7 @@ export default function RegisterPage() {
         <RegisterForm onSuccess={() => navigate(routes.auth.login())} />
 
         {/* Divider */}
-        <div
-          className="grid grid-cols-[1fr_auto_1fr] items-center gap-[7px] mt-[75px] text-[#525252] max-[560px]:mt-14"
-          aria-hidden="true"
-        >
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-[7px] mt-[75px] text-[#525252] max-[560px]:mt-14" aria-hidden="true">
           <span className="h-px bg-[#525252]" />
           <p className="px-[2px] text-sm font-normal leading-[1.2] whitespace-nowrap">or continue with</p>
           <span className="h-px bg-[#525252]" />
@@ -58,7 +59,7 @@ export default function RegisterPage() {
 
         {/* Social buttons */}
         <div className="flex justify-center gap-[31px] mt-[34px]" aria-label="Social sign up options">
-          {["G", "f", "A"].map((label, i) => (
+          {(["G", "f", "A"] as const).map((label, i) => (
             <button
               key={i}
               type="button"

@@ -25,9 +25,14 @@ export default function ProfileForm({ initial, onSubmit }: ProfileFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true); setMessage("");
-    try { await onSubmit({ userName, firstName, lastName, avatar, skills, socials }); setMessage("Saved."); }
-    catch (err) { setMessage(err as string); }
-    finally { setSaving(false); }
+    try {
+      await onSubmit({ userName, firstName, lastName, avatar, skills, socials });
+      setMessage("Saved.");
+    } catch (err) {
+      setMessage(err instanceof Error ? err.message : "Could not save profile.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const inputClass = "border border-gray-300 rounded px-3 py-2 w-full text-sm outline-none focus:border-gray-500";
