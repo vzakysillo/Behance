@@ -27,7 +27,7 @@ export default function HomePage() {
   if (error) return <ErrorMessage message={error} className="ml-[200px]" />;
 
   return (
-    <div className="min-h-screen bg-white p-0 ml-[200px] flex-1">
+    <div className="min-h-screen bg-white p-0 flex-1">
       {/* Top Bar */}
       <div className="flex justify-between items-center px-[50px] pt-[50px] gap-5
                       max-[1024px]:flex-col max-[1024px]:items-stretch
@@ -53,6 +53,15 @@ export default function HomePage() {
 
         {/* Action buttons */}
         <div className="flex gap-[15px] max-[1024px]:flex-col">
+        {token && (
+          <Link
+            to={routes.welcome()}
+            className="px-[10px] h-[45px] flex items-center justify-center text-base font-['Inter',sans-serif] font-normal no-underline rounded bg-[#e8e7e7] text-black min-w-[285px] transition-colors hover:bg-[#d8d7d7]
+                       max-[1024px]:w-full max-[768px]:w-full"
+          >
+            Start free trial
+          </Link>
+        )}
           <Link
             to={routes.profile.projectNew()}
             className="px-[10px] h-[45px] flex items-center justify-center text-base font-['Inter',sans-serif] font-normal no-underline rounded bg-[#e8e7e7] text-black min-w-[284px] transition-colors hover:bg-[#d8d7d7]
@@ -60,15 +69,6 @@ export default function HomePage() {
           >
             Share work
           </Link>
-          {!token && (
-            <Link
-              to={routes.auth.register()}
-              className="px-[10px] h-[45px] flex items-center justify-center text-base font-['Inter',sans-serif] font-normal no-underline rounded bg-[#e8e7e7] text-black min-w-[285px] transition-colors hover:bg-[#d8d7d7]
-                         max-[1024px]:w-full max-[768px]:w-full"
-            >
-              Start free trial
-            </Link>
-          )}
         </div>
       </div>
 

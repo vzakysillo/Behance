@@ -9,17 +9,29 @@ interface ProjectFormProps {
   submitLabel?: string;
 }
 
-export default function ProjectForm({ initial = {}, onSubmit, submitLabel = "Save" }: ProjectFormProps) {
+export default function ProjectForm({ initial = {}, onSubmit }: ProjectFormProps) {
+  // existing fields
   const [name, setName] = useState(initial.name || "");
   const [description, setDescription] = useState(initial.description || "");
   const [cover, setCover] = useState(initial.cover || "");
   const [photos, setPhotos] = useState<string[]>(initial.photos || []);
-  const [photoInput, setPhotoInput] = useState("");
+
+  // new fields — wire to API later
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const [category, setCategory] = useState("");
+  const [tools, setTools] = useState("");
+  const [disableComments, setDisableComments] = useState(false);
+
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const addPhoto = () => { const url = photoInput.trim(); if (url) { setPhotos([...photos, url]); setPhotoInput(""); } };
-  const removePhoto = (i: number) => setPhotos(photos.filter((_, idx) => idx !== i));
+  const addTag = () => {
+    const t = tagInput.trim();
+    if (t && tags.length < 10) { setTags([...tags, t]); setTagInput(""); }
+  };
+
+  const removeTag = (i: number) => setTags(tags.filter((_, idx) => idx !== i));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true); setError("");
@@ -32,55 +44,168 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel = "Sav
     }
   };
 
-  const inputClass = "border border-gray-300 rounded px-3 py-2 w-full text-sm outline-none focus:border-gray-500";
-  const labelClass = "flex flex-col gap-1 text-sm font-medium text-gray-700";
+  const inputClass =
+    "w-full h-11 px-2.5 py-2 outline outline-1 outline-offset-[-1px] outline-stone-500 text-sm font-normal font-['Inter'] leading-5 text-stone-500 bg-white focus:outline-black focus:text-black placeholder:text-stone-500";
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-lg">
-      <label className={labelClass}>
-        Name
-        <input className={inputClass} id="name" type="text" value={name} onChange={(e) => setName(e.target.value)} required />
-      </label>
+    <form
+      id="project-form"
+      onSubmit={handleSubmit}
+      className="grid grid-cols-[1fr_1px_726px] min-h-[calc(100vh-73px)]"
+    >
+      {/* ── Left column: cover upload ── */}
+      <div className="flex flex-col items-center justify-start pt-[133px] px-8">
+        <p className="self-start ml-[198px] mb-4 text-base font-semibold font-['Inter'] leading-6">
+          Project Cover <span className="font-normal">(required)</span>
+        </p>
 
-      <label className={labelClass}>
-        Description
-        <textarea className={`${inputClass} min-h-[100px] resize-y`} id="description" value={description}
-          onChange={(e) => setDescription(e.target.value)} />
-      </label>
+        {/* Cover drop zone */}
+        <label className="w-[726px] h-96 border-2 border-zinc-500 flex flex-col items-center justify-center gap-3 cursor-pointer hover:border-zinc-700 transition-colors">
+          {cover ? (
+            <img src={cover} alt="cover preview" className="w-full h-full object-cover" />
+          ) : (
+            <>
+              <span className="text-xl font-semibold font-['Inter'] uppercase leading-8 text-black">
+                Upload cover image
+              </span>
+              <span className="text-center text-neutral-600 text-base font-light font-['Inter'] leading-snug">
+                Minimum size of "808 × 632px"<br />GIF files will not animate.
+              </span>
+            </>
+          )}
+          {/* Hidden URL input for now — swap for file upload when backend supports it */}
+          <input
+            type="url"
+            className="sr-only"
+            placeholder="https://..."
+            value={cover}
+            onChange={(e) => setCover(e.target.value)}
+          />
+        </label>
 
-      <label className={labelClass}>
-        Cover URL
-        <input className={inputClass} id="cover" type="url" placeholder="https://..." value={cover}
-          onChange={(e) => setCover(e.target.value)} />
-        {cover && <img src={cover} alt="cover preview" className="w-full h-40 object-cover rounded" />}
-      </label>
-
-      <div className="flex flex-col gap-1">
-        <span className="text-sm font-medium text-gray-700">Photos</span>
-        <div className="flex gap-2">
-          <input className={`${inputClass} flex-1`} id="photo" type="url" placeholder="https://..." value={photoInput}
-            onChange={(e) => setPhotoInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addPhoto())} />
-          <button type="button" onClick={addPhoto} className="px-3 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300">Add photo</button>
-        </div>
-        <ul className="flex flex-col gap-2 mt-1">
-          {photos.map((url, i) => (
-            <li key={i} className="flex items-center gap-2">
-              <img src={url} alt={`photo-${i}`} className="w-16 h-16 object-cover rounded" />
-              <span className="flex-1 text-sm text-gray-600 truncate">{url}</span>
-              <button type="button" onClick={() => removePhoto(i)}
-                className="text-sm text-red-500 hover:text-red-700 shrink-0">Remove</button>
-            </li>
-          ))}
-        </ul>
+        {/* Visible URL input as fallback */}
+        <input
+          type="url"
+          placeholder="Or paste a cover image URL..."
+          value={cover}
+          onChange={(e) => setCover(e.target.value)}
+          className="mt-3 w-[726px] h-9 px-2.5 outline outline-1 outline-stone-400 text-sm font-['Inter'] placeholder:text-stone-400 focus:outline-black bg-white"
+        />
       </div>
 
-      {error && <p className="text-red-600 text-sm">{error}</p>}
+      {/* ── Divider ── */}
+      <div className="bg-gray-200 self-stretch" />
 
-      <button type="submit" disabled={saving}
-        className="px-4 py-2 bg-gray-800 text-white text-sm rounded disabled:opacity-50 hover:bg-gray-700">
-        {saving ? "Saving..." : submitLabel}
-      </button>
+      {/* ── Right column: project information ── */}
+      <div className="flex flex-col px-10 pt-[133px] pb-20 gap-0">
+        <p className="text-base font-semibold font-['Inter'] uppercase leading-6 mb-[50px]">
+          Project Information
+        </p>
+
+        {/* Title */}
+        <label className="flex flex-col gap-[10px] mb-[50px]">
+          <span className="text-base font-['Inter'] leading-6">
+            <strong className="font-semibold">Title</strong>{" "}
+            <span className="font-normal">(required)</span>
+          </span>
+          <input
+            className={inputClass}
+            placeholder="Give your project a title"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </label>
+
+        {/* Tags */}
+        <label className="flex flex-col gap-[10px] mb-[50px]">
+          <span className="text-base font-['Inter'] leading-6">
+            <strong className="font-semibold">Tags</strong>{" "}
+            <span className="font-normal">(limit of 10)</span>
+          </span>
+          <div className="relative">
+            <input
+              className={inputClass}
+              placeholder="Add up to 10 keywords to help people discover your project"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
+            />
+          </div>
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-1">
+              {tags.map((tag, i) => (
+                <span
+                  key={i}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 bg-zinc-100 text-sm font-['Inter']"
+                >
+                  {tag}
+                  <button type="button" onClick={() => removeTag(i)} className="text-zinc-400 hover:text-black">×</button>
+                </span>
+              ))}
+            </div>
+          )}
+        </label>
+
+        {/* Category */}
+        <div className="flex flex-col gap-[10px] mb-[50px]">
+          <div className="flex items-center justify-between">
+            <span className="text-base font-['Inter'] leading-6">
+              <strong className="font-semibold">Category</strong>{" "}
+              <span className="font-normal">(required, limit of 3)</span>
+            </span>
+            <button type="button" className="text-neutral-500 text-base font-medium font-['Inter'] leading-6">
+              View all
+            </button>
+          </div>
+          <input
+            className={inputClass}
+            placeholder="How would you categorize this project?"
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+          />
+        </div>
+
+        {/* Tools used */}
+        <label className="flex flex-col gap-[10px] mb-[50px]">
+          <span className="text-base font-semibold font-['Inter'] leading-6">Tools used</span>
+          <input
+            className={inputClass}
+            placeholder="What software, hardware, or materials did you use?"
+            value={tools}
+            onChange={(e) => setTools(e.target.value)}
+          />
+        </label>
+
+        {/* Description */}
+        <label className="flex flex-col gap-[10px] mb-[50px]">
+          <span className="text-base font-semibold font-['Inter'] leading-6">Description</span>
+          <textarea
+            className={`${inputClass} h-28 resize-none items-start`}
+            placeholder="Add short description for your project"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+        </label>
+
+        {/* Comments */}
+        <div className="flex flex-col gap-[10px]">
+          <span className="text-base font-semibold font-['Inter'] leading-6">Comments</span>
+          <label className="flex items-center gap-3">
+            <div
+              className={`w-4 h-4 outline outline-1 outline-offset-[-0.5px] outline-black flex items-center justify-center cursor-pointer ${disableComments ? "bg-black" : "bg-white"}`}
+              onClick={() => setDisableComments(!disableComments)}
+            >
+              {disableComments && <span className="text-white text-xs leading-none">✓</span>}
+            </div>
+            <span className="text-base font-normal font-['Inter'] leading-6">
+              Disable comments on this project
+            </span>
+          </label>
+        </div>
+
+        {error && <p className="mt-4 text-red-600 text-sm font-['Inter']">{error}</p>}
+      </div>
     </form>
   );
 }

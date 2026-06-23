@@ -1,7 +1,8 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Outlet} from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { routes } from "../routes";
 import type { ReactNode } from "react";
+
 
 export function Spinner({ className = "" }: { className?: string }) {
   return (
@@ -27,11 +28,11 @@ export function ErrorMessage({
   );
 }
 
-export function ProtectedRoute({ children }: { children: ReactNode }) {
+export function ProtectedRoute({ children }: { children?: ReactNode }) {
   const { token, loading } = useAuth();
 
   if (loading) return <Spinner />;
   if (!token) return <Navigate to={routes.auth.login()} replace />;
 
-  return <>{children}</>;
+  return children ? <>{children}</> : <Outlet />;
 }

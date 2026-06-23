@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, Outlet } from "react-router-dom";
 import { ProtectedRoute } from "./components/ui";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
@@ -12,11 +12,13 @@ import HomePage from "./pages/HomePage";
 import Sidebar from "./components/Sidebar";
 import { routes } from "./routes";
 
-function MainLayout() {
+function SidebarLayout() {
   return (
     <div className="flex">
       <Sidebar />
-      <HomePage />
+      <main className="ml-[200px] flex-1">
+        <Outlet />
+      </main>
     </div>
   );
 }
@@ -24,36 +26,25 @@ function MainLayout() {
 function App() {
   return (
     <Routes>
+      {/* No sidebar */}
       <Route path={routes.welcome()} element={<WelcomePage />} />
       <Route path={routes.auth.login()} element={<LoginPage />} />
       <Route path={routes.auth.register()} element={<RegisterPage />} />
 
-      {/* Protected routes */}
-      <Route
-        path={routes.auth.interests()}
-        element={<ProtectedRoute><InterestsPage /></ProtectedRoute>}
-      />
-      <Route
-        path={routes.profile.root()}
-        element={<ProtectedRoute><ProfilePage /></ProtectedRoute>}
-      />
-      <Route
-        path={routes.profile.projects()}
-        element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>}
-      />
-      <Route
-        path={routes.profile.projectNew()}
-        element={<ProtectedRoute><CreateProjectPage /></ProtectedRoute>}
-      />
-      <Route
-        path="/profile/projects/:id"
-        element={<ProtectedRoute><ProjectDetailPage /></ProtectedRoute>}
-      />
+      {/* With sidebar */}
+      <Route element={<SidebarLayout />}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/projects/:id" element={<ProjectDetailPage publicView />} />
 
-      {/* Public project view */}
-      <Route path="/projects/:id" element={<ProjectDetailPage publicView />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path={routes.auth.interests()} element={<InterestsPage />} />
+          <Route path={routes.profile.root()} element={<ProfilePage />} />
+          <Route path={routes.profile.projects()} element={<ProjectsPage />} />
+          <Route path={routes.profile.projectNew()} element={<CreateProjectPage />} />
+          <Route path="/profile/projects/:id" element={<ProjectDetailPage />} />
+        </Route>
+      </Route>
 
-      <Route path="/" element={<MainLayout />} />
       <Route path="*" element={<Navigate to={routes.welcome()} replace />} />
     </Routes>
   );
