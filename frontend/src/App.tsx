@@ -39,6 +39,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path={routes.auth.interests()} element={<InterestsPage />} />
           <Route path={routes.profile.root()} element={<ProfilePage />} />
+          {/* <Route path={routes.profile.edit()} element={<ProfileEditPage />} /> */}
           <Route path={routes.profile.projects()} element={<ProjectsPage />} />
           <Route path={routes.profile.projectNew()} element={<CreateProjectPage />} />
           <Route path="/profile/projects/:id" element={<ProjectDetailPage />} />

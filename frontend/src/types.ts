@@ -8,6 +8,19 @@ export interface IUser {
   skills: string[];
   avatar: string;
   isVerified: boolean;
+  // new — wire to backend later
+  specialization?: string;
+  location?: string;
+  availableForFreelance?: boolean;
+  aboutMe?: string;
+  memberSince?: string;
+  stats?: {
+    projectViews: number;
+    appreciations: number;
+    followers: number;
+    following: number;
+  };
+  teams?: { name: string; location: string; avatar?: string }[];
 }
 
 export interface IProject {
@@ -36,3 +49,4 @@ export interface IComment {
   createdAt: string;
   updatedAt: string;
 }
+

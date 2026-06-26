@@ -9,6 +9,7 @@ export const routes = {
   },
   profile: {
     root: () => "/profile",
+    edit: () => "/profile/edit",
     projects: () => "/profile/projects",
     projectNew: () => "/profile/projects/new",
     projectDetail: (id: string) => `/profile/projects/${id}`,
