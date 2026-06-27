@@ -4,6 +4,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import InterestsPage from "./pages/InterestsPage";
 import ProfilePage from "./pages/ProfilePage";
+import ProfileEditPage from "./pages/ProfileEditPage"
 import ProjectsPage from "./pages/ProjectsPage";
 import CreateProjectPage from "./pages/CreateProjectPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
@@ -39,7 +40,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path={routes.auth.interests()} element={<InterestsPage />} />
           <Route path={routes.profile.root()} element={<ProfilePage />} />
-          {/* <Route path={routes.profile.edit()} element={<ProfileEditPage />} /> */}
+          <Route path={routes.profile.edit()} element={<ProfileEditPage />} />
           <Route path={routes.profile.projects()} element={<ProjectsPage />} />
           <Route path={routes.profile.projectNew()} element={<CreateProjectPage />} />
           <Route path="/profile/projects/:id" element={<ProjectDetailPage />} />

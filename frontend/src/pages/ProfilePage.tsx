@@ -5,7 +5,7 @@ import { getProjects } from "../api/project.api";
 import { useAuth } from "../hooks/useAuth";
 import { Spinner, ErrorMessage } from "../components/ui";
 import { routes } from "../routes";
-import { MapPin, Link as LinkIcon, Briefcase, ExternalLink, Plus } from "lucide-react";
+import { MapPin, Link as LinkIcon, Briefcase, Plus } from "lucide-react";
 
 type Tab = "Work" | "Moodboards" | "For sale" | "Appreciations" | "Your stats" | "Drafts";
 const TABS: Tab[] = ["Work", "Moodboards", "For sale", "Appreciations", "Your stats", "Drafts"];
