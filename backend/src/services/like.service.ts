@@ -56,11 +56,16 @@ export const getLikesForProject = async (projectId: string) => {
 
 export const removeLikeFromProject = async (
   userId: Types.ObjectId,
-  projectId: string
+  projectId: string,
+  likeId: string
 ) => {
   await ensureProjectExists(projectId);
 
-  const like = await Like.findOneAndDelete({ userId, projectId });
+  if (!mongoose.isValidObjectId(likeId)) {
+    throw new BadRequestError("Invalid like id");
+  }
+
+  const like = await Like.findOneAndDelete({ _id: likeId, userId, projectId });
 
   if (!like) {
     throw new NotFoundError("Like not found");

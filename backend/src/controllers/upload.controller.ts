@@ -5,7 +5,7 @@ import { getSingleUploadedFile, toUploadedFile } from "../utils/uploadFile.js";
 import type { AuthContext } from "../types/koa.js";
 import User from "../models/user.model.js";
 
-export const uploadImage = async (ctx: AuthContext): Promise<void> => {
+export const uploadAvatar = async (ctx: AuthContext): Promise<void> => {
   const file = getSingleUploadedFile(ctx.request.files?.image);
   const uploadedFile: UploadedFile = toUploadedFile(file);
 

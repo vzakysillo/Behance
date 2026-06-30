@@ -1,3 +1,4 @@
+import type { Context } from "koa";
 import type { AuthContext } from "../types/koa.js";
 import {
   addCommentToProject,
@@ -15,7 +16,7 @@ export const addComment = async (ctx: AuthContext): Promise<void> => {
   created(ctx, "Comment added successfully", { comment });
 };
 
-export const getComments = async (ctx: AuthContext): Promise<void> => {
+export const getComments = async (ctx: Context): Promise<void> => {
   const { projectId } = ctx.params;
   const comments = await getCommentsForProject(projectId);
 

@@ -1,3 +1,4 @@
+import type { Context } from "koa";
 import type { AuthContext } from "../types/koa.js";
 import {
   addLikeToProject,
@@ -13,7 +14,7 @@ export const addLike = async (ctx: AuthContext): Promise<void> => {
   created(ctx, "Project liked successfully", { like });
 };
 
-export const getLikes = async (ctx: AuthContext): Promise<void> => {
+export const getLikes = async (ctx: Context): Promise<void> => {
   const { projectId } = ctx.params;
   const likes = await getLikesForProject(projectId);
 
@@ -21,8 +22,8 @@ export const getLikes = async (ctx: AuthContext): Promise<void> => {
 };
 
 export const removeLike = async (ctx: AuthContext): Promise<void> => {
-  const { projectId } = ctx.params;
-  const like = await removeLikeFromProject(ctx.state.user._id, projectId);
+  const { projectId, likeId } = ctx.params;
+  const like = await removeLikeFromProject(ctx.state.user._id, projectId, likeId);
 
   ok(ctx, "Project like removed successfully", { like });
 };

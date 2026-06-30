@@ -77,8 +77,11 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
 
     try {
       if (isLiked) {
-        await removeProjectLike(id);
-        setLikes(likes.filter((like) => like.userId !== currentUser?._id));
+        const like = likes.find((l) => l.userId === currentUser?._id);
+        if (like) {
+          await removeProjectLike(id, like._id);
+          setLikes(likes.filter((l) => l._id !== like._id));
+        }
         return;
       }
       const like = await addProjectLike(id);

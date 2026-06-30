@@ -6,6 +6,7 @@ import { errorHandler } from "./middlewares/errorHandler.js";
 import authRoutes from "./routes/auth.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
+import feedRoutes from "./routes/feed.routes.js";
 import projectRoutes from "./routes/project.routes.js";
 import likeRoutes from "./routes/like.routes.js";
 import commentRoutes from "./routes/comment.routes.js";
@@ -30,6 +31,9 @@ app.use(userRoutes.allowedMethods());
 
 app.use(uploadRoutes.routes());
 app.use(uploadRoutes.allowedMethods());
+
+app.use(feedRoutes.routes());
+app.use(feedRoutes.allowedMethods());
 
 app.use(projectRoutes.routes());
 app.use(projectRoutes.allowedMethods());

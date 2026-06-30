@@ -68,8 +68,8 @@ export const addProjectLike = async (projectId: string): Promise<ILike> => {
   return like;
 };
 
-export const removeProjectLike = async (projectId: string): Promise<void> => {
-  await AxiosApi.delete(`/projects/${projectId}/likes`);
+export const removeProjectLike = async (projectId: string, likeId: string): Promise<void> => {
+  await AxiosApi.delete(`/projects/${projectId}/likes/${likeId}`);
 };
 
 export const getProjectComments = async (

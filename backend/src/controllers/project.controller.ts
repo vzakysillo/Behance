@@ -20,26 +20,26 @@ export const createProject = async (ctx: AuthContext): Promise<void> => {
   created(ctx, "Project created successfully", { project });
 };
 
-export const getProjects = async (ctx: AuthContext): Promise<void> => {
+export const listMyProjects = async (ctx: AuthContext): Promise<void> => {
   const projects = await getProjectsForUser(ctx.state.user._id);
 
   ok(ctx, "Projects fetched successfully", { projects });
 };
 
-export const getFeedProjects = async (ctx: Context): Promise<void> => {
+export const listPublicProjects = async (ctx: Context): Promise<void> => {
   const projects = await getAllProjects();
 
   ok(ctx, "Projects fetched successfully", { projects });
 };
 
-export const getFeedProject = async (ctx: Context): Promise<void> => {
+export const getPublicProject = async (ctx: Context): Promise<void> => {
   const { id } = ctx.params;
   const project = await getProjectById(id);
 
   ok(ctx, "Project fetched successfully", { project });
 };
 
-export const getProject = async (ctx: AuthContext): Promise<void> => {
+export const getMyProject = async (ctx: AuthContext): Promise<void> => {
   const { id } = ctx.params;
   const project = await getProjectForUser(ctx.state.user._id, id);
 

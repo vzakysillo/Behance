@@ -6,6 +6,6 @@ const router = new Router({ prefix: "/projects/:projectId/likes" });
 
 router.get("/", getLikes);
 router.post("/", authMiddleware, addLike);
-router.delete("/", authMiddleware, removeLike);
+router.delete("/:likeId", authMiddleware, removeLike);
 
 export default router;
