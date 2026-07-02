@@ -156,6 +156,22 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
 
       {project.description && <p className="text-gray-700 mb-4">{project.description}</p>}
 
+      {(project.tags ?? []).length > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {project.tags!.map((tag, i) => (
+            <span key={i} className="px-2 py-0.5 bg-zinc-100 text-sm text-zinc-700 rounded">{tag}</span>
+          ))}
+        </div>
+      )}
+
+      {project.category && (
+        <p className="text-sm text-zinc-500 mb-2">Category: {project.category}</p>
+      )}
+
+      {(project.toolsUsed ?? []).length > 0 && (
+        <p className="text-sm text-zinc-500 mb-4">Tools: {project.toolsUsed!.join(", ")}</p>
+      )}
+
       <section className="flex items-center gap-3 mb-6">
         <button
           type="button"
@@ -180,7 +196,9 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
       <section className="mb-6">
         <h2 className="text-lg font-semibold text-gray-800 mb-3">Comments</h2>
 
-        {!token || !currentUser ? (
+        {project.disableComments ? (
+          <p className="text-sm text-gray-500 mb-4">Comments are disabled for this project.</p>
+        ) : !token || !currentUser ? (
           <p className="text-sm text-gray-600 mb-4">
             <Link to={routes.auth.login()} className="text-blue-600 hover:underline">
               Login
@@ -206,9 +224,11 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
 
         {reactionError && <p className="text-red-600 text-sm mb-4">{reactionError}</p>}
 
-        {comments.length === 0 ? (
+        {!project.disableComments && comments.length === 0 && (
           <p className="text-gray-500 text-sm">No comments yet.</p>
-        ) : (
+        )}
+
+        {!project.disableComments && comments.length > 0 && (
           <ul className="flex flex-col gap-3">
             {comments.map((comment) => (
               <li key={comment._id} className="border border-gray-200 rounded p-3">

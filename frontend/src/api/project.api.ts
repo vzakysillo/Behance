@@ -3,7 +3,7 @@ import type { IComment, ILike, IProject } from "../types";
 
 export type ProjectPayload = Pick<
   IProject,
-  "name" | "description" | "cover" | "photos"
+  "name" | "description" | "cover" | "photos" | "tags" | "category" | "toolsUsed" | "disableComments"
 >;
 
 export const getProjects = async (): Promise<IProject[]> => {

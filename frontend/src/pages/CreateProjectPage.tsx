@@ -7,17 +7,15 @@ export default function CreateProjectPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="p-8 max-w-2xl mx-auto">
-      <nav className="mb-4">
+    <div>
+      <div className="px-[50px] py-4 flex items-center gap-2">
         <Link to={routes.profile.projects()} className="text-sm text-blue-600 hover:underline">
           ← Projects
         </Link>
-      </nav>
-
-      <h1 className="text-2xl font-bold text-gray-800 mb-6">New Project</h1>
+      </div>
 
       <ProjectForm
-        submitLabel="Create project"
+        submitLabel="Publish"
         onSubmit={async (data) => {
           const project = await createProject(data);
           navigate(routes.profile.projectDetail(project._id));

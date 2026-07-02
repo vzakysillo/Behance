@@ -9,19 +9,16 @@ interface ProjectFormProps {
   submitLabel?: string;
 }
 
-export default function ProjectForm({ initial = {}, onSubmit }: ProjectFormProps) {
-  // existing fields
+export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: ProjectFormProps) {
   const [name, setName] = useState(initial.name || "");
   const [description, setDescription] = useState(initial.description || "");
   const [cover, setCover] = useState(initial.cover || "");
   const [photos, setPhotos] = useState<string[]>(initial.photos || []);
-
-  // new fields — wire to API later
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>(initial.tags || []);
   const [tagInput, setTagInput] = useState("");
-  const [category, setCategory] = useState("");
-  const [tools, setTools] = useState("");
-  const [disableComments, setDisableComments] = useState(false);
+  const [category, setCategory] = useState(initial.category || "");
+  const [toolsInput, setToolsInput] = useState(initial.toolsUsed?.join(", ") || "");
+  const [disableComments, setDisableComments] = useState(initial.disableComments ?? false);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -36,7 +33,11 @@ export default function ProjectForm({ initial = {}, onSubmit }: ProjectFormProps
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true); setError("");
     try {
-      await onSubmit({ name, description, cover, photos });
+      const toolsUsed = toolsInput
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean);
+      await onSubmit({ name, description, cover, photos, tags, category, toolsUsed, disableComments });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save project.");
     } finally {
@@ -171,9 +172,9 @@ export default function ProjectForm({ initial = {}, onSubmit }: ProjectFormProps
           <span className="text-base font-semibold font-['Inter'] leading-6">Tools used</span>
           <input
             className={inputClass}
-            placeholder="What software, hardware, or materials did you use?"
-            value={tools}
-            onChange={(e) => setTools(e.target.value)}
+            placeholder="What software, hardware, or materials did you use? (comma-separated)"
+            value={toolsInput}
+            onChange={(e) => setToolsInput(e.target.value)}
           />
         </label>
 
@@ -205,6 +206,16 @@ export default function ProjectForm({ initial = {}, onSubmit }: ProjectFormProps
         </div>
 
         {error && <p className="mt-4 text-red-600 text-sm font-['Inter']">{error}</p>}
+
+        <div className="flex justify-end mt-8">
+          <button
+            type="submit"
+            disabled={saving}
+            className="flex justify-center items-center w-[284px] h-[45px] gap-2.5 p-2.5 bg-[#b3b3b3] text-base font-medium text-black disabled:opacity-50"
+          >
+            {saving ? "Saving..." : submitLabel || "Publish"}
+          </button>
+        </div>
       </div>
     </form>
   );

@@ -1,31 +1,9 @@
-import mongoose, { type Types } from "mongoose";
+import { type Types } from "mongoose";
 import Comment, { type IComment } from "../models/comment.model.js";
-import Project from "../models/project.model.js";
+import { ensureProjectExists, validateObjectId } from "../utils/validation.js";
 import { BadRequestError, NotFoundError } from "../utils/ApiError.js";
 
 export type CreateCommentBody = Pick<IComment, "text">;
-
-const validateProjectId = (projectId: string): void => {
-  if (!mongoose.isValidObjectId(projectId)) {
-    throw new BadRequestError("Invalid project id");
-  }
-};
-
-const validateCommentId = (commentId: string): void => {
-  if (!mongoose.isValidObjectId(commentId)) {
-    throw new BadRequestError("Invalid comment id");
-  }
-};
-
-const ensureProjectExists = async (projectId: string): Promise<void> => {
-  validateProjectId(projectId);
-
-  const project = await Project.exists({ _id: projectId });
-
-  if (!project) {
-    throw new NotFoundError("Project not found");
-  }
-};
 
 export const addCommentToProject = async (
   userId: Types.ObjectId,
@@ -57,7 +35,7 @@ export const removeCommentFromProject = async (
   commentId: string
 ) => {
   await ensureProjectExists(projectId);
-  validateCommentId(commentId);
+  validateObjectId(commentId, "comment id");
 
   const comment = await Comment.findOneAndDelete({
     _id: commentId,

@@ -1,14 +1,15 @@
-import mongoose, { type Types } from "mongoose";
+import { type Types } from "mongoose";
 import Project, { type IProject } from "../models/project.model.js";
 import Comment from "../models/comment.model.js";
 import Like from "../models/like.model.js";
+import { validateObjectId } from "../utils/validation.js";
 import {
   BadRequestError,
   ConflictError,
   NotFoundError,
 } from "../utils/ApiError.js";
 
-type ProjectPayload = Pick<IProject, "name" | "description" | "cover" | "photos">;
+type ProjectPayload = Pick<IProject, "name" | "description" | "cover" | "photos" | "tags" | "category" | "toolsUsed" | "disableComments">;
 
 export type CreateProjectBody = Pick<ProjectPayload, "name"> &
   Partial<Omit<ProjectPayload, "name">>;
@@ -27,17 +28,11 @@ const checkDuplicateProject = (error: unknown): never => {
   throw error;
 };
 
-const validateProjectId = (projectId: string): void => {
-  if (!mongoose.isValidObjectId(projectId)) {
-    throw new BadRequestError("Invalid project id");
-  }
-};
-
 const ensureUserOwnsProject = async (
   userId: Types.ObjectId,
   projectId: string
 ): Promise<void> => {
-  validateProjectId(projectId);
+  validateObjectId(projectId, "project id");
 
   const project = await Project.exists({ _id: projectId, userId });
 
@@ -121,7 +116,7 @@ export const getAllProjects = async () => {
 };
 
 export const getProjectById = async (projectId: string) => {
-  validateProjectId(projectId);
+  validateObjectId(projectId, "project id");
 
   const project = await Project.findById(projectId);
 

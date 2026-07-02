@@ -1,27 +1,7 @@
-import mongoose, { type Types } from "mongoose";
+import { type Types } from "mongoose";
 import Like from "../models/like.model.js";
-import Project from "../models/project.model.js";
-import {
-  BadRequestError,
-  ConflictError,
-  NotFoundError,
-} from "../utils/ApiError.js";
-
-const validateProjectId = (projectId: string): void => {
-  if (!mongoose.isValidObjectId(projectId)) {
-    throw new BadRequestError("Invalid project id");
-  }
-};
-
-const ensureProjectExists = async (projectId: string): Promise<void> => {
-  validateProjectId(projectId);
-
-  const project = await Project.exists({ _id: projectId });
-
-  if (!project) {
-    throw new NotFoundError("Project not found");
-  }
-};
+import { ensureProjectExists, validateObjectId } from "../utils/validation.js";
+import { BadRequestError, ConflictError, NotFoundError } from "../utils/ApiError.js";
 
 const checkDuplicateLike = (error: unknown): never => {
   if (
@@ -61,9 +41,7 @@ export const removeLikeFromProject = async (
 ) => {
   await ensureProjectExists(projectId);
 
-  if (!mongoose.isValidObjectId(likeId)) {
-    throw new BadRequestError("Invalid like id");
-  }
+  validateObjectId(likeId, "like id");
 
   const like = await Like.findOneAndDelete({ _id: likeId, userId, projectId });
 
