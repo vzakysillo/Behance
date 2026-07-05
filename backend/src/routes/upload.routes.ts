@@ -1,7 +1,7 @@
 import Router from "@koa/router";
 import { koaBody } from "koa-body";
 import { authMiddleware } from "../middlewares/auth.js";
-import { uploadAvatar } from "../controllers/upload.controller.js";
+import { uploadAvatar, uploadImage } from "../controllers/upload.controller.js";
 import { isAllowedImageMimeType, MAX_IMAGE_FILE_SIZE_BYTES } from "../utils/uploadFile.js";
 
 const router = new Router({ prefix: "/upload" });
@@ -18,5 +18,6 @@ const multipartParser = koaBody({
 });
 
 router.post("/avatar", multipartParser, authMiddleware, uploadAvatar);
+router.post("/image", multipartParser, authMiddleware, uploadImage);
 
 export default router;

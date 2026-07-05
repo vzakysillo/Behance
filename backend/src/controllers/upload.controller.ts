@@ -22,3 +22,12 @@ export const uploadAvatar = async (ctx: AuthContext): Promise<void> => {
 
   created(ctx, "Image uploaded successfully", { url, user });
 };
+
+export const uploadImage = async (ctx: AuthContext): Promise<void> => {
+  const file = getSingleUploadedFile(ctx.request.files?.image);
+  const uploadedFile: UploadedFile = toUploadedFile(file);
+
+  const url = await uploadImageToCloudinary(uploadedFile);
+
+  created(ctx, "Image uploaded successfully", { url });
+};

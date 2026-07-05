@@ -178,7 +178,7 @@ export default function ProfilePage() {
                 activeTab === tab ? "border-black" : "border-transparent hover:border-stone-300",
               ].join(" ")}
             >
-              {tab === "Drafts" ? `Drafts (${projects?.length ?? 0})` : tab}
+              {tab === "Drafts" ? `Drafts` : tab}
             </button>
           ))}
         </div>
