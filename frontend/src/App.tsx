@@ -8,6 +8,7 @@ import ProfileEditPage from "./pages/ProfileEditPage"
 import ProjectsPage from "./pages/ProjectsPage";
 import CreateProjectPage from "./pages/CreateProjectPage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
+import ProjectPublishedPage from "./pages/ProjectPublishedPage";
 import WelcomePage from "./pages/WelcomePage";
 import HomePage from "./pages/HomePage";
 import Sidebar from "./components/Sidebar";
@@ -43,6 +44,7 @@ function App() {
           <Route path={routes.profile.edit()} element={<ProfileEditPage />} />
           <Route path={routes.profile.projects()} element={<ProjectsPage />} />
           <Route path={routes.profile.projectNew()} element={<CreateProjectPage />} />
+          <Route path={routes.profile.projectPublished(":id")} element={<ProjectPublishedPage />} />
           <Route path="/profile/projects/:id" element={<ProjectDetailPage />} />
         </Route>
       </Route>

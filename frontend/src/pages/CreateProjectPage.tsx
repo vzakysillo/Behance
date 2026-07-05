@@ -18,7 +18,7 @@ export default function CreateProjectPage() {
         submitLabel="Publish"
         onSubmit={async (data) => {
           const project = await createProject(data);
-          navigate(routes.profile.projectDetail(project._id));
+          navigate(routes.profile.projectPublished(project._id));
         }}
       />
     </div>

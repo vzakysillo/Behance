@@ -12,7 +12,7 @@ export const routes = {
     edit: () => "/profile/edit",
     projects: () => "/profile/projects",
     projectNew: () => "/profile/projects/new",
+    projectPublished: (id: string) => `/profile/projects/${id}/published`,
     projectDetail: (id: string) => `/profile/projects/${id}`,
   },
-  
 } as const;
