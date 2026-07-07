@@ -10,6 +10,7 @@ import feedRoutes from "./routes/feed.routes.js";
 import projectRoutes from "./routes/project.routes.js";
 import likeRoutes from "./routes/like.routes.js";
 import commentRoutes from "./routes/comment.routes.js";
+import followRoutes from "./routes/follow.routes.js";
 
 const app = new Koa();
 
@@ -43,6 +44,9 @@ app.use(likeRoutes.allowedMethods());
 
 app.use(commentRoutes.routes());
 app.use(commentRoutes.allowedMethods());
+
+app.use(followRoutes.routes());
+app.use(followRoutes.allowedMethods());
 
 connectDB();
 

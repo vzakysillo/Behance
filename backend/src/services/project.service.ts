@@ -100,13 +100,23 @@ export const getAllProjects = async () => {
       },
     },
     {
+      $lookup: {
+        from: "comments",
+        localField: "_id",
+        foreignField: "projectId",
+        as: "comments",
+      },
+    },
+    {
       $addFields: {
         likesCount: { $size: "$likes" },
+        commentsCount: { $size: "$comments" },
       },
     },
     {
       $project: {
         likes: 0,
+        comments: 0,
       },
     },
     {

@@ -5,6 +5,7 @@ import { getFeedProjects } from "../api/project.api";
 import { useAuth } from "../hooks/useAuth";
 import { Spinner, ErrorMessage } from "../components/ui";
 import { routes } from "../routes";
+import { Heart, MessageSquare, Search } from "lucide-react";
 
 type Category = "All" | "Logo design" | "Branding" | "Illustration" | "Social media design" | "UI/UX";
 
@@ -36,10 +37,7 @@ export default function HomePage() {
         <div className="flex-1 max-w-[873px] max-[1024px]:max-w-full">
           <div className="flex items-center gap-[10px] px-5 py-[10px] bg-[#c6c2c2] rounded h-[45px]">
             <div className="flex items-center justify-center w-6 h-6 shrink-0">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <circle cx="11" cy="11" r="7" stroke="black" strokeWidth="2" />
-                <path d="M20 20L16 16" stroke="black" strokeWidth="2" strokeLinecap="round" />
-              </svg>
+              <Search size={24} className="text-black" />
             </div>
             <input
               type="text"
@@ -134,24 +132,16 @@ export default function HomePage() {
                   {project.description || "No description available"}
                 </p>
                 <div className="flex gap-[30px]">
-                  {[
-                    { icon: (
-                      <svg width="18" height="16" viewBox="0 0 18 16" fill="none">
-                        <path d="M9 1C4.58 1 1 4.58 1 9C1 13.42 4.58 17 9 17C13.42 17 17 13.42 17 9C17 4.58 13.42 1 9 1ZM9 15.5C5.41 15.5 2.5 12.59 2.5 9C2.5 5.41 5.41 2.5 9 2.5C12.59 2.5 15.5 5.41 15.5 9C15.5 12.59 12.59 15.5 9 15.5Z" fill="#374151" />
-                        <path d="M6 8C6 8 7.5 5.5 9 5.5C10.5 5.5 12 8 12 8C12 8 10.5 10.5 9 10.5C7.5 10.5 6 8 6 8Z" fill="#374151" />
-                      </svg>
-                    ), label: "8k" },
-                    { icon: (
-                      <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                        <path d="M9 1L11.5 6.5H17L12.5 10L14.5 16L9 12.5L3.5 16L5.5 10L1 6.5H6.5L9 1Z" fill="#374151" />
-                      </svg>
-                    ), label: "2k" },
-                  ].map((stat, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      {stat.icon}
-                      <span className="text-base font-['Inter',sans-serif] font-medium text-gray-700">{stat.label}</span>
+                  <div className="flex items-center gap-2">
+                    <Heart size={18} className="text-gray-700" />
+                    <span className="text-base font-['Inter',sans-serif] font-medium text-gray-700">{project.likesCount ?? 0}</span>
+                  </div>
+                  {!project.disableComments && (
+                    <div className="flex items-center gap-2">
+                      <MessageSquare size={18} className="text-gray-700" />
+                      <span className="text-base font-['Inter',sans-serif] font-medium text-gray-700">{project.commentsCount ?? 0}</span>
                     </div>
-                  ))}
+                  )}
                 </div>
               </div>
             </Link>

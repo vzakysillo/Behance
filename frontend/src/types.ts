@@ -16,7 +16,7 @@ export interface IUser {
   memberSince?: string;
   stats?: {
     projectViews: number;
-    appreciations: number;
+    likes: number;
     followers: number;
     following: number;
   };
@@ -35,6 +35,7 @@ export interface IProject {
   toolsUsed?: string[];
   disableComments?: boolean;
   likesCount?: number;
+  commentsCount?: number;
   createdAt?: string;
   updatedAt?: string;
 }

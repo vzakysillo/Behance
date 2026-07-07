@@ -34,11 +34,9 @@ const SOCIAL_PLATFORMS = [
   },
 ];
 
-const DragIcon = () => (
-  <svg width={16} height={16} viewBox="0 0 16 16" fill="none" className="shrink-0">
-    <path fillRule="evenodd" clipRule="evenodd" d="M2.5 12C2.5 11.8674 2.55268 11.7402 2.64645 11.6464C2.74021 11.5527 2.86739 11.5 3 11.5H13C13.1326 11.5 13.2598 11.5527 13.3536 11.6464C13.4473 11.7402 13.5 11.8674 13.5 12C13.5 12.1326 13.4473 12.2598 13.3536 12.3536C13.2598 12.4473 13.1326 12.5 13 12.5H3C2.86739 12.5 2.74021 12.4473 2.64645 12.3536C2.55268 12.2598 2.5 12.1326 2.5 12ZM2.5 8C2.5 7.86739 2.55268 7.74021 2.64645 7.64645C2.74021 7.55268 2.86739 7.5 3 7.5H13C13.1326 7.5 13.2598 7.55268 13.3536 7.64645C13.4473 7.74021 13.5 7.86739 13.5 8C13.5 8.13261 13.4473 8.25979 13.3536 8.35355C13.2598 8.44732 13.1326 8.5 13 8.5H3C2.86739 8.5 2.74021 8.44732 2.64645 8.35355C2.55268 8.25979 2.5 8.13261 2.5 8ZM2.5 4C2.5 3.86739 2.55268 3.74021 2.64645 3.64645C2.74021 3.55268 2.86739 3.5 3 3.5H13C13.1326 3.5 13.2598 3.55268 13.3536 3.64645C13.4473 3.74021 13.5 3.86739 13.5 4C13.5 4.13261 13.4473 4.25979 13.3536 4.35355C13.2598 4.44732 13.1326 4.5 13 4.5H3C2.86739 4.5 2.74021 4.44732 2.64645 4.35355C2.55268 4.25979 2.5 4.13261 2.5 4Z" fill="black" />
-  </svg>
-);
+import { GripHorizontal, User, ArrowLeft, Upload, ChevronDown } from "lucide-react";
+
+const DragIcon = () => <GripHorizontal size={16} className="shrink-0 text-black" />;
 
 const Divider = () => <div className="w-full h-px bg-[#575656] my-8" />;
 
@@ -88,9 +86,7 @@ export default function ProfileEditPage() {
           to={routes.profile.root()}
           className="flex items-center gap-3.5 no-underline text-black"
         >
-          <svg width={21} height={15} viewBox="0 0 21 15" fill="none">
-            <path d="M0.292892 6.65691C-0.0976315 7.04743 -0.0976315 7.6806 0.292892 8.07112L6.65685 14.4351C7.04738 14.8256 7.68054 14.8256 8.07107 14.4351C8.46159 14.0446 8.46159 13.4114 8.07107 13.0209L2.41421 7.36401L8.07107 1.70716C8.46159 1.31664 8.46159 0.68347 8.07107 0.292946C7.68054 -0.0975785 7.04738 -0.0975785 6.65685 0.292946L0.292892 6.65691ZM21 7.36401V6.36401L1 6.36401V7.36401V8.36401L21 8.36401V7.36401Z" fill="black" />
-          </svg>
+          <ArrowLeft size={21} className="text-black" />
           <span className="text-xl">Edit profile</span>
         </Link>
 
@@ -141,11 +137,7 @@ export default function ProfileEditPage() {
                   {user?.avatar ? (
                     <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
                   ) : (
-                    <svg width={137} height={137} viewBox="0 0 137 137" fill="none">
-                      <ellipse cx="68.4999" cy="68.5015" rx="68.4999" ry="68.5015" fill="#D9D9D9" />
-                      <ellipse cx="68.5003" cy="52.4394" rx="27.8724" ry="27.873" fill="white" />
-                      <path d="M68.501 88.8154C89.826 88.8155 108.631 98.7788 119.76 113.94C107.211 128.087 88.8971 137.003 68.5 137.003C48.1027 137.003 29.788 128.087 17.2393 113.94C28.3679 98.7781 47.1753 88.8154 68.501 88.8154Z" fill="white" />
-                    </svg>
+                    <User size={137} className="text-white bg-[#D9D9D9] p-4" />
                   )}
                 </div>
                 <button
@@ -209,10 +201,8 @@ export default function ProfileEditPage() {
                 type="button"
                 className="flex items-center justify-center gap-2 h-[30px] px-4 border border-black text-sm text-black hover:bg-gray-50 flex-1 max-w-[579px]"
               >
+                <Upload size={16} className="text-black" />
                 Upload CV
-                <svg width={8} height={11} viewBox="0 0 8 11" fill="none">
-                  <path d="M4.03519 0.146446C3.83993 -0.0488157 3.52335 -0.0488157 3.32809 0.146446L0.146107 3.32843C-0.0491552 3.52369 -0.0491552 3.84027 0.146107 4.03553C0.341369 4.2308 0.657952 4.2308 0.853214 4.03553L3.68164 1.20711L6.51007 4.03553C6.70533 4.2308 7.02191 4.2308 7.21717 4.03553C7.41244 3.84027 7.41244 3.52369 7.21717 3.32843L4.03519 0.146446ZM3.68164 10.5L4.18164 10.5L4.18164 0.5L3.68164 0.5L3.18164 0.5L3.18164 10.5L3.68164 10.5Z" fill="black" />
-                </svg>
               </button>
             </div>
           </section>
@@ -262,9 +252,7 @@ export default function ProfileEditPage() {
 
             <button type="button" className="flex items-center gap-2 mt-4 text-sm text-black">
               View more
-              <svg width={15} height={9} viewBox="0 0 15 9" fill="none">
-                <path d="M1 1L7.5 7.5L14 1" stroke="black" strokeWidth={2} strokeLinecap="round" />
-              </svg>
+              <ChevronDown size={15} className="text-black" />
             </button>
           </section>
 
