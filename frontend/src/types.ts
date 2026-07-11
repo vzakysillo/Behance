@@ -26,6 +26,7 @@ export interface IUser {
 export interface IProject {
   _id: string;
   userId: string;
+  author?: IUser;
   name: string;
   description?: string;
   cover?: string;
@@ -36,6 +37,12 @@ export interface IProject {
   disableComments?: boolean;
   likesCount?: number;
   commentsCount?: number;
+  savesCount?: number;
+  sharesCount?: number;
+  isSaved?: boolean;
+  attachedAssets?: { name: string; url: string; type?: string }[];
+  similarProjects?: IProject[];
+  authorProjects?: IProject[];
   createdAt?: string;
   updatedAt?: string;
 }
@@ -49,6 +56,7 @@ export interface ILike {
 export interface IComment {
   _id: string;
   userId: string;
+  author?: IUser;
   projectId: string;
   text: string;
   createdAt: string;
