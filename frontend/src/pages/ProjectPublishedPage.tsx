@@ -6,7 +6,7 @@ export default function ProjectPublishedPage() {
   const { id } = useParams<{ id: string }>();
 
   if (!id) {
-    return <Navigate to={routes.profile.projects()} replace />;
+    return <Navigate to={routes.profile.root()} replace />;
   }
 
   return (

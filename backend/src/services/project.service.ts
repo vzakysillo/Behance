@@ -1,4 +1,4 @@
-import { type Types } from "mongoose";
+import { Types } from "mongoose";
 import Project, { type IProject } from "../models/project.model.js";
 import Comment from "../models/comment.model.js";
 import Like from "../models/like.model.js";
@@ -86,7 +86,26 @@ export const createProjectForUser = async (
 };
 
 export const getProjectsForUser = async (userId: Types.ObjectId) => {
-  return Project.find({ userId });
+  return Project.aggregate([
+    { $match: { userId } },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "projectId",
+        as: "likes",
+      },
+    },
+    {
+      $addFields: {
+        likesCount: { $size: "$likes" },
+      },
+    },
+    {
+      $project: { likes: 0 },
+    },
+    { $sort: { _id: -1 } },
+  ]);
 };
 
 export const getAllProjects = async () => {
@@ -108,15 +127,72 @@ export const getAllProjects = async () => {
       },
     },
     {
+      $lookup: {
+        from: "users",
+        localField: "userId",
+        foreignField: "_id",
+        as: "author",
+      },
+    },
+    {
       $addFields: {
         likesCount: { $size: "$likes" },
         commentsCount: { $size: "$comments" },
+        author: { $first: "$author" },
       },
     },
     {
       $project: {
         likes: 0,
         comments: 0,
+        "author.password": 0,
+      },
+    },
+    {
+      $sort: { _id: -1 },
+    },
+  ]);
+};
+
+export const getPublicProjectsByUserService = async (userId: string) => {
+  return Project.aggregate([
+    { $match: { userId: new Types.ObjectId(userId) } },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "projectId",
+        as: "likes",
+      },
+    },
+    {
+      $lookup: {
+        from: "comments",
+        localField: "_id",
+        foreignField: "projectId",
+        as: "comments",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "userId",
+        foreignField: "_id",
+        as: "author",
+      },
+    },
+    {
+      $addFields: {
+        likesCount: { $size: "$likes" },
+        commentsCount: { $size: "$comments" },
+        author: { $first: "$author" },
+      },
+    },
+    {
+      $project: {
+        likes: 0,
+        comments: 0,
+        "author.password": 0,
       },
     },
     {
@@ -128,7 +204,21 @@ export const getAllProjects = async () => {
 export const getProjectById = async (projectId: string) => {
   validateObjectId(projectId, "project id");
 
-  const project = await Project.findById(projectId);
+  const projects = await Project.aggregate([
+    { $match: { _id: new Types.ObjectId(projectId) } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "userId",
+        foreignField: "_id",
+        as: "author",
+      },
+    },
+    { $addFields: { author: { $first: "$author" } } },
+    { $project: { "author.password": 0 } },
+  ]);
+
+  const project = projects[0] ?? null;
 
   if (!project) {
     throw new NotFoundError("Project not found");
@@ -143,7 +233,21 @@ export const getProjectForUser = async (
 ) => {
   await ensureUserOwnsProject(userId, projectId);
 
-  const project = await Project.findById(projectId);
+  const projects = await Project.aggregate([
+    { $match: { _id: new Types.ObjectId(projectId) } },
+    {
+      $lookup: {
+        from: "users",
+        localField: "userId",
+        foreignField: "_id",
+        as: "author",
+      },
+    },
+    { $addFields: { author: { $first: "$author" } } },
+    { $project: { "author.password": 0 } },
+  ]);
+
+  const project = projects[0] ?? null;
 
   if (!project) {
     throw new NotFoundError("Project not found");

@@ -126,11 +126,16 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
 
   const authorProjects = useMemo(() => {
     if (!project) return [];
+    const seen = new Set<string>();
     return (project.authorProjects?.length
       ? project.authorProjects
       : relatedProjects.filter((item) => item.userId === project.userId)
     )
-      .filter((item) => item._id !== project._id)
+      .filter((item) => {
+        if (item._id === project._id || seen.has(item._id)) return false;
+        seen.add(item._id);
+        return true;
+      })
       .slice(0, 4);
   }, [project, relatedProjects]);
 
@@ -193,7 +198,7 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
     if (!id || !confirm("Delete this project?")) return;
     try {
       await deleteProject(id);
-      navigate(routes.profile.projects());
+      navigate(routes.profile.root());
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not delete project.");
     }
@@ -215,7 +220,7 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
       <div className="grid min-h-screen grid-cols-[minmax(0,1fr)_494px] max-[1280px]:grid-cols-1">
         <main className="min-w-0 px-[50px] pb-20 pt-[30px] max-[768px]:px-5">
           <Link
-            to={publicView ? routes.home() : routes.profile.projects()}
+            to={publicView ? routes.home() : routes.profile.root()}
             className="mb-5 inline-flex h-5 items-center gap-2 text-xs font-medium text-black no-underline hover:underline"
           >
             <ArrowLeft size={12} strokeWidth={2} />
@@ -488,7 +493,7 @@ function AuthorPanel({
 
       <div className="mb-24 space-y-3">
         <Link
-          to={routes.profile.root()}
+          to={author ? routes.publicProfile(author._id) : routes.profile.root()}
           className="flex h-11 w-full items-center justify-center gap-3 bg-white px-4 text-base text-black no-underline hover:bg-neutral-50"
         >
           <Eye size={18} />
@@ -505,10 +510,10 @@ function AuthorPanel({
 
       <h3 className="mb-6 text-2xl font-semibold uppercase leading-9">Other projects</h3>
       <div className="space-y-5">
-        {(projects.length > 0 ? projects : [currentProject, currentProject, currentProject, currentProject]).map(
-          (project, index) => (
+        {projects.length > 0 ? (
+          projects.map((project) => (
             <Link
-              key={`${project._id}-${index}`}
+              key={project._id}
               to={routes.projectDetail(project._id)}
               className="grid h-28 grid-cols-[160px_minmax(0,1fr)] bg-[#d9d9d9] text-black no-underline hover:bg-[#d0d0d0]"
             >
@@ -524,7 +529,9 @@ function AuthorPanel({
                 </p>
               </div>
             </Link>
-          )
+          ))
+        ) : (
+          <p className="text-sm text-neutral-500">No other projects yet.</p>
         )}
       </div>
     </div>

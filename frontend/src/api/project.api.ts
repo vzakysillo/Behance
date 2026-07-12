@@ -100,3 +100,10 @@ export const removeProjectComment = async (
 ): Promise<void> => {
   await AxiosApi.delete(`/projects/${projectId}/comments/${commentId}`);
 };
+
+export const getUserProjects = async (userId: string): Promise<IProject[]> => {
+  const res = await AxiosApi.get<ApiResponse<{ projects: IProject[] }>>(
+    `/users/${userId}/projects`
+  );
+  return res.data.data?.projects ?? [];
+};

@@ -14,3 +14,10 @@ export const updateMe = async (data: Partial<IUser>): Promise<IUser> => {
   if (!user) throw new Error("No user data");
   return user;
 };
+
+export const getUser = async (id: string): Promise<IUser> => {
+  const res = await AxiosApi.get<ApiResponse<{ user: IUser }>>(`/users/${id}`);
+  const user = res.data.data?.user;
+  if (!user) throw new Error("No user data");
+  return user;
+};

@@ -21,3 +21,11 @@ export const getFollowing = async (userId: string): Promise<FollowUser[]> => {
   );
   return res.data.data?.users ?? [];
 };
+
+export const followUser = async (userId: string): Promise<void> => {
+  await AxiosApi.post(`/users/${userId}/follow`);
+};
+
+export const unfollowUser = async (userId: string): Promise<void> => {
+  await AxiosApi.delete(`/users/${userId}/follow`);
+};

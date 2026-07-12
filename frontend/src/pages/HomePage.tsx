@@ -124,8 +124,14 @@ export default function HomePage() {
               {/* Info — always visible, dark text on white background (fixes prior white-on-white bug) */}
               <div className="pt-[15px]">
                 <div className="flex items-center gap-[10px] mb-2">
-                  <div className="w-[46px] h-[46px] rounded-full bg-[#e2e2e2] shrink-0" />
-                  <span className="text-base font-['Inter',sans-serif] font-medium text-gray-800">Username</span>
+                  <div className="w-[46px] h-[46px] rounded-full bg-[#e2e2e2] shrink-0 overflow-hidden">
+                    {project.author?.avatar && (
+                      <img src={project.author.avatar} alt="" className="w-full h-full object-cover" />
+                    )}
+                  </div>
+                  <span className="text-base font-['Inter',sans-serif] font-medium text-gray-800">
+                    {[project.author?.firstName, project.author?.lastName].filter(Boolean).join(" ") || project.author?.userName || "User"}
+                  </span>
                 </div>
                 <h3 className="text-xl font-['Inter',sans-serif] font-semibold text-gray-900 m-0 mb-2">{project.name}</h3>
                 <p className="text-base font-['Inter',sans-serif] font-normal text-gray-600 m-0 mb-[15px] leading-[1.4] line-clamp-2">

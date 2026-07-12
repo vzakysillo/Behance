@@ -34,7 +34,17 @@ const SOCIAL_PLATFORMS = [
   },
 ];
 
-import { GripHorizontal, User, ArrowLeft, Upload, ChevronDown } from "lucide-react";
+const getSocialUrl = (socials: string[], platform: string): string => {
+  const entry = socials.find((s) => s.startsWith(`${platform}:`));
+  return entry ? entry.slice(platform.length + 1) : "";
+};
+
+const setSocialUrl = (socials: string[], platform: string, url: string): string[] => {
+  const filtered = socials.filter((s) => !s.startsWith(`${platform}:`));
+  return url ? [...filtered, `${platform}:${url}`] : filtered;
+};
+
+import { GripHorizontal, User, ArrowLeft, Upload } from "lucide-react";
 
 const DragIcon = () => <GripHorizontal size={16} className="shrink-0 text-black" />;
 
@@ -57,6 +67,9 @@ export default function ProfileEditPage() {
   // Teams
   const [teamLink, setTeamLink] = useState("");
 
+  // Socials
+  const [socials, setSocials] = useState<string[]>(user?.socials ?? []);
+
   // Links
   const [linkTitle, setLinkTitle] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
@@ -65,7 +78,7 @@ export default function ProfileEditPage() {
     setSaving(true);
     setError("");
     try {
-      await updateMe({ firstName, lastName, specialization: headline, location });
+      await updateMe({ firstName, lastName, specialization: headline, location, socials });
       await refreshUser();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save.");
@@ -230,30 +243,35 @@ export default function ProfileEditPage() {
             </p>
 
             <div className="flex flex-col gap-2">
-              {SOCIAL_PLATFORMS.map((platform) => (
-                <div key={platform.name} className="flex items-center gap-2.5 h-10">
-                  <DragIcon />
-                  <div className="flex items-center gap-2 w-[200px]">
-                    {platform.icon}
-                    <span className="text-sm text-[#a2a0a0]">{platform.name}</span>
+              {SOCIAL_PLATFORMS.map((platform) => {
+                const url = getSocialUrl(socials, platform.name);
+                return (
+                  <div key={platform.name} className="flex items-center gap-2.5 h-10">
+                    <DragIcon />
+                    <div className="flex items-center gap-2 w-[200px]">
+                      {platform.icon}
+                      <span className="text-sm text-[#a2a0a0]">{platform.name}</span>
+                    </div>
+                    <input
+                      type="url"
+                      className="flex-1 h-10 px-2.5 border border-[#a2a0a0] text-sm text-black font-['Inter'] bg-white outline-none focus:border-black placeholder:text-[#a2a0a0]"
+                      placeholder="https://..."
+                      value={url}
+                      onChange={(e) => setSocials(setSocialUrl(socials, platform.name, e.target.value))}
+                    />
+                    {url && (
+                      <button
+                        type="button"
+                        onClick={() => setSocials(setSocialUrl(socials, platform.name, ""))}
+                        className="w-[100px] h-10 bg-[#b5b5b5] text-sm text-black shrink-0 hover:brightness-95"
+                      >
+                        Disconnect
+                      </button>
+                    )}
                   </div>
-                  <div className="flex-1 h-10 border border-[#a2a0a0] flex items-center justify-center">
-                    <span className="text-sm text-[#a2a0a0]">Add link</span>
-                  </div>
-                  <button
-                    type="button"
-                    className="w-[100px] h-10 bg-[#b5b5b5] text-sm text-black shrink-0 hover:brightness-95"
-                  >
-                    Connect
-                  </button>
-                </div>
-              ))}
+                );
+              })}
             </div>
-
-            <button type="button" className="flex items-center gap-2 mt-4 text-sm text-black">
-              View more
-              <ChevronDown size={15} className="text-black" />
-            </button>
           </section>
 
           <Divider />

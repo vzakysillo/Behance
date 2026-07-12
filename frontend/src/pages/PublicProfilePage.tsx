@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useAsync } from "../hooks/useAsync";
-import { getProjects } from "../api/project.api";
-import { getFollowers, getFollowing } from "../api/follow.api";
+import { getUserProjects } from "../api/project.api";
+import { getUser } from "../api/user.api";
+import { getFollowers, getFollowing, followUser, unfollowUser } from "../api/follow.api";
 import { useAuth } from "../hooks/useAuth";
 import { Spinner, ErrorMessage } from "../components/ui";
 import { routes } from "../routes";
-import { MapPin, Link as LinkIcon, Briefcase, Plus, ChevronRight, Heart } from "lucide-react";
+import { MapPin, Link as LinkIcon, Briefcase, ChevronRight, Heart, MessageSquare } from "lucide-react";
+import type { IUser } from "../types";
 
 const SOCIAL_ICONS: Record<string, JSX.Element> = {
   Facebook: (
@@ -35,81 +37,127 @@ const parseSocials = (socials: string[]) =>
     })
     .filter((s) => SOCIAL_ICONS[s.platform] && s.url);
 
-type Tab = "Work" | "Moodboards" | "For sale" | "Appreciations" | "Your stats" | "Drafts";
-const TABS: Tab[] = ["Work", "Moodboards", "For sale", "Appreciations", "Your stats", "Drafts"];
+type Tab = "Work" | "Moodboards" | "For sale" | "Appreciations" | "Your stats";
+const TABS: Tab[] = ["Work", "Moodboards", "For sale", "Appreciations", "Your stats"];
 
-export default function ProfilePage() {
-  const { user, logout } = useAuth();
-  const { data: projects, loading, error } = useAsync(getProjects);
+export default function PublicProfilePage() {
+  const { id } = useParams<{ id: string }>();
+  const { user: currentUser, token } = useAuth();
+
+  const {
+    data: profileUser,
+    loading: userLoading,
+    error: userError,
+  } = useAsync(() => getUser(id!), [id]);
+
+  const {
+    data: projects,
+    loading: projectsLoading,
+    error: projectsError,
+  } = useAsync(() => getUserProjects(id!), [id]);
+
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("Work");
 
   useEffect(() => {
-    if (!user) return;
+    if (!id) return;
 
-    getFollowers(user._id).then((res) => setFollowersCount(res.length));
-    getFollowing(user._id).then((res) => setFollowingCount(res.length));
-  }, [user]);
+    getFollowers(id).then((res) => setFollowersCount(res.length));
+    getFollowing(id).then((res) => setFollowingCount(res.length));
 
-  if (!user) return <Spinner />;
+    if (currentUser && currentUser._id !== id) {
+      getFollowing(currentUser._id).then((res) => {
+        setIsFollowing(res.some((u) => u._id === id));
+      });
+    }
+  }, [id, currentUser]);
 
-  const fullName = [user.firstName, user.lastName].filter(Boolean).join(" ") || user.userName;
+  const handleFollowToggle = async () => {
+    if (!currentUser || !id) return;
+    try {
+      if (isFollowing) {
+        await unfollowUser(id);
+        setFollowersCount((c) => c - 1);
+      } else {
+        await followUser(id);
+        setFollowersCount((c) => c + 1);
+      }
+      setIsFollowing(!isFollowing);
+    } catch {
+      // silently fail
+    }
+  };
 
+  if (userLoading) return <Spinner />;
+  if (userError) return <ErrorMessage message={userError} />;
+  if (!profileUser) return <ErrorMessage message="User not found." />;
+
+  const fullName = [profileUser.firstName, profileUser.lastName].filter(Boolean).join(" ") || profileUser.userName;
   const likesCount = (projects ?? []).reduce((sum, p) => sum + (p.likesCount ?? 0), 0);
+  const isOwnProfile = currentUser?._id === profileUser._id;
 
-  const parsedSocials = parseSocials(user.socials ?? []);
+  const parsedSocials = parseSocials(profileUser.socials ?? []);
 
   return (
     <div className="flex min-h-screen bg-white font-['Inter',sans-serif]">
 
-      {/* ── Left info panel ── */}
+      {/* Left info panel */}
       <aside className="w-[340px] shrink-0 border-r border-stone-200 flex flex-col px-[50px] py-10 gap-0">
 
         {/* Avatar */}
         <div className="w-[144px] h-[144px] rounded-full bg-zinc-300 overflow-hidden mb-4 self-start">
-          {user.avatar
-            ? <img src={user.avatar} alt={fullName} className="w-full h-full object-cover" />
+          {profileUser.avatar
+            ? <img src={profileUser.avatar} alt={fullName} className="w-full h-full object-cover" />
             : <div className="w-full h-full bg-zinc-300" />}
         </div>
 
         {/* Name & specialization */}
         <h1 className="text-2xl font-normal text-black leading-9">{fullName}</h1>
-        <p className="text-xl font-normal text-zinc-600 mb-3">{user.specialization ?? "Specialization"}</p>
+        <p className="text-xl font-normal text-zinc-600 mb-3">{profileUser.specialization ?? "Specialization"}</p>
 
         {/* Location */}
         <div className="flex items-center gap-2.5 py-2.5 text-sm text-black">
           <MapPin size={24} className="text-zinc-400 shrink-0" />
-          <span>{user.location ?? "Location"}</span>
+          <span>{profileUser.location ?? "Location"}</span>
         </div>
 
         {/* Available for freelance */}
         <div className="flex items-center gap-2.5 py-2.5 text-sm text-black">
           <Briefcase size={24} className="text-zinc-400 shrink-0" />
-          <span>{user.availableForFreelance ? "Available for freelance" : "Not available for freelance"}</span>
+          <span>{profileUser.availableForFreelance ? "Available for freelance" : "Not available for freelance"}</span>
         </div>
 
         {/* Username / link */}
         <div className="flex items-center gap-2.5 py-2.5 text-sm text-black">
           <LinkIcon size={24} className="text-zinc-400 shrink-0" />
-          <span>{user.userName}</span>
+          <span>{profileUser.userName}</span>
         </div>
 
-        {/* Edit buttons */}
-        <div className="flex flex-col gap-[18px] mt-6">
-          <Link
-            to={routes.profile.edit()}
-            className="w-full h-10 flex items-center justify-center bg-stone-300 text-black text-sm font-normal no-underline hover:brightness-95"
-          >
-            Edit profile info
-          </Link>
-          <button
-            type="button"
-            className="w-full h-10 flex items-center justify-center bg-gray-200 text-black text-sm font-normal hover:brightness-95"
-          >
-            Customize profile PRO
-          </button>
-        </div>
+        {/* Follow / Message buttons */}
+        {!isOwnProfile && token && (
+          <div className="flex flex-col gap-[18px] mt-6">
+            <button
+              type="button"
+              onClick={handleFollowToggle}
+              className={`w-full h-10 flex items-center justify-center text-sm font-normal transition-colors hover:brightness-95 ${
+                isFollowing
+                  ? "bg-gray-200 text-black border border-neutral-600"
+                  : "bg-stone-300 text-black"
+              }`}
+            >
+              {isFollowing ? "Following" : "Follow"}
+            </button>
+            <button
+              type="button"
+              className="w-full h-10 flex items-center justify-center gap-2 bg-gray-200 text-black text-sm font-normal hover:brightness-95"
+            >
+              <MessageSquare size={14} />
+              Message
+            </button>
+          </div>
+        )}
 
         {/* Divider */}
         <div className="w-full h-px bg-stone-300 my-6" />
@@ -162,46 +210,36 @@ export default function ProfilePage() {
         <div className="flex flex-col mb-6">
           <div className="flex items-center justify-between mb-3">
             <p className="text-base font-normal text-black">Teams</p>
-            <button type="button" className="flex items-center justify-center">
-              <Plus size={16} className="text-stone-500" />
-            </button>
           </div>
-          {(user.teams ?? [{ name: "Teams name", location: "Location" }]).map((team, i) => (
-            <div key={i} className="flex items-center gap-3 py-2">
-              <div className="w-16 h-16 rounded-full bg-zinc-300 shrink-0 overflow-hidden">
-                {team.avatar && <img src={team.avatar} alt={team.name} className="w-full h-full object-cover" />}
+          {(profileUser.teams ?? []).length > 0 ? (
+            profileUser.teams!.map((team, i) => (
+              <div key={i} className="flex items-center gap-3 py-2">
+                <div className="w-16 h-16 rounded-full bg-zinc-300 shrink-0 overflow-hidden">
+                  {team.avatar && <img src={team.avatar} alt={team.name} className="w-full h-full object-cover" />}
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-base font-normal text-black">{team.name}</span>
+                  <span className="text-sm font-normal text-black">{team.location}</span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="text-base font-normal text-black">{team.name}</span>
-                <span className="text-sm font-normal text-black">{team.location}</span>
-              </div>
-            </div>
-          ))}
+            ))
+          ) : null}
           <div className="w-full h-px bg-stone-300 mt-3" />
         </div>
 
         {/* About me */}
         <p className="text-base font-normal text-black mb-3">About me</p>
         <p className="text-sm font-normal text-black leading-5">
-          {user.aboutMe ?? "No bio yet."}
+          {profileUser.aboutMe ?? "No bio yet."}
         </p>
 
         {/* Member since */}
         <p className="text-base font-normal text-zinc-400 mt-auto pt-10">
-          {user.memberSince ? `Member since ${user.memberSince}` : ""}
+          {profileUser.memberSince ? `Member since ${profileUser.memberSince}` : ""}
         </p>
-
-        {/* Logout */}
-        <button
-          type="button"
-          onClick={logout}
-          className="mt-4 text-sm text-gray-400 hover:text-black text-left"
-        >
-          Log out
-        </button>
       </aside>
 
-      {/* ── Main content area ── */}
+      {/* Main content area */}
       <main className="flex-1 flex flex-col">
 
         {/* Tabs */}
@@ -216,7 +254,7 @@ export default function ProfilePage() {
                 activeTab === tab ? "border-black" : "border-transparent hover:border-stone-300",
               ].join(" ")}
             >
-              {tab === "Drafts" ? `Drafts` : tab}
+              {tab}
             </button>
           ))}
         </div>
@@ -225,27 +263,14 @@ export default function ProfilePage() {
         <div className="flex-1 px-[50px] py-8">
           {activeTab === "Work" && (
             <>
-              {loading && <Spinner />}
-              {error && <ErrorMessage message={error} />}
-              {!loading && !error && (
+              {projectsLoading && <Spinner />}
+              {projectsError && <ErrorMessage message={projectsError} />}
+              {!projectsLoading && !projectsError && (
                 <div className="grid grid-cols-3 gap-[22px]">
-
-                  {/* Add project card */}
-                  <Link
-                    to={routes.profile.projectNew()}
-                    className="w-96 h-96 bg-zinc-300 flex flex-col items-center justify-center gap-3 no-underline hover:brightness-95"
-                  >
-                    <div className="w-12 h-12 flex items-center justify-center">
-                      <Plus size={48} strokeWidth={3} className="text-black" />
-                    </div>
-                    <span className="text-base font-medium text-black">Add project</span>
-                  </Link>
-
-                  {/* Project cards */}
                   {(projects ?? []).map((project) => (
                     <Link
                       key={project._id}
-                      to={routes.profile.projectDetail(project._id)}
+                      to={routes.projectDetail(project._id)}
                       className="w-96 h-96 bg-zinc-300 relative block overflow-hidden no-underline group"
                     >
                       {project.cover
@@ -255,17 +280,10 @@ export default function ProfilePage() {
                       {/* Hover info */}
                       <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-black/40 to-transparent">
                         <p className="text-xl font-normal text-black">{project.name}</p>
-                        <div className="flex items-center justify-between mt-1">
-                          <span className="text-base font-normal text-black">Name Surname</span>
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1">
-                              <LinkIcon size={24} className="text-black" />
-                              <span className="text-base font-normal text-black">1.5</span>
-                            </div>
-                            <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-4 mt-1">
+                          <div className="flex items-center gap-1">
                             <Heart size={20} className="text-black" />
-                            <span className="text-base font-normal text-black">1.5</span>
-                            </div>
+                            <span className="text-base font-normal text-black">{project.likesCount ?? 0}</span>
                           </div>
                         </div>
                       </div>

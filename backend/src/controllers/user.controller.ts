@@ -2,6 +2,9 @@ import User, { type IUser } from "../models/user.model.js";
 import type { AuthContext } from "../types/koa.js";
 import { ConflictError, NotFoundError } from "../utils/ApiError.js";
 import { ok } from "../utils/httpResponse.js";
+import { validateObjectId } from "../utils/validation.js";
+import type { Context } from "koa";
+import { getPublicProjectsByUserService } from "../services/project.service.js";
 
 type UpdateUserBody = Partial<
   Pick<IUser, "userName" | "firstName" | "lastName" | "socials" | "skills" | "avatar">
@@ -48,4 +51,26 @@ export const updateMe = async (ctx: AuthContext): Promise<void> => {
   } catch (error) {
     checkDuplicateUser(error);
   }
+};
+
+export const getUserById = async (ctx: Context): Promise<void> => {
+  const { id } = ctx.params;
+  validateObjectId(id, "user id");
+
+  const user = await User.findById(id).select("-password");
+
+  if (!user) {
+    throw new NotFoundError("User not found");
+  }
+
+  ok(ctx, "User fetched successfully", { user });
+};
+
+export const getPublicProjectsByUser = async (ctx: Context): Promise<void> => {
+  const { id } = ctx.params;
+  validateObjectId(id, "user id");
+
+  const projects = await getPublicProjectsByUserService(id);
+
+  ok(ctx, "User projects fetched successfully", { projects });
 };
