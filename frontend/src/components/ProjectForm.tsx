@@ -16,12 +16,13 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
   const [cover, setCover] = useState(initial.cover || "");
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState(initial.cover || "");
-  const [photos] = useState<string[]>(initial.photos || []);
   const [tags, setTags] = useState<string[]>(initial.tags || []);
   const [tagInput, setTagInput] = useState("");
-  const [category, setCategory] = useState(initial.category || "");
-  const [toolsInput, setToolsInput] = useState(initial.toolsUsed?.join(", ") || "");
+  const [categories, setCategories] = useState<string[]>(initial.categories || []);
+  const [categoryInput, setCategoryInput] = useState("");
+  const [toolsInput, setToolsInput] = useState(initial.toolsUsed?.join(" ") || "");
   const [disableComments, setDisableComments] = useState(initial.disableComments ?? false);
+
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -68,11 +69,13 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
       }
 
       const toolsUsed = toolsInput
-        .split(",")
+        .split(" ")
         .map((tool) => tool.trim())
         .filter(Boolean);
 
-      await onSubmit({ name, description, cover: coverUrl, photos, tags, category, toolsUsed, disableComments });
+      const payload = { name, description, cover: coverUrl, tags, categories, toolsUsed, disableComments };
+      console.log("Project payload:", payload);
+      await onSubmit(payload);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save project.");
     } finally {
@@ -180,8 +183,8 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
         <div className="flex flex-col gap-2 mb-6">
           <div className="flex items-center justify-between">
             <span className="text-sm leading-5 text-black">
-              <strong className="font-semibold">Category</strong>{" "}
-              <span className="font-normal">(required, limit of 3)</span>
+              <strong className="font-semibold">Categories</strong>{" "}
+              <span className="font-normal">(space-separated, limit of 3)</span>
             </span>
             <button type="button" className="text-[#676767] text-sm font-normal hover:text-black">
               View all
@@ -190,10 +193,31 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
           <input
             className={inputClass}
             placeholder="How would you categorize this project?"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            required
+            value={categoryInput}
+            onChange={(e) => setCategoryInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                const newCats = categoryInput.split(" ").map((c) => c.trim()).filter(Boolean);
+                if (newCats.length > 0 && categories.length < 3) {
+                  setCategories([...categories, ...newCats].slice(0, 3));
+                  setCategoryInput("");
+                }
+              }
+            }}
           />
+          {categories.length > 0 && (
+            <div className="flex flex-wrap gap-2 mt-1">
+              {categories.map((cat, i) => (
+                <span key={cat} className="inline-flex items-center gap-2 h-7 px-2 bg-[#f0efef] text-sm text-black">
+                  {cat}
+                  <button type="button" onClick={() => setCategories(categories.filter((_, idx) => idx !== i))} className="text-zinc-500 hover:text-black">
+                    x
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <label className="flex flex-col gap-2 mb-6">

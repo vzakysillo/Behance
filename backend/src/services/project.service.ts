@@ -9,7 +9,7 @@ import {
   NotFoundError,
 } from "../utils/ApiError.js";
 
-type ProjectPayload = Pick<IProject, "name" | "description" | "cover" | "photos" | "tags" | "category" | "toolsUsed" | "disableComments">;
+type ProjectPayload = Pick<IProject,   "name" | "description" | "cover" | "assets" | "tags" | "categories" | "toolsUsed" | "disableComments">;
 
 export type CreateProjectBody = Pick<ProjectPayload, "name"> &
   Partial<Omit<ProjectPayload, "name">>;
@@ -58,8 +58,24 @@ const getProjectPayload = (
     payload.cover = body.cover;
   }
 
-  if (body.photos !== undefined) {
-    payload.photos = body.photos;
+  if (body.assets !== undefined) {
+    payload.assets = body.assets;
+  }
+
+  if (body.tags !== undefined) {
+    payload.tags = body.tags;
+  }
+
+  if (body.categories !== undefined) {
+    payload.categories = body.categories;
+  }
+
+  if (body.toolsUsed !== undefined) {
+    payload.toolsUsed = body.toolsUsed;
+  }
+
+  if (body.disableComments !== undefined) {
+    payload.disableComments = body.disableComments;
   }
 
   return payload;

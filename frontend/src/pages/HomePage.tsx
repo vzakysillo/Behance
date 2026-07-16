@@ -20,7 +20,7 @@ export default function HomePage() {
   const filteredProjects = (projects ?? []).filter((project) => {
     const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory =
-      selectedCategory === "All" || project.category?.toLowerCase().includes(selectedCategory.toLowerCase());
+      selectedCategory === "All" || project.categories?.some((c) => c.toLowerCase().includes(selectedCategory.toLowerCase()));
     return matchesSearch && matchesCategory;
   });
 

@@ -7,7 +7,6 @@ import {
   Eye,
   Heart,
   MessageSquare,
-  Paperclip,
   Send,
   Share2,
   Trash2,
@@ -114,7 +113,7 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
 
   const gallery = useMemo(() => {
     if (!project) return [];
-    return [project.cover, ...(project.photos ?? [])].filter((image): image is string => Boolean(image));
+    return [project.cover, ...(project.assets ?? [])].filter((image): image is string => Boolean(image));
   }, [project]);
 
   const similarProjects = useMemo(() => {
@@ -235,15 +234,20 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
                 project
               </div>
             )}
-
-            <a
-              href={project.attachedAssets?.[0]?.url ?? "#"}
-              className="absolute right-4 top-4 inline-flex h-6 items-center justify-center gap-1.5 bg-white px-3 text-[10px] font-medium text-black no-underline"
-            >
-              <Paperclip size={11} />
-              Attached Assets
-            </a>
           </section>
+
+          {(project.assets ?? []).length > 0 && (
+            <section className="mb-8 flex flex-col">
+              {project.assets!.map((asset, index) => (
+                <img
+                  key={`${asset}-${index}`}
+                  src={asset}
+                  alt={`${project.name} asset ${index + 1}`}
+                  className="w-full object-cover"
+                />
+              ))}
+            </section>
+          )}
 
           <section className="space-y-7">
             <div>
@@ -286,9 +290,9 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
 
             <section>
               <h2 className="mb-4 text-sm font-medium leading-5">Tags</h2>
-              {(project.tags ?? []).length > 0 || project.category ? (
+              {(project.tags ?? []).length > 0 || (project.categories ?? []).length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {[project.category, ...(project.tags ?? [])].filter(Boolean).map((tag) => (
+                  {[...(project.categories ?? []), ...(project.tags ?? [])].map((tag) => (
                     <span key={tag} className="inline-flex h-7 items-center bg-[#e8e5e5] px-3 text-xs">
                       {tag}
                     </span>

@@ -5,9 +5,9 @@ export interface IProject {
   name: string;
   description: string;
   cover: string;
-  photos: string[];
+  assets: string[];
   tags: string[];
-  category: string;
+  categories: string[];
   toolsUsed: string[];
   disableComments: boolean;
   createdAt: Date;
@@ -26,10 +26,9 @@ const projectSchema = new mongoose.Schema<IProject>(
     description: { type: String, default: null },
 
     cover: { type: String, default: null },
-
-    photos: { type: [String], default: [] },
+    assets: { type: [String], default: [] },
     tags: { type: [String], default: [] },
-    category: { type: String, default: "" },
+    categories: { type: [String], default: [] },
     toolsUsed: { type: [String], default: [] },
     disableComments: { type: Boolean, default: false },
   },

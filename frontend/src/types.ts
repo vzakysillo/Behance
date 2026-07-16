@@ -30,9 +30,9 @@ export interface IProject {
   name: string;
   description?: string;
   cover?: string;
-  photos?: string[];
+  assets?: string[];
   tags?: string[];
-  category?: string;
+  categories?: string[];
   toolsUsed?: string[];
   disableComments?: boolean;
   likesCount?: number;
