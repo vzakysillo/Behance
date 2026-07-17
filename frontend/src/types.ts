@@ -14,12 +14,6 @@ export interface IUser {
   availableForFreelance?: boolean;
   aboutMe?: string;
   memberSince?: string;
-  stats?: {
-    projectViews: number;
-    likes: number;
-    followers: number;
-    following: number;
-  };
   teams?: { name: string; location: string; avatar?: string }[];
 }
 
@@ -37,10 +31,6 @@ export interface IProject {
   disableComments?: boolean;
   likesCount?: number;
   commentsCount?: number;
-  savesCount?: number;
-  sharesCount?: number;
-  isSaved?: boolean;
-  attachedAssets?: { name: string; url: string; type?: string }[];
   similarProjects?: IProject[];
   authorProjects?: IProject[];
   createdAt?: string;

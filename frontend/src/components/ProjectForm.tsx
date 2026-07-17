@@ -1,7 +1,21 @@
 import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { ProjectPayload } from "../api/project.api";
 import { uploadImage } from "../api/upload.api";
 
+const projectSchema = z.object({
+  name: z.string().min(1, "Title is required"),
+  description: z.string(),
+  cover: z.string(),
+  tagsInput: z.string(),
+  categoriesInput: z.string(),
+  toolsInput: z.string(),
+  disableComments: z.boolean(),
+});
+
+type ProjectFormValues = z.infer<typeof projectSchema>;
 type ProjectFormData = ProjectPayload;
 
 interface ProjectFormProps {
@@ -11,35 +25,28 @@ interface ProjectFormProps {
 }
 
 export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: ProjectFormProps) {
-  const [name, setName] = useState(initial.name || "");
-  const [description, setDescription] = useState(initial.description || "");
-  const [cover, setCover] = useState(initial.cover || "");
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState(initial.cover || "");
-  const [tags, setTags] = useState<string[]>(initial.tags || []);
-  const [tagInput, setTagInput] = useState("");
-  const [categories, setCategories] = useState<string[]>(initial.categories || []);
-  const [categoryInput, setCategoryInput] = useState("");
-  const [toolsInput, setToolsInput] = useState(initial.toolsUsed?.join(" ") || "");
-  const [disableComments, setDisableComments] = useState(initial.disableComments ?? false);
-
-
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const addTag = () => {
-    const tag = tagInput.trim();
-    if (tag && tags.length < 10 && !tags.includes(tag)) {
-      setTags([...tags, tag]);
-      setTagInput("");
-    }
-  };
+  const { register, handleSubmit, watch, setValue, formState: { isSubmitting } } = useForm<ProjectFormValues>({
+    resolver: zodResolver(projectSchema),
+    defaultValues: {
+      name: initial.name || "",
+      description: initial.description || "",
+      cover: initial.cover || "",
+      tagsInput: initial.tags?.join(" ") || "",
+      categoriesInput: initial.categories?.join(" ") || "",
+      toolsInput: initial.toolsUsed?.join(" ") || "",
+      disableComments: initial.disableComments ?? false,
+    },
+  });
 
-  const removeTag = (i: number) => setTags(tags.filter((_, idx) => idx !== i));
+  const coverValue = watch("cover");
 
   useEffect(() => {
     if (!coverFile) {
-      setCoverPreview(cover);
+      setCoverPreview(coverValue);
       return;
     }
 
@@ -47,39 +54,32 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
     setCoverPreview(previewUrl);
 
     return () => URL.revokeObjectURL(previewUrl);
-  }, [cover, coverFile]);
+  }, [coverValue, coverFile]);
 
   const handleCoverSelect = (file: File | undefined) => {
     if (!file) return;
-
     setCoverFile(file);
     setError("");
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSaving(true);
+  const onSubmitForm = async (data: ProjectFormValues) => {
     setError("");
     try {
-      let coverUrl = cover;
+      let coverUrl = data.cover;
       if (coverFile) {
         coverUrl = await uploadImage(coverFile);
-        setCover(coverUrl);
+        setValue("cover", coverUrl);
         setCoverFile(null);
       }
 
-      const toolsUsed = toolsInput
-        .split(" ")
-        .map((tool) => tool.trim())
-        .filter(Boolean);
+      const tags = data.tagsInput.split(" ").map((t) => t.trim()).filter(Boolean);
+      const categories = data.categoriesInput.split(" ").map((c) => c.trim()).filter(Boolean);
+      const toolsUsed = data.toolsInput.split(" ").map((t) => t.trim()).filter(Boolean);
 
-      const payload = { name, description, cover: coverUrl, tags, categories, toolsUsed, disableComments };
-      console.log("Project payload:", payload);
+      const payload = { name: data.name, description: data.description, cover: coverUrl, tags, categories, toolsUsed, disableComments: data.disableComments };
       await onSubmit(payload);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save project.");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -89,7 +89,7 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
   return (
     <form
       id="project-form"
-      onSubmit={handleSubmit}
+      onSubmit={handleSubmit(onSubmitForm)}
       className="grid grid-cols-[minmax(520px,1fr)_minmax(420px,726px)] gap-[120px] px-[120px] pt-[92px] pb-20 min-h-[calc(100vh-80px)] bg-white text-black font-['Inter',sans-serif]"
     >
       <section className="flex flex-col pt-[88px]">
@@ -126,11 +126,7 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
         <input
           type="url"
           placeholder="Or paste a cover image URL..."
-          value={cover}
-          onChange={(e) => {
-            setCover(e.target.value);
-            setCoverFile(null);
-          }}
+          {...register("cover", { onChange: () => setCoverFile(null) })}
           className="mt-3 w-full max-w-[726px] h-9 px-2.5 border border-[#a2a0a0] text-sm font-['Inter'] text-black placeholder:text-[#676767] outline-none focus:border-black bg-white"
         />
       </section>
@@ -148,85 +144,40 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
           <input
             className={inputClass}
             placeholder="Give your project a title"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
+            {...register("name")}
           />
         </label>
 
         <label className="flex flex-col gap-2 mb-6">
           <span className="text-sm leading-5 text-black">
             <strong className="font-semibold">Tags</strong>{" "}
-            <span className="font-normal">(limit of 10)</span>
+            <span className="font-normal">(space-separated, limit of 10)</span>
           </span>
           <input
             className={inputClass}
             placeholder="Add up to 10 keywords to help people discover your project"
-            value={tagInput}
-            onChange={(e) => setTagInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
+            {...register("tagsInput")}
           />
-          {tags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-1">
-              {tags.map((tag, i) => (
-                <span key={tag} className="inline-flex items-center gap-2 h-7 px-2 bg-[#f0efef] text-sm text-black">
-                  {tag}
-                  <button type="button" onClick={() => removeTag(i)} className="text-zinc-500 hover:text-black">
-                    x
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
         </label>
 
-        <div className="flex flex-col gap-2 mb-6">
-          <div className="flex items-center justify-between">
-            <span className="text-sm leading-5 text-black">
-              <strong className="font-semibold">Categories</strong>{" "}
-              <span className="font-normal">(space-separated, limit of 3)</span>
-            </span>
-            <button type="button" className="text-[#676767] text-sm font-normal hover:text-black">
-              View all
-            </button>
-          </div>
+        <label className="flex flex-col gap-2 mb-6">
+          <span className="text-sm leading-5 text-black">
+            <strong className="font-semibold">Categories</strong>{" "}
+            <span className="font-normal">(space-separated, limit of 3)</span>
+          </span>
           <input
             className={inputClass}
             placeholder="How would you categorize this project?"
-            value={categoryInput}
-            onChange={(e) => setCategoryInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                const newCats = categoryInput.split(" ").map((c) => c.trim()).filter(Boolean);
-                if (newCats.length > 0 && categories.length < 3) {
-                  setCategories([...categories, ...newCats].slice(0, 3));
-                  setCategoryInput("");
-                }
-              }
-            }}
+            {...register("categoriesInput")}
           />
-          {categories.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-1">
-              {categories.map((cat, i) => (
-                <span key={cat} className="inline-flex items-center gap-2 h-7 px-2 bg-[#f0efef] text-sm text-black">
-                  {cat}
-                  <button type="button" onClick={() => setCategories(categories.filter((_, idx) => idx !== i))} className="text-zinc-500 hover:text-black">
-                    x
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
+        </label>
 
         <label className="flex flex-col gap-2 mb-6">
           <span className="text-sm font-semibold leading-5 text-black">Tools used</span>
           <input
             className={inputClass}
             placeholder="What software, hardware, or materials did you use?"
-            value={toolsInput}
-            onChange={(e) => setToolsInput(e.target.value)}
+            {...register("toolsInput")}
           />
         </label>
 
@@ -235,8 +186,7 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
           <textarea
             className={`${inputClass} h-[100px] py-2 resize-none`}
             placeholder="Add short description for your project"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            {...register("description")}
           />
         </label>
 
@@ -245,8 +195,7 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
           <label className="flex items-center gap-2 text-sm font-normal text-black">
             <input
               type="checkbox"
-              checked={disableComments}
-              onChange={(e) => setDisableComments(e.target.checked)}
+              {...register("disableComments")}
               className="w-4 h-4 accent-black"
             />
             Disable comments on this project
@@ -258,10 +207,10 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
         <div className="flex justify-end mt-[124px]">
           <button
             type="submit"
-            disabled={saving}
+            disabled={isSubmitting}
             className="flex justify-center items-center w-[284px] h-[45px] bg-[#b5b5b5] text-sm font-normal text-black hover:brightness-95 disabled:opacity-50"
           >
-            {saving ? "Publishing..." : submitLabel || "Publish"}
+            {isSubmitting ? "Publishing..." : submitLabel || "Publish"}
           </button>
         </div>
       </section>

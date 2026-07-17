@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface AsyncState<T> {
   data: T | null;
@@ -6,7 +6,7 @@ interface AsyncState<T> {
   error: string;
 }
 
-export function useAsync<T>(fn: () => Promise<T>): AsyncState<T> & { reload: () => void } {
+export function useAsync<T>(fn: () => Promise<T>, deps: unknown[] = []): AsyncState<T> & { reload: () => void } {
   const [reloadKey, setReloadKey] = useState(0);
   const [state, setState] = useState<AsyncState<T>>({
     data: null,
@@ -14,10 +14,13 @@ export function useAsync<T>(fn: () => Promise<T>): AsyncState<T> & { reload: () 
     error: "",
   });
 
+  const fnRef = useRef(fn);
+  fnRef.current = fn;
+
   useEffect(() => {
     let cancelled = false;
 
-    fn()
+    fnRef.current()
       .then((data) => {
         if (!cancelled) setState({ data, loading: false, error: "" });
       })
@@ -33,8 +36,7 @@ export function useAsync<T>(fn: () => Promise<T>): AsyncState<T> & { reload: () 
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reloadKey]);
+  }, [reloadKey, ...deps]);
 
   return {
     ...state,

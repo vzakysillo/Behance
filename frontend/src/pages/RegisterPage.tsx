@@ -1,15 +1,14 @@
-import { Link, Navigate, useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuthRedirect } from "../hooks/useAuthRedirect";
 import RegisterForm from "../components/RegisterForm";
+import BackLink from "../components/BackLink";
 import { routes } from "../routes";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
-  const { user, token, loading } = useAuth();
+  const redirect = useAuthRedirect();
 
-  if (!loading && token && user) {
-    return <Navigate to={user.skills?.length ? routes.home() : routes.auth.interests()} replace />;
-  }
+  if (redirect) return redirect;
 
   return (
     <main className="min-h-svh w-[min(100vw,1920px)] mx-auto grid grid-cols-[minmax(420px,49.74%)_minmax(460px,1fr)] overflow-hidden bg-white text-[#525252] font-['Inter',system-ui,sans-serif] text-left
@@ -19,14 +18,7 @@ export default function RegisterPage() {
         className="relative min-h-svh grid place-items-center bg-[#71717a] max-[1024px]:min-h-[240px] max-[560px]:min-h-[180px]"
         aria-label="Featured project preview"
       >
-        <Link
-          to={routes.welcome()}
-          className="absolute top-[50px] left-[50px] inline-flex items-center gap-[14px] text-white text-base font-medium leading-[1.2] no-underline max-[1024px]:top-7 max-[1024px]:left-7 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-[3px]"
-          aria-label="Back to home"
-        >
-          <span className="w-2 h-4 border-l-2 border-b-2 border-current rotate-45" aria-hidden="true" />
-          <span>Back</span>
-        </Link>
+        <BackLink to={routes.welcome()} />
         <p className="text-[#525252] text-[30px] font-normal leading-[1.2] max-[560px]:text-2xl">picture</p>
       </section>
 

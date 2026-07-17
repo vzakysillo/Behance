@@ -28,6 +28,10 @@ export function ErrorMessage({
   );
 }
 
+export function Divider({ className = "w-full h-px bg-stone-300 my-6" }: { className?: string }) {
+  return <div className={className} />;
+}
+
 export function ProtectedRoute({ children }: { children?: ReactNode }) {
   const { token, loading } = useAuth();
 

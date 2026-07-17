@@ -1,5 +1,19 @@
 import { useState } from "react";
+import { useFieldArray, useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { IUser } from "../types";
+
+const profileSchema = z.object({
+  userName: z.string(),
+  firstName: z.string(),
+  lastName: z.string(),
+  avatar: z.string(),
+  skills: z.array(z.object({ value: z.string() })),
+  socials: z.array(z.object({ value: z.string() })),
+});
+
+type ProfileValues = z.infer<typeof profileSchema>;
 
 interface ProfileFormProps {
   initial: IUser;
@@ -7,31 +21,43 @@ interface ProfileFormProps {
 }
 
 export default function ProfileForm({ initial, onSubmit }: ProfileFormProps) {
-  const [userName, setUserName] = useState(initial.userName || "");
-  const [firstName, setFirstName] = useState(initial.firstName || "");
-  const [lastName, setLastName] = useState(initial.lastName || "");
-  const [avatar, setAvatar] = useState(initial.avatar || "");
-  const [skills, setSkills] = useState<string[]>(initial.skills || []);
-  const [skillInput, setSkillInput] = useState("");
-  const [socials, setSocials] = useState<string[]>(initial.socials || []);
-  const [socialInput, setSocialInput] = useState("");
-  const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
-  const addSkill = () => { const s = skillInput.trim(); if (s) { setSkills([...skills, s]); setSkillInput(""); } };
-  const removeSkill = (i: number) => setSkills(skills.filter((_, idx) => idx !== i));
-  const addSocial = () => { const s = socialInput.trim(); if (s) { setSocials([...socials, s]); setSocialInput(""); } };
-  const removeSocial = (i: number) => setSocials(socials.filter((_, idx) => idx !== i));
+  const { register, handleSubmit, control, formState: { isSubmitting } } = useForm<ProfileValues>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      userName: initial.userName || "",
+      firstName: initial.firstName || "",
+      lastName: initial.lastName || "",
+      avatar: initial.avatar || "",
+      skills: (initial.skills || []).map((s) => ({ value: s })),
+      socials: (initial.socials || []).map((s) => ({ value: s })),
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault(); setSaving(true); setMessage("");
+  const { fields: skillFields, append: appendSkill, remove: removeSkill } = useFieldArray({ control, name: "skills" });
+  const { fields: socialFields, append: appendSocial, remove: removeSocial } = useFieldArray({ control, name: "socials" });
+
+  const [skillInput, setSkillInput] = useState("");
+  const [socialInput, setSocialInput] = useState("");
+
+  const addSkill = () => { const s = skillInput.trim(); if (s) { appendSkill({ value: s }); setSkillInput(""); } };
+  const addSocial = () => { const s = socialInput.trim(); if (s) { appendSocial({ value: s }); setSocialInput(""); } };
+
+  const onSubmitForm = async (data: ProfileValues) => {
+    setMessage("");
     try {
-      await onSubmit({ userName, firstName, lastName, avatar, skills, socials });
+      await onSubmit({
+        userName: data.userName,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        avatar: data.avatar,
+        skills: data.skills.map((s) => s.value),
+        socials: data.socials.map((s) => s.value),
+      });
       setMessage("Saved.");
     } catch (err) {
       setMessage(err instanceof Error ? err.message : "Could not save profile.");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -39,15 +65,14 @@ export default function ProfileForm({ initial, onSubmit }: ProfileFormProps) {
   const labelClass = "flex flex-col gap-1 text-sm font-medium text-gray-700";
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-lg">
-      <label className={labelClass}>Username <input className={inputClass} type="text" value={userName} onChange={(e) => setUserName(e.target.value)} /></label>
+    <form onSubmit={handleSubmit(onSubmitForm)} className="flex flex-col gap-4 max-w-lg">
+      <label className={labelClass}>Username <input className={inputClass} type="text" {...register("userName")} /></label>
       <label className={labelClass}>Email <input className={`${inputClass} bg-gray-100 cursor-not-allowed`} type="email" value={initial.email} disabled /></label>
-      <label className={labelClass}>First name <input className={inputClass} type="text" value={firstName} onChange={(e) => setFirstName(e.target.value)} /></label>
-      <label className={labelClass}>Last name <input className={inputClass} type="text" value={lastName} onChange={(e) => setLastName(e.target.value)} /></label>
+      <label className={labelClass}>First name <input className={inputClass} type="text" {...register("firstName")} /></label>
+      <label className={labelClass}>Last name <input className={inputClass} type="text" {...register("lastName")} /></label>
       <label className={labelClass}>
         Avatar URL
-        <input className={inputClass} type="url" placeholder="https://..." value={avatar} onChange={(e) => setAvatar(e.target.value)} />
-        {avatar && <img src={avatar} alt={userName} className="w-16 h-16 rounded-full object-cover" />}
+        <input className={inputClass} type="url" placeholder="https://..." {...register("avatar")} />
       </label>
 
       <div className="flex flex-col gap-1">
@@ -59,9 +84,9 @@ export default function ProfileForm({ initial, onSubmit }: ProfileFormProps) {
           <button type="button" onClick={addSkill} className="px-3 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300">Add</button>
         </div>
         <ul className="flex flex-wrap gap-2 mt-1">
-          {skills.map((skill, i) => (
-            <li key={`${skill}-${i}`} className="flex items-center gap-1 bg-gray-100 rounded px-2 py-1 text-sm">
-              <span>{skill}</span>
+          {skillFields.map((field, i) => (
+            <li key={field.id} className="flex items-center gap-1 bg-gray-100 rounded px-2 py-1 text-sm">
+              <span>{field.value}</span>
               <button type="button" onClick={() => removeSkill(i)} className="text-gray-500 hover:text-red-500">×</button>
             </li>
           ))}
@@ -77,18 +102,18 @@ export default function ProfileForm({ initial, onSubmit }: ProfileFormProps) {
           <button type="button" onClick={addSocial} className="px-3 py-2 text-sm bg-gray-200 rounded hover:bg-gray-300">Add</button>
         </div>
         <ul className="flex flex-col gap-1 mt-1">
-          {socials.map((social, i) => (
-            <li key={`${social}-${i}`} className="flex items-center gap-2 text-sm">
-              <span className="truncate text-blue-600">{social}</span>
+          {socialFields.map((field, i) => (
+            <li key={field.id} className="flex items-center gap-2 text-sm">
+              <span className="truncate text-blue-600">{field.value}</span>
               <button type="button" onClick={() => removeSocial(i)} className="text-gray-500 hover:text-red-500 shrink-0">Remove</button>
             </li>
           ))}
         </ul>
       </div>
 
-      <button type="submit" disabled={saving}
+      <button type="submit" disabled={isSubmitting}
         className="px-4 py-2 bg-gray-800 text-white text-sm rounded disabled:opacity-50 hover:bg-gray-700">
-        {saving ? "Saving..." : "Save profile"}
+        {isSubmitting ? "Saving..." : "Save profile"}
       </button>
       {message && <p className="text-sm text-gray-600">{message}</p>}
     </form>

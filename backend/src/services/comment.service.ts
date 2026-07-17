@@ -1,7 +1,8 @@
 import { type Types } from "mongoose";
 import Comment, { type IComment } from "../models/comment.model.js";
+import Project from "../models/project.model.js";
 import { ensureProjectExists, validateObjectId } from "../utils/validation.js";
-import { BadRequestError, NotFoundError } from "../utils/ApiError.js";
+import { BadRequestError, ForbiddenError, NotFoundError } from "../utils/ApiError.js";
 
 export type CreateCommentBody = Pick<IComment, "text">;
 
@@ -11,6 +12,11 @@ export const addCommentToProject = async (
   body: CreateCommentBody
 ) => {
   await ensureProjectExists(projectId);
+
+  const project = await Project.findById(projectId).select("disableComments");
+  if (project?.disableComments) {
+    throw new ForbiddenError("Comments are disabled for this project");
+  }
 
   if (!body.text?.trim()) {
     throw new BadRequestError("Comment text is required");

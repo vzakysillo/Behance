@@ -1,22 +1,18 @@
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { useAuthRedirect } from "../hooks/useAuthRedirect";
 import LoginForm from "../components/LoginForm";
+import BackLink from "../components/BackLink";
 import { routes } from "../routes";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { user, token, loading } = useAuth();
+  const redirect = useAuthRedirect();
 
-  // Already logged in — redirect away
-  if (!loading && token && user) {
-    return <Navigate to={user.skills?.length ? routes.home() : routes.auth.interests()} replace />;
-  }
+  if (redirect) return redirect;
 
   const handleSuccess = () => {
-    // After LoginForm calls useAuth().login(), the user object is updated in context.
-    // We read it via a fresh render; navigate based on skills.
-    // Because LoginForm awaits setAuth(token) which calls getMe() internally,
-    // by the time onSuccess fires the auth context user is populated.
     navigate(user?.skills?.length ? routes.home() : routes.auth.interests());
   };
 
@@ -27,14 +23,7 @@ export default function LoginPage() {
         className="relative min-h-svh grid place-items-center bg-[#8b8b8b] max-[1024px]:min-h-[240px] max-[560px]:min-h-[180px]"
         aria-label="Featured project preview"
       >
-        <Link
-          to={routes.welcome()}
-          className="absolute top-[50px] left-[50px] inline-flex items-center gap-[14px] text-white text-base font-medium leading-[1.2] no-underline max-[1024px]:top-7 max-[1024px]:left-7 focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-[3px]"
-          aria-label="Back to home"
-        >
-          <span className="w-2 h-4 border-l-2 border-b-2 border-current rotate-45" aria-hidden="true" />
-          <span>Back</span>
-        </Link>
+        <BackLink to={routes.welcome()} />
         <p className="text-[#575656] text-[30px] font-normal leading-[1.2] max-[560px]:text-2xl">picture</p>
       </section>
 
