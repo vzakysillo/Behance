@@ -1,4 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { ChevronLeft } from "lucide-react";
 import { createProject } from "../api/project.api";
 import ProjectForm from "../components/ProjectForm";
@@ -6,6 +7,15 @@ import { routes } from "../routes";
 
 export default function CreateProjectPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const createMutation = useMutation({
+    mutationFn: createProject,
+    onSuccess: (project) => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      navigate(routes.profile.projectPublished(project._id));
+    },
+  });
 
   return (
     <div className="min-h-screen bg-white font-['Inter',sans-serif] text-black">
@@ -22,9 +32,8 @@ export default function CreateProjectPage() {
       <ProjectForm
         submitLabel="Publish"
         onSubmit={async (data) => {
-          const project = await createProject(data);
+          const project = await createMutation.mutateAsync(data);
           console.log(project);
-          navigate(routes.profile.projectPublished(project._id));
         }}
       />
     </div>

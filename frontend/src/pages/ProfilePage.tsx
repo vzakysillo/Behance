@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAsync } from "../hooks/useAsync";
+import { useQuery } from "@tanstack/react-query";
 import { getProjects } from "../api/project.api";
 import { getFollowers, getFollowing } from "../api/follow.api";
 import { useAuth } from "../hooks/useAuth";
@@ -16,17 +16,25 @@ const TABS: Tab[] = ["Work", "Moodboards", "For sale", "Appreciations", "Your st
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
-  const { data: projects, loading, error } = useAsync(getProjects);
-  const [followersCount, setFollowersCount] = useState(0);
-  const [followingCount, setFollowingCount] = useState(0);
   const [activeTab, setActiveTab] = useState<Tab>("Work");
 
-  useEffect(() => {
-    if (!user) return;
+  const { data: projects, isLoading, isError, error } = useQuery({
+    queryKey: ["projects"],
+    queryFn: getProjects,
+    enabled: !!user,
+  });
 
-    getFollowers(user._id).then((res) => setFollowersCount(res.length));
-    getFollowing(user._id).then((res) => setFollowingCount(res.length));
-  }, [user]);
+  const { data: followers } = useQuery({
+    queryKey: ["followers", user?._id],
+    queryFn: () => getFollowers(user!._id),
+    enabled: !!user,
+  });
+
+  const { data: following } = useQuery({
+    queryKey: ["following", user?._id],
+    queryFn: () => getFollowing(user!._id),
+    enabled: !!user,
+  });
 
   if (!user) return <Spinner />;
 
@@ -39,8 +47,8 @@ export default function ProfilePage() {
       <ProfileSidebar
         user={user}
         likesCount={likesCount}
-        followersCount={followersCount}
-        followingCount={followingCount}
+        followersCount={followers?.length ?? 0}
+        followingCount={following?.length ?? 0}
         actionButtons={
           <div className="flex flex-col gap-[18px] mt-6">
             <Link
@@ -78,9 +86,9 @@ export default function ProfilePage() {
         <div className="flex-1 px-[50px] py-8">
           {activeTab === "Work" && (
             <>
-              {loading && <Spinner />}
-              {error && <ErrorMessage message={error} />}
-              {!loading && !error && (
+              {isLoading && <Spinner />}
+              {isError && <ErrorMessage message={error.message} />}
+              {!isLoading && !isError && (
                 <div className="grid grid-cols-3 gap-[22px]">
 
                   {/* Add project card */}

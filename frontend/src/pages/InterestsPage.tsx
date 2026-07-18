@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import { updateMe } from "../api/user.api";
 import { useAuth } from "../hooks/useAuth";
 import { Spinner } from "../components/ui";
@@ -21,9 +22,19 @@ export default function InterestsPage() {
   const navigate = useNavigate();
   const { user, loading, refreshUser } = useAuth();
   const [selected, setSelected] = useState<string[]>([]);
-  const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const selectedCount = selected.length;
+
+  const saveMutation = useMutation({
+    mutationFn: (skills: string[]) => updateMe({ skills }),
+    onSuccess: () => {
+      refreshUser();
+      navigate(routes.home());
+    },
+    onError: (err: Error) => {
+      setMessage(err.message || "Could not save your interests. Please try again.");
+    },
+  });
 
   // Auth loading (ProtectedRoute already guarantees a token exists)
   if (loading) {
@@ -48,19 +59,12 @@ export default function InterestsPage() {
     });
   };
 
-  const persistAndLeave = async (skills: string[]) => {
-    setSaving(true);
+  const persistAndLeave = (skills: string[]) => {
     setMessage("");
-    try {
-      if (skills.length > 0) {
-        await updateMe({ skills });
-        await refreshUser();
-      }
+    if (skills.length > 0) {
+      saveMutation.mutate(skills);
+    } else {
       navigate(routes.home());
-    } catch (err) {
-      setMessage(err instanceof Error ? err.message : "Could not save your interests. Please try again.");
-    } finally {
-      setSaving(false);
     }
   };
 
@@ -141,12 +145,12 @@ export default function InterestsPage() {
           </p>
           <button
             type="button"
-            disabled={saving}
+            disabled={saveMutation.isPending}
             onClick={() => persistAndLeave(selected)}
             className="w-[295px] h-[45px] border-0 rounded-none bg-[#b3b3b3] text-black text-base font-medium leading-[1.2] cursor-pointer disabled:cursor-wait disabled:opacity-70 hover:brightness-95 focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]
                        max-[640px]:w-full"
           >
-            {saving ? "Saving..." : "Continue"}
+            {saveMutation.isPending ? "Saving..." : "Continue"}
           </button>
         </div>
       </section>

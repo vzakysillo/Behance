@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useAsync } from "../hooks/useAsync";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getUserProjects } from "../api/project.api";
 import { getUser } from "../api/user.api";
 import { getFollowers, getFollowing, followUser, unfollowUser } from "../api/follow.api";
@@ -17,55 +17,59 @@ const TABS: Tab[] = ["Work", "Moodboards", "For sale", "Appreciations", "Your st
 export default function PublicProfilePage() {
   const { id } = useParams<{ id: string }>();
   const { user: currentUser, token } = useAuth();
+  const queryClient = useQueryClient();
+  const [activeTab, setActiveTab] = useState<Tab>("Work");
 
   const {
     data: profileUser,
-    loading: userLoading,
+    isLoading: userLoading,
     error: userError,
-  } = useAsync(() => getUser(id!), [id]);
+  } = useQuery({
+    queryKey: ["user", id],
+    queryFn: () => getUser(id!),
+    enabled: !!id,
+  });
 
   const {
     data: projects,
-    loading: projectsLoading,
+    isLoading: projectsLoading,
     error: projectsError,
-  } = useAsync(() => getUserProjects(id!), [id]);
+  } = useQuery({
+    queryKey: ["userProjects", id],
+    queryFn: () => getUserProjects(id!),
+    enabled: !!id,
+  });
 
-  const [followersCount, setFollowersCount] = useState(0);
-  const [followingCount, setFollowingCount] = useState(0);
-  const [isFollowing, setIsFollowing] = useState(false);
-  const [activeTab, setActiveTab] = useState<Tab>("Work");
+  const { data: followers } = useQuery({
+    queryKey: ["followers", id],
+    queryFn: () => getFollowers(id!),
+    enabled: !!id,
+  });
 
-  useEffect(() => {
-    if (!id) return;
+  const { data: following } = useQuery({
+    queryKey: ["following", id],
+    queryFn: () => getFollowing(id!),
+    enabled: !!id,
+  });
 
-    getFollowers(id).then((res) => setFollowersCount(res.length));
-    getFollowing(id).then((res) => setFollowingCount(res.length));
+  const { data: currentUserFollowing } = useQuery({
+    queryKey: ["following", currentUser?._id],
+    queryFn: () => getFollowing(currentUser!._id),
+    enabled: !!currentUser && currentUser._id !== id,
+  });
 
-    if (currentUser && currentUser._id !== id) {
-      getFollowing(currentUser._id).then((res) => {
-        setIsFollowing(res.some((u) => u._id === id));
-      });
-    }
-  }, [id, currentUser]);
+  const isFollowing = currentUserFollowing?.some((u) => u._id === id) ?? false;
 
-  const handleFollowToggle = async () => {
-    if (!currentUser || !id) return;
-    try {
-      if (isFollowing) {
-        await unfollowUser(id);
-        setFollowersCount((c) => c - 1);
-      } else {
-        await followUser(id);
-        setFollowersCount((c) => c + 1);
-      }
-      setIsFollowing(!isFollowing);
-    } catch {
-      // silently fail
-    }
-  };
+  const followMutation = useMutation({
+    mutationFn: () => (isFollowing ? unfollowUser(id!) : followUser(id!)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["followers", id] });
+      queryClient.invalidateQueries({ queryKey: ["following", currentUser?._id] });
+    },
+  });
 
   if (userLoading) return <Spinner />;
-  if (userError) return <ErrorMessage message={userError} />;
+  if (userError) return <ErrorMessage message={userError.message} />;
   if (!profileUser) return <ErrorMessage message="User not found." />;
 
   const likesCount = (projects ?? []).reduce((sum, p) => sum + (p.likesCount ?? 0), 0);
@@ -78,14 +82,14 @@ export default function PublicProfilePage() {
       <ProfileSidebar
         user={profileUser}
         likesCount={likesCount}
-        followersCount={followersCount}
-        followingCount={followingCount}
+        followersCount={followers?.length ?? 0}
+        followingCount={following?.length ?? 0}
         actionButtons={
           !isOwnProfile && token ? (
             <div className="flex flex-col gap-[18px] mt-6">
               <button
                 type="button"
-                onClick={handleFollowToggle}
+                onClick={() => followMutation.mutate()}
                 className={`w-full h-10 flex items-center justify-center text-sm font-normal transition-colors hover:brightness-95 ${
                   isFollowing
                     ? "bg-gray-200 text-black border border-neutral-600"
@@ -117,7 +121,7 @@ export default function PublicProfilePage() {
           {activeTab === "Work" && (
             <>
               {projectsLoading && <Spinner />}
-              {projectsError && <ErrorMessage message={projectsError} />}
+              {projectsError && <ErrorMessage message={projectsError.message} />}
               {!projectsLoading && !projectsError && (
                 <div className="grid grid-cols-3 gap-[22px]">
                   {(projects ?? []).map((project) => (

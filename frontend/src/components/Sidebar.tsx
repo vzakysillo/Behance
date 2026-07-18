@@ -17,11 +17,12 @@ interface MenuItem {
   icon: LucideIcon;
   label: string;
   path: string;
+  match?: string[];
 }
 
 const menuItems: MenuItem[] = [
-  { icon: User, label: "Profile", path: routes.profile.root() },
-  { icon: Home, label: "Home", path: routes.home() },
+  { icon: User, label: "Profile", path: routes.profile.root(), match: ["/profile"] },
+  { icon: Home, label: "Home", path: routes.home(), match: ["/", "/projects", "/users"] },
   { icon: Briefcase, label: "Vacancies", path: "#" },
   { icon: MessageCircle, label: "Chat", path: "#" },
   { icon: Bell, label: "Notifications", path: "#" },
@@ -48,7 +49,9 @@ export default function Sidebar() {
       {/* Nav */}
       <nav className="flex flex-col pt-[98px]">
         {menuItems.map((item) => {
-          const isActive = location.pathname === item.path;
+          const isActive = item.match
+            ? item.match.some((m) => location.pathname === m || location.pathname.startsWith(m + "/"))
+            : location.pathname === item.path;
           const Icon = item.icon;
           return (
             <Link

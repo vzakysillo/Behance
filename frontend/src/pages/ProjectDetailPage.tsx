@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   ArrowLeft,
   Bookmark,
@@ -58,48 +59,81 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user: currentUser, token } = useAuth();
+  const queryClient = useQueryClient();
 
-  const [project, setProject] = useState<IProject | null>(null);
-  const [likes, setLikes] = useState<ILike[]>([]);
-  const [comments, setComments] = useState<IComment[]>([]);
-  const [relatedProjects, setRelatedProjects] = useState<IProject[]>([]);
   const [commentText, setCommentText] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [reactionError, setReactionError] = useState("");
 
-  useEffect(() => {
-    if (!id) return;
-    let cancelled = false;
+  const { data: project, isLoading, error } = useQuery({
+    queryKey: ["project", id, publicView],
+    queryFn: () => (publicView ? getFeedProject(id!) : getProject(id!)),
+    enabled: !!id,
+  });
 
-    Promise.resolve()
-      .then(() => {
-        if (!cancelled) setLoading(true);
-        return Promise.all([
-          publicView ? getFeedProject(id) : getProject(id),
-          getProjectLikes(id),
-          getProjectComments(id),
-          publicView ? getFeedProjects() : getProjects(),
-        ]);
-      })
-      .then(([p, projectLikes, projectComments, projects]) => {
-        if (cancelled) return;
-        setProject(p);
-        setLikes(projectLikes);
-        setComments(projectComments);
-        setRelatedProjects(projects.filter((item) => item._id !== p._id));
-        setLoading(false);
-      })
-      .catch((err) => {
-        if (cancelled) return;
-        setError(err instanceof Error ? err.message : "Failed to load project.");
-        setLoading(false);
-      });
+  const { data: likes = [] } = useQuery({
+    queryKey: ["projectLikes", id],
+    queryFn: () => getProjectLikes(id!),
+    enabled: !!id,
+  });
 
-    return () => {
-      cancelled = true;
-    };
-  }, [id, publicView]);
+  const { data: comments = [] } = useQuery({
+    queryKey: ["projectComments", id],
+    queryFn: () => getProjectComments(id!),
+    enabled: !!id,
+  });
+
+  const { data: allProjects = [] } = useQuery({
+    queryKey: ["projects", publicView ? "feed" : "all"],
+    queryFn: () => (publicView ? getFeedProjects() : getProjects()),
+  });
+
+  const relatedProjects = useMemo(
+    () => allProjects.filter((item) => item._id !== project?._id),
+    [allProjects, project]
+  );
+
+  const likeMutation = useMutation({
+    mutationFn: () => {
+      if (!id) throw new Error("No project id");
+      const existingLike = likes.find((l) => l.userId === currentUser?._id);
+      if (existingLike) return removeProjectLike(id, existingLike._id);
+      return addProjectLike(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projectLikes", id] });
+    },
+  });
+
+  const addCommentMutation = useMutation({
+    mutationFn: (text: string) => {
+      if (!id) throw new Error("No project id");
+      return addProjectComment(id, text);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projectComments", id] });
+      setCommentText("");
+    },
+  });
+
+  const removeCommentMutation = useMutation({
+    mutationFn: (commentId: string) => {
+      if (!id) throw new Error("No project id");
+      return removeProjectComment(id, commentId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projectComments", id] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: () => {
+      if (!id) throw new Error("No project id");
+      return deleteProject(id);
+    },
+    onSuccess: () => {
+      navigate(routes.profile.root());
+    },
+  });
 
   const isLiked = likes.some((like) => like.userId === currentUser?._id);
 
@@ -136,73 +170,46 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
       .slice(0, 4);
   }, [project, relatedProjects]);
 
-  const handleLike = async () => {
-    if (!id) return;
-    setReactionError("");
-
+  const handleLike = () => {
     if (!currentUser) {
       setReactionError("Please login to like projects.");
       return;
     }
-
-    try {
-      if (isLiked) {
-        const like = likes.find((l) => l.userId === currentUser?._id);
-        if (like) {
-          await removeProjectLike(id, like._id);
-          setLikes(likes.filter((l) => l._id !== like._id));
-        }
-        return;
-      }
-      const like = await addProjectLike(id);
-      setLikes([...likes, like]);
-    } catch (err) {
-      setReactionError(err instanceof Error ? err.message : "Could not update like.");
-    }
+    setReactionError("");
+    likeMutation.mutate(undefined, {
+      onError: (err) => setReactionError(err instanceof Error ? err.message : "Could not update like."),
+    });
   };
 
-  const handleAddComment = async (e: React.FormEvent) => {
+  const handleAddComment = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!id || !commentText.trim()) return;
-    setReactionError("");
-
+    if (!commentText.trim()) return;
     if (!currentUser) {
       setReactionError("Please login to comment.");
       return;
     }
-
-    try {
-      const comment = await addProjectComment(id, commentText);
-      setComments([comment, ...comments]);
-      setCommentText("");
-    } catch (err) {
-      setReactionError(err instanceof Error ? err.message : "Could not post comment.");
-    }
-  };
-
-  const handleRemoveComment = async (commentId: string) => {
-    if (!id) return;
     setReactionError("");
-    try {
-      await removeProjectComment(id, commentId);
-      setComments(comments.filter((comment) => comment._id !== commentId));
-    } catch (err) {
-      setReactionError(err instanceof Error ? err.message : "Could not delete comment.");
-    }
+    addCommentMutation.mutate(commentText, {
+      onError: (err) => setReactionError(err instanceof Error ? err.message : "Could not post comment."),
+    });
   };
 
-  const handleDelete = async () => {
-    if (!id || !confirm("Delete this project?")) return;
-    try {
-      await deleteProject(id);
-      navigate(routes.profile.root());
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not delete project.");
-    }
+  const handleRemoveComment = (commentId: string) => {
+    setReactionError("");
+    removeCommentMutation.mutate(commentId, {
+      onError: (err) => setReactionError(err instanceof Error ? err.message : "Could not delete comment."),
+    });
   };
 
-  if (loading) return <Spinner />;
-  if (error) return <ErrorMessage message={error} />;
+  const handleDelete = () => {
+    if (!confirm("Delete this project?")) return;
+    deleteMutation.mutate(undefined, {
+      onError: (err) => setReactionError(err instanceof Error ? err.message : "Could not delete project."),
+    });
+  };
+
+  if (isLoading) return <Spinner />;
+  if (error) return <ErrorMessage message={error.message} />;
   if (!project) return <ErrorMessage message="Project not found." />;
 
   const fallbackDescription =
@@ -214,7 +221,7 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
 
   return (
     <div className="min-h-screen bg-white font-['Inter',sans-serif] text-black">
-      <div className="grid min-h-screen grid-cols-[minmax(0,1fr)_494px] max-[1280px]:grid-cols-1">
+      <div className="mx-auto grid min-h-screen max-w-[1756px] grid-cols-[minmax(0,1fr)_494px] max-[1280px]:grid-cols-1">
         <main className="min-w-0 px-[50px] pb-20 pt-[30px] max-[768px]:px-5">
           <Link
             to={publicView ? routes.home() : routes.profile.root()}
@@ -456,7 +463,7 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
           </section>
         </main>
 
-        <aside className="sticky top-0 h-screen overflow-y-auto bg-[#e7e7e7] px-[50px] py-[50px] max-[1280px]:static max-[1280px]:h-auto max-[768px]:px-5">
+        <aside className="h-screen overflow-y-auto bg-[#e7e7e7] px-[50px] py-[50px] max-[1280px]:static max-[1280px]:h-auto max-[768px]:px-5">
           <AuthorPanel
             author={author}
             authorName={authorName}

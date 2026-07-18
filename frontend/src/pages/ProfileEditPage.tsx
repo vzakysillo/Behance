@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
 import { updateMe } from "../api/user.api";
 import { routes } from "../routes";
@@ -54,13 +55,18 @@ export default function ProfileEditPage() {
     },
   });
 
+  const saveMutation = useMutation({
+    mutationFn: (data: ProfileEditValues) =>
+      updateMe({ firstName: data.firstName, lastName: data.lastName, specialization: data.headline, location: data.location, socials: data.socials }),
+    onSuccess: () => refreshUser(),
+  });
+
   const socials = watch("socials");
 
   const handleSave = async (data: ProfileEditValues) => {
     setError("");
     try {
-      await updateMe({ firstName: data.firstName, lastName: data.lastName, specialization: data.headline, location: data.location, socials: data.socials });
-      await refreshUser();
+      await saveMutation.mutateAsync(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save.");
     }

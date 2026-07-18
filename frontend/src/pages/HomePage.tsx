@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { useAsync } from "../hooks/useAsync";
+import { useQuery } from "@tanstack/react-query";
 import { getFeedProjects } from "../api/project.api";
 import { useAuth } from "../hooks/useAuth";
 import { Spinner, ErrorMessage } from "../components/ui";
@@ -13,7 +13,10 @@ const categories: Category[] = ["All", "Logo design", "Branding", "Illustration"
 
 export default function HomePage() {
   const { token } = useAuth();
-  const { data: projects, loading, error } = useAsync(getFeedProjects);
+  const { data: projects, isLoading, isError, error } = useQuery({
+    queryKey: ["projects", "feed"],
+    queryFn: getFeedProjects,
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Category>("All");
 
@@ -24,8 +27,8 @@ export default function HomePage() {
     return matchesSearch && matchesCategory;
   });
 
-  if (loading) return <Spinner className="ml-[200px]" />;
-  if (error) return <ErrorMessage message={error} className="ml-[200px]" />;
+  if (isLoading) return <Spinner className="ml-[200px]" />;
+  if (isError) return <ErrorMessage message={error.message} className="ml-[200px]" />;
 
   return (
     <div className="min-h-screen bg-white p-0 flex-1">
