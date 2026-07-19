@@ -2,15 +2,16 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { X } from "lucide-react";
 import type { ProjectPayload } from "../api/project.api";
-import { uploadImage } from "../api/upload.api";
+import CategoryPicker from "./CategoryPicker";
+import { MAX_CATEGORIES } from "../utils/categories";
 
 const projectSchema = z.object({
   name: z.string().min(1, "Title is required"),
   description: z.string(),
   cover: z.string(),
   tagsInput: z.string(),
-  categoriesInput: z.string(),
   toolsInput: z.string(),
   disableComments: z.boolean(),
 });
@@ -28,15 +29,16 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
   const [coverFile, setCoverFile] = useState<File | null>(null);
   const [coverPreview, setCoverPreview] = useState(initial.cover || "");
   const [error, setError] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(initial.categories || []);
+  const [showPicker, setShowPicker] = useState(false);
 
-  const { register, handleSubmit, watch, setValue, formState: { isSubmitting } } = useForm<ProjectFormValues>({
+  const { register, handleSubmit, watch, formState: { isSubmitting } } = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
       name: initial.name || "",
       description: initial.description || "",
       cover: initial.cover || "",
       tagsInput: initial.tags?.join(" ") || "",
-      categoriesInput: initial.categories?.join(" ") || "",
       toolsInput: initial.toolsUsed?.join(" ") || "",
       disableComments: initial.disableComments ?? false,
     },
@@ -67,16 +69,13 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
     try {
       let coverUrl = data.cover;
       if (coverFile) {
-        coverUrl = await uploadImage(coverFile);
-        setValue("cover", coverUrl);
-        setCoverFile(null);
+        coverUrl = URL.createObjectURL(coverFile);
       }
 
       const tags = data.tagsInput.split(" ").map((t) => t.trim()).filter(Boolean);
-      const categories = data.categoriesInput.split(" ").map((c) => c.trim()).filter(Boolean);
       const toolsUsed = data.toolsInput.split(" ").map((t) => t.trim()).filter(Boolean);
 
-      const payload = { name: data.name, description: data.description, cover: coverUrl, tags, categories, toolsUsed, disableComments: data.disableComments };
+      const payload = { name: data.name, description: data.description, cover: coverUrl, tags, categories: selectedCategories, toolsUsed, disableComments: data.disableComments };
       await onSubmit(payload);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save project.");
@@ -160,17 +159,43 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
           />
         </label>
 
-        <label className="flex flex-col gap-2 mb-6">
-          <span className="text-sm leading-5 text-black">
+        <div className="mb-6">
+          <p className="mb-2 text-sm leading-5 text-black">
             <strong className="font-semibold">Categories</strong>{" "}
-            <span className="font-normal">(space-separated, limit of 3)</span>
-          </span>
-          <input
-            className={inputClass}
-            placeholder="How would you categorize this project?"
-            {...register("categoriesInput")}
-          />
-        </label>
+            <span className="font-normal">(required, limit of {MAX_CATEGORIES})</span>
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowPicker(true)}
+            className={`${inputClass} text-left truncate`}
+          >
+            {selectedCategories.length > 0 ? selectedCategories.join(", ") : "Select categories..."}
+          </button>
+          {selectedCategories.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {selectedCategories.map((cat) => (
+                <span key={cat} className="inline-flex h-7 items-center gap-1.5 bg-[#e8e5e5] pl-3 pr-1.5 text-xs">
+                  {cat}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedCategories((prev) => prev.filter((c) => c !== cat))}
+                    className="text-neutral-500 hover:text-black"
+                    aria-label={`Remove ${cat}`}
+                  >
+                    <X size={12} />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+          {showPicker && (
+            <CategoryPicker
+              selected={selectedCategories}
+              onSelect={setSelectedCategories}
+              onClose={() => setShowPicker(false)}
+            />
+          )}
+        </div>
 
         <label className="flex flex-col gap-2 mb-6">
           <span className="text-sm font-semibold leading-5 text-black">Tools used</span>

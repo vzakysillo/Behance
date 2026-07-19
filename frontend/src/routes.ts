@@ -12,6 +12,8 @@ export const routes = {
     root: () => "/profile",
     edit: () => "/profile/edit",
     projectNew: () => "/profile/projects/new",
+    projectAssets: () => "/profile/projects/new/assets",
+    projectDetails: () => "/profile/projects/new/details",
     projectPublished: (id: string) => `/profile/projects/${id}/published`,
     projectDetail: (id: string) => `/profile/projects/${id}`,
   },

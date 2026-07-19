@@ -11,14 +11,17 @@ import ProjectPublishedPage from "./pages/ProjectPublishedPage";
 import PublicProfilePage from "./pages/PublicProfilePage";
 import WelcomePage from "./pages/WelcomePage";
 import HomePage from "./pages/HomePage";
+import UploadAssetPage from "./pages/UploadAssetPage";
+import ProjectAssetsPage from "./pages/ProjectAssetsPage";
+import { ProjectCreationProvider } from "./context/ProjectCreationContext";
 import Sidebar from "./components/Sidebar";
 import { routes } from "./routes";
 
 function SidebarLayout() {
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       <Sidebar />
-      <main className="ml-[200px] flex-1">
+      <main className="ml-[200px] flex-1 min-h-0">
         <Outlet />
       </main>
     </div>
@@ -43,9 +46,14 @@ function App() {
           <Route path={routes.profile.root()} element={<ProfilePage />} />
           <Route path="/users/:id" element={<PublicProfilePage />} />
           <Route path={routes.profile.edit()} element={<ProfileEditPage />} />
-          <Route path={routes.profile.projectNew()} element={<CreateProjectPage />} />
           <Route path={routes.profile.projectPublished(":id")} element={<ProjectPublishedPage />} />
           <Route path="/profile/projects/:id" element={<ProjectDetailPage />} />
+
+          <Route element={<ProjectCreationProvider><Outlet /></ProjectCreationProvider>}>
+            <Route path={routes.profile.projectNew()} element={<UploadAssetPage />} />
+            <Route path={routes.profile.projectAssets()} element={<ProjectAssetsPage />} />
+            <Route path={routes.profile.projectDetails()} element={<CreateProjectPage />} />
+          </Route>
         </Route>
       </Route>
 
