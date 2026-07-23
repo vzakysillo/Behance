@@ -3,15 +3,16 @@ import { ProtectedRoute } from "./components/ui";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import InterestsPage from "./pages/InterestsPage";
+import VerifyPage from "./pages/VerifyPage";
 import ProfilePage from "./pages/ProfilePage";
 import ProfileEditPage from "./pages/ProfileEditPage"
-import CreateProjectPage from "./pages/CreateProjectPage";
+import ProjectCreatePage from "./pages/ProjectCreatePage";
 import ProjectDetailPage from "./pages/ProjectDetailPage";
 import ProjectPublishedPage from "./pages/ProjectPublishedPage";
 import PublicProfilePage from "./pages/PublicProfilePage";
 import WelcomePage from "./pages/WelcomePage";
 import HomePage from "./pages/HomePage";
-import UploadAssetPage from "./pages/UploadAssetPage";
+import ProjectUploadPage from "./pages/ProjectUploadPage";
 import ProjectAssetsPage from "./pages/ProjectAssetsPage";
 import { ProjectCreationProvider } from "./context/ProjectCreationContext";
 import Sidebar from "./components/Sidebar";
@@ -32,17 +33,18 @@ function App() {
   return (
     <Routes>
       {/* No sidebar */}
+      <Route path="/" element={<WelcomePage />} />
       <Route path={routes.welcome()} element={<WelcomePage />} />
       <Route path={routes.auth.login()} element={<LoginPage />} />
       <Route path={routes.auth.register()} element={<RegisterPage />} />
+      <Route path={routes.auth.verify()} element={<VerifyPage />} />
 
       {/* With sidebar */}
       <Route element={<SidebarLayout />}>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/feed" element={<HomePage />} />
         <Route path="/projects/:id" element={<ProjectDetailPage publicView />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path={routes.auth.interests()} element={<InterestsPage />} />
           <Route path={routes.profile.root()} element={<ProfilePage />} />
           <Route path="/users/:id" element={<PublicProfilePage />} />
           <Route path={routes.profile.edit()} element={<ProfileEditPage />} />
@@ -50,14 +52,19 @@ function App() {
           <Route path="/profile/projects/:id" element={<ProjectDetailPage />} />
 
           <Route element={<ProjectCreationProvider><Outlet /></ProjectCreationProvider>}>
-            <Route path={routes.profile.projectNew()} element={<UploadAssetPage />} />
+            <Route path={routes.profile.projectUpload()} element={<ProjectUploadPage />} />
             <Route path={routes.profile.projectAssets()} element={<ProjectAssetsPage />} />
-            <Route path={routes.profile.projectDetails()} element={<CreateProjectPage />} />
+            <Route path={routes.profile.projectCreate()} element={<ProjectCreatePage />} />
           </Route>
         </Route>
       </Route>
 
-      <Route path="*" element={<Navigate to={routes.welcome()} replace />} />
+      {/* Standalone protected pages — no sidebar */}
+      <Route element={<ProtectedRoute />}>
+        <Route path={routes.auth.interests()} element={<InterestsPage />} />
+      </Route>
+
+      <Route path="*" element={<Navigate to={routes.home()} replace />} />
     </Routes>
   );
 }

@@ -5,14 +5,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { X } from "lucide-react";
 import type { ProjectPayload } from "../api/project.api";
 import CategoryPicker from "./CategoryPicker";
+import TagInput from "./TagInput";
 import { MAX_CATEGORIES } from "../utils/categories";
+import { TAGS, MAX_TAGS } from "../utils/tags";
+import { TOOLS } from "../utils/tools";
 
 const projectSchema = z.object({
   name: z.string().min(1, "Title is required"),
   description: z.string(),
   cover: z.string(),
-  tagsInput: z.string(),
-  toolsInput: z.string(),
   disableComments: z.boolean(),
 });
 
@@ -21,7 +22,7 @@ type ProjectFormData = ProjectPayload;
 
 interface ProjectFormProps {
   initial?: Partial<ProjectFormData>;
-  onSubmit: (data: ProjectFormData) => Promise<void>;
+  onSubmit: (data: ProjectFormData, coverFile?: File) => Promise<void>;
   submitLabel?: string;
 }
 
@@ -30,6 +31,8 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
   const [coverPreview, setCoverPreview] = useState(initial.cover || "");
   const [error, setError] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>(initial.categories || []);
+  const [selectedTags, setSelectedTags] = useState<string[]>(initial.tags || []);
+  const [selectedTools, setSelectedTools] = useState<string[]>(initial.toolsUsed || []);
   const [showPicker, setShowPicker] = useState(false);
 
   const { register, handleSubmit, watch, formState: { isSubmitting } } = useForm<ProjectFormValues>({
@@ -38,8 +41,6 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
       name: initial.name || "",
       description: initial.description || "",
       cover: initial.cover || "",
-      tagsInput: initial.tags?.join(" ") || "",
-      toolsInput: initial.toolsUsed?.join(" ") || "",
       disableComments: initial.disableComments ?? false,
     },
   });
@@ -68,15 +69,9 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
     setError("");
     try {
       let coverUrl = data.cover;
-      if (coverFile) {
-        coverUrl = URL.createObjectURL(coverFile);
-      }
 
-      const tags = data.tagsInput.split(" ").map((t) => t.trim()).filter(Boolean);
-      const toolsUsed = data.toolsInput.split(" ").map((t) => t.trim()).filter(Boolean);
-
-      const payload = { name: data.name, description: data.description, cover: coverUrl, tags, categories: selectedCategories, toolsUsed, disableComments: data.disableComments };
-      await onSubmit(payload);
+      const payload = { name: data.name, description: data.description, cover: coverUrl, tags: selectedTags, categories: selectedCategories, toolsUsed: selectedTools, disableComments: data.disableComments };
+      await onSubmit(payload, coverFile ?? undefined);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save project.");
     }
@@ -147,17 +142,21 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
           />
         </label>
 
-        <label className="flex flex-col gap-2 mb-6">
-          <span className="text-sm leading-5 text-black">
+        <div className="mb-6">
+          <p className="mb-2 text-sm leading-5 text-black">
             <strong className="font-semibold">Tags</strong>{" "}
-            <span className="font-normal">(space-separated, limit of 10)</span>
-          </span>
-          <input
-            className={inputClass}
-            placeholder="Add up to 10 keywords to help people discover your project"
-            {...register("tagsInput")}
-          />
-        </label>
+            <span className="font-normal">(limit of {MAX_TAGS})</span>
+          </p>
+          <div className="w-full px-2.5 py-2 border border-[#a2a0a0] bg-white outline-none focus-within:border-black">
+            <TagInput
+              selected={selectedTags}
+              onSelect={setSelectedTags}
+              options={TAGS}
+              placeholder="Add up to 10 keywords to help people discover your project"
+              maxItems={MAX_TAGS}
+            />
+          </div>
+        </div>
 
         <div className="mb-6">
           <p className="mb-2 text-sm leading-5 text-black">
@@ -197,14 +196,17 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
           )}
         </div>
 
-        <label className="flex flex-col gap-2 mb-6">
-          <span className="text-sm font-semibold leading-5 text-black">Tools used</span>
-          <input
-            className={inputClass}
-            placeholder="What software, hardware, or materials did you use?"
-            {...register("toolsInput")}
-          />
-        </label>
+        <div className="mb-6">
+          <p className="mb-2 text-sm font-semibold leading-5 text-black">Tools used</p>
+          <div className="w-full px-2.5 py-2 border border-[#a2a0a0] bg-white outline-none focus-within:border-black">
+            <TagInput
+              selected={selectedTools}
+              onSelect={setSelectedTools}
+              options={TOOLS}
+              placeholder="What software, hardware, or materials did you use?"
+            />
+          </div>
+        </div>
 
         <label className="flex flex-col gap-2 mb-6">
           <span className="text-sm font-semibold leading-5 text-black">Description</span>

@@ -27,6 +27,7 @@ export function ok<T>(ctx: Context, message: string, data?: T): void {
 }
 
 export function created<T>(ctx: Context, message: string, data?: T): void {
+  ctx.status = 201;
   sendSuccess(ctx, message, data);
 }
 

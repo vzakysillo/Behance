@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Link } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../hooks/useAuth";
 import { updateMe } from "../api/user.api";
 import { routes } from "../routes";
@@ -26,6 +26,7 @@ const profileEditSchema = z.object({
   company: z.string(),
   location: z.string(),
   city: z.string(),
+  bio: z.string(),
   teamLink: z.string(),
   socials: z.array(z.string()),
   linkTitle: z.string(),
@@ -36,6 +37,7 @@ type ProfileEditValues = z.infer<typeof profileEditSchema>;
 
 export default function ProfileEditPage() {
   const { user, refreshUser } = useAuth();
+  const queryClient = useQueryClient();
   const [error, setError] = useState("");
   const [activeSection, setActiveSection] = useState<Section>("Base information");
 
@@ -48,6 +50,7 @@ export default function ProfileEditPage() {
       company: "",
       location: user?.location ?? "",
       city: "",
+      bio: user?.bio ?? "",
       teamLink: "",
       socials: user?.socials ?? [],
       linkTitle: "",
@@ -57,8 +60,12 @@ export default function ProfileEditPage() {
 
   const saveMutation = useMutation({
     mutationFn: (data: ProfileEditValues) =>
-      updateMe({ firstName: data.firstName, lastName: data.lastName, specialization: data.headline, location: data.location, socials: data.socials }),
-    onSuccess: () => refreshUser(),
+      updateMe({ firstName: data.firstName, lastName: data.lastName, specialization: data.headline, location: data.location, socials: data.socials, bio: data.bio }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["user", user?._id] });
+      refreshUser();
+    },
   });
 
   const socials = watch("socials");
@@ -113,7 +120,11 @@ export default function ProfileEditPage() {
             <button
               key={section}
               type="button"
-              onClick={() => setActiveSection(section)}
+              onClick={() => {
+                setActiveSection(section);
+                const id = section.toLowerCase().replace(/\s+/g, "-");
+                document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
               className={[
                 "w-full h-10 px-2.5 text-left text-sm font-['Inter'] transition-colors",
                 activeSection === section
@@ -184,6 +195,15 @@ export default function ProfileEditPage() {
                     <label className="text-sm text-black">City</label>
                     <input className={inputClass} placeholder="City" {...register("city")} />
                   </div>
+                </div>
+
+                <div className="flex flex-col gap-1">
+                  <label className="text-sm text-black">Bio</label>
+                  <textarea
+                    className={`${inputClass} h-[100px] py-2 resize-none`}
+                    placeholder="Tell us about yourself"
+                    {...register("bio")}
+                  />
                 </div>
               </div>
             </div>

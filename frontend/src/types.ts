@@ -7,6 +7,7 @@ export interface IUser {
   socials: string[];
   skills: string[];
   avatar: string;
+  bio?: string;
   isVerified: boolean;
   // new — wire to backend later
   specialization?: string;

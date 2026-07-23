@@ -101,6 +101,7 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projectLikes", id] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
   });
 
@@ -111,6 +112,7 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projectComments", id] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
       setCommentText("");
     },
   });
@@ -122,6 +124,7 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projectComments", id] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
   });
 
@@ -131,6 +134,9 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
       return deleteProject(id);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
+      queryClient.invalidateQueries({ queryKey: ["projectLikes", id] });
+      queryClient.invalidateQueries({ queryKey: ["projectComments", id] });
       navigate(routes.profile.root());
     },
   });

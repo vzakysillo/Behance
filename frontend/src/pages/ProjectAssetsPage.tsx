@@ -23,7 +23,7 @@ export default function ProjectAssetsPage() {
     <div className="h-full overflow-hidden bg-[#f8f8f8] font-['Inter',sans-serif] flex flex-col">
       <header className="flex items-center justify-between px-[37px] pt-[43px] shrink-0">
         <button
-          onClick={() => navigate(routes.profile.projectNew())}
+          onClick={() => navigate(routes.profile.projectUpload())}
           className="inline-flex items-center gap-3.5 text-base font-medium text-[#6146ea] hover:opacity-80"
         >
           <ChevronLeft size={16} strokeWidth={2} className="text-[#6146ea]" />
@@ -106,7 +106,7 @@ export default function ProjectAssetsPage() {
 
       <div className="flex justify-end px-[37px] pb-[43px] pt-4 shrink-0">
         <button
-          onClick={() => navigate(routes.profile.projectDetails())}
+          onClick={() => navigate(routes.profile.projectCreate())}
           disabled={files.length === 0}
           className="flex items-center justify-center gap-[5px] h-[45px] px-7 rounded-[30px] bg-[#6146ea] text-base font-medium text-white hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
         >

@@ -8,15 +8,21 @@ export interface FollowUser {
   avatar: string;
 }
 
-export const getFollowers = async (userId: string): Promise<FollowUser[]> => {
-  const res = await AxiosApi.get<ApiResponse<{ users: FollowUser[] }>>(
+export interface FollowEntry {
+  _id: string;
+  followerId: string;
+  followingId: FollowUser;
+}
+
+export const getFollowers = async (userId: string): Promise<FollowEntry[]> => {
+  const res = await AxiosApi.get<ApiResponse<{ users: FollowEntry[] }>>(
     `/users/${userId}/follow/followers`
   );
   return res.data.data?.users ?? [];
 };
 
-export const getFollowing = async (userId: string): Promise<FollowUser[]> => {
-  const res = await AxiosApi.get<ApiResponse<{ users: FollowUser[] }>>(
+export const getFollowing = async (userId: string): Promise<FollowEntry[]> => {
+  const res = await AxiosApi.get<ApiResponse<{ users: FollowEntry[] }>>(
     `/users/${userId}/follow/following`
   );
   return res.data.data?.users ?? [];

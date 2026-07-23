@@ -3,6 +3,11 @@ import { MapPin, Link as LinkIcon, Briefcase, ChevronRight } from "lucide-react"
 import { SOCIAL_ICONS, parseSocials } from "../utils/socials";
 import type { IUser } from "../types";
 
+const getMemberSinceDate = (id: string): string => {
+  const timestamp = parseInt(id.slice(0, 8), 16) * 1000;
+  return new Date(timestamp).toLocaleDateString("en-US", { month: "long", year: "numeric" });
+};
+
 interface ProfileSidebarProps {
   user: IUser;
   likesCount: number;
@@ -127,12 +132,12 @@ export default function ProfileSidebar({
       {/* About me */}
       <p className="text-base font-normal text-black mb-3">About me</p>
       <p className="text-sm font-normal text-black leading-5">
-        {user.aboutMe ?? "No bio yet."}
+        {user.bio || "No bio yet."}
       </p>
 
       {/* Member since */}
-      <p className="text-base font-normal text-zinc-400 mt-auto pt-10">
-        {user.memberSince ? `Member since ${user.memberSince}` : ""}
+      <p className="text-sm font-normal text-zinc-400 mt-auto pt-10">
+        Member since {getMemberSinceDate(user._id)}
       </p>
 
       {/* Logout button slot */}

@@ -22,7 +22,7 @@ interface MenuItem {
 
 const menuItems: MenuItem[] = [
   { icon: User, label: "Profile", path: routes.profile.root(), match: ["/profile"] },
-  { icon: Home, label: "Home", path: routes.home(), match: ["/", "/projects", "/users"] },
+  { icon: Home, label: "Home", path: routes.home(), match: ["/feed", "/", "/projects", "/users"] },
   { icon: Briefcase, label: "Vacancies", path: "#" },
   { icon: MessageCircle, label: "Chat", path: "#" },
   { icon: Bell, label: "Notifications", path: "#" },

@@ -39,7 +39,7 @@ export default function InterestsPage() {
   // Auth loading (ProtectedRoute already guarantees a token exists)
   if (loading) {
     return (
-      <main className="min-h-svh w-[min(100vw,1920px)] mx-auto relative overflow-hidden bg-white text-[#525252] font-['Inter',system-ui,sans-serif] text-center">
+      <main className="h-svh w-[min(100vw,1920px)] mx-auto relative overflow-hidden bg-white text-[#525252] font-['Inter',system-ui,sans-serif] text-center">
         <Spinner />
       </main>
     );
@@ -71,8 +71,7 @@ export default function InterestsPage() {
   const skip = () => navigate(routes.home());
 
   return (
-    <main className="min-h-svh w-[min(100vw,1920px)] mx-auto relative overflow-hidden bg-white text-[#525252] font-['Inter',system-ui,sans-serif] text-center
-                     max-[1160px]:overflow-visible">
+    <main className="h-svh w-[min(100vw,1920px)] mx-auto flex flex-col overflow-hidden bg-white text-[#525252] font-['Inter',system-ui,sans-serif] text-center">
       <header className="absolute inset-x-0 top-0 z-[2] pointer-events-none
                          max-[1160px]:static max-[1160px]:flex max-[1160px]:items-center max-[1160px]:justify-between max-[1160px]:gap-6 max-[1160px]:px-10 max-[1160px]:pt-8 max-[1160px]:box-border max-[1160px]:pointer-events-auto">
         <Link
@@ -95,8 +94,8 @@ export default function InterestsPage() {
       </header>
 
       <section
-        className="min-h-svh w-[min(1210px,calc(100%-80px))] mx-auto flex flex-col items-center pt-[137px] pb-[115px] box-border
-                   max-[1160px]:min-h-0 max-[1160px]:pt-[82px] max-[1160px]:pb-[180px]
+        className="flex-1 min-h-0 w-[min(1210px,calc(100%-80px))] mx-auto flex flex-col items-center pt-[137px] pb-6 box-border overflow-hidden
+                   max-[1160px]:pt-[82px]
                    max-[640px]:w-[min(calc(100%-40px),1210px)] max-[640px]:pt-[58px]"
         aria-labelledby="interests-title"
       >
@@ -114,8 +113,8 @@ export default function InterestsPage() {
         </p>
 
         <div
-          className="w-full flex flex-wrap justify-center content-start gap-x-[10px] gap-y-[13px] mt-[106px]
-                     max-[1160px]:mt-14 max-[640px]:justify-start max-[640px]:gap-[10px] max-[640px]:mt-[42px]"
+          className="w-full flex-1 min-h-0 overflow-y-auto flex flex-wrap justify-center content-start gap-x-[10px] gap-y-[13px] mt-[42px]
+                     max-[640px]:justify-start max-[640px]:gap-[10px]"
           aria-label="Available interests"
         >
           {INTERESTS.map((interest) => {
@@ -138,8 +137,8 @@ export default function InterestsPage() {
           })}
         </div>
 
-        <div className="absolute right-[50px] bottom-[115px] grid justify-items-end gap-[14px]
-                     max-[640px]:left-5 max-[640px]:right-5 max-[640px]:bottom-10">
+        <div className="shrink-0 mt-auto w-full grid justify-items-end gap-[14px] pt-4
+                     max-[640px]:px-5">
           <p className="min-h-[18px] m-0 text-[#575656] text-sm font-medium leading-[1.2]" aria-live="polite">
             {message || (selectedCount > 0 ? `${selectedCount}/${MAX_INTERESTS} selected` : "")}
           </p>

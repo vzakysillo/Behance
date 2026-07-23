@@ -7,7 +7,7 @@ import ProjectForm from "../components/ProjectForm";
 import { useProjectCreation } from "../context/ProjectCreationContext";
 import { routes } from "../routes";
 
-export default function CreateProjectPage() {
+export default function ProjectCreatePage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { files, clearFiles } = useProjectCreation();
@@ -35,13 +35,21 @@ export default function CreateProjectPage() {
 
       <ProjectForm
         submitLabel="Publish"
-        onSubmit={async (data) => {
-          const uploadedFiles = await Promise.all(
+        onSubmit={async (data, coverFile) => {
+          let coverUrl = data.cover;
+          if (coverFile) {
+            coverUrl = await uploadImage(coverFile);
+          }
+
+          const uploadedAssets = await Promise.all(
             files.map((f) => uploadImage(f))
           );
-          const cover = uploadedFiles[0] || data.cover;
-          const assets = uploadedFiles.slice(1);
-          const project = await createMutation.mutateAsync({ ...data, cover, assets });
+
+          if (!coverUrl && uploadedAssets.length > 0) {
+            coverUrl = uploadedAssets.shift()!;
+          }
+
+          const project = await createMutation.mutateAsync({ ...data, cover: coverUrl, assets: uploadedAssets });
           console.log(project);
         }}
       />

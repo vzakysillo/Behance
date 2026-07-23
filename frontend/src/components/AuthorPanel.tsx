@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
-import { Eye, UserPlus } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Eye, UserPlus, UserMinus } from "lucide-react";
 import { routes } from "../routes";
+import { getFollowing, followUser, unfollowUser } from "../api/follow.api";
+import { useAuth } from "../hooks/useAuth";
 import type { IProject, IUser } from "../types";
 
 export const getProjectImage = (project: IProject) => project.cover || project.assets?.[0] || "";
@@ -16,6 +19,27 @@ export default function AuthorPanel({
   authorSpecialization: string;
   projects: IProject[];
 }) {
+  const { user: currentUser } = useAuth();
+  const queryClient = useQueryClient();
+  const authorId = author?._id;
+  const isOwnProfile = currentUser?._id === authorId;
+
+  const { data: currentUserFollowing } = useQuery({
+    queryKey: ["following", currentUser?._id],
+    queryFn: () => getFollowing(currentUser!._id),
+    enabled: !!currentUser && !isOwnProfile,
+  });
+
+  const isFollowing = currentUserFollowing?.some((u) => u.followingId._id === authorId) ?? false;
+
+  const followMutation = useMutation({
+    mutationFn: () => (isFollowing ? unfollowUser(authorId!) : followUser(authorId!)),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["following", currentUser?._id] });
+      queryClient.invalidateQueries({ queryKey: ["followers", authorId] });
+    },
+  });
+
   return (
     <div>
       <div className="mb-7 flex items-center gap-5">
@@ -36,13 +60,20 @@ export default function AuthorPanel({
           <Eye size={18} />
           View profile
         </Link>
-        <button
-          type="button"
-          className="flex h-11 w-full items-center justify-center gap-3 border border-neutral-600 px-4 text-base text-neutral-600 hover:bg-neutral-100"
-        >
-          <UserPlus size={18} />
-          Follow
-        </button>
+        {!isOwnProfile && (
+          <button
+            type="button"
+            onClick={() => followMutation.mutate()}
+            className={`flex h-11 w-full items-center justify-center gap-3 px-4 text-base transition-colors hover:brightness-95 ${
+              isFollowing
+                ? "border border-neutral-600 text-neutral-600 hover:bg-neutral-100"
+                : "border border-neutral-600 text-neutral-600 hover:bg-neutral-100"
+            }`}
+          >
+            {isFollowing ? <UserMinus size={18} /> : <UserPlus size={18} />}
+            {isFollowing ? "Following" : "Follow"}
+          </button>
+        )}
       </div>
 
       <h3 className="mb-6 text-2xl font-semibold uppercase leading-9">Other projects</h3>

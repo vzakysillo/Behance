@@ -58,7 +58,7 @@ export default function PublicProfilePage() {
     enabled: !!currentUser && currentUser._id !== id,
   });
 
-  const isFollowing = currentUserFollowing?.some((u) => u._id === id) ?? false;
+  const isFollowing = currentUserFollowing?.some((u) => u.followingId._id === id) ?? false;
 
   const followMutation = useMutation({
     mutationFn: () => (isFollowing ? unfollowUser(id!) : followUser(id!)),
@@ -135,12 +135,12 @@ export default function PublicProfilePage() {
                         : <div className="w-full h-full bg-stone-300" />}
 
                       {/* Hover info */}
-                      <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-black/40 to-transparent">
-                        <p className="text-xl font-normal text-black">{project.name}</p>
+                      <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-black/70 to-transparent">
+                        <p className="text-xl font-normal text-white">{project.name}</p>
                         <div className="flex items-center gap-4 mt-1">
                           <div className="flex items-center gap-1">
-                            <Heart size={20} className="text-black" />
-                            <span className="text-base font-normal text-black">{project.likesCount ?? 0}</span>
+                            <Heart size={20} className="text-white" />
+                            <span className="text-base font-normal text-white">{project.likesCount ?? 0}</span>
                           </div>
                         </div>
                       </div>

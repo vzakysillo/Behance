@@ -7,7 +7,6 @@ import { useAuth } from "../hooks/useAuth";
 import { Spinner, ErrorMessage } from "../components/ui";
 import { routes } from "../routes";
 import { Plus, Heart } from "lucide-react";
-import { Link as LinkIcon } from "lucide-react";
 import ProfileSidebar from "../components/ProfileSidebar";
 import TabBar from "../components/TabBar";
 
@@ -93,7 +92,7 @@ export default function ProfilePage() {
 
                   {/* Add project card */}
                   <Link
-                    to={routes.profile.projectNew()}
+                    to={routes.profile.projectUpload()}
                     className="w-96 h-96 bg-zinc-300 flex flex-col items-center justify-center gap-3 no-underline hover:brightness-95"
                   >
                     <div className="w-12 h-12 flex items-center justify-center">
@@ -114,19 +113,15 @@ export default function ProfilePage() {
                         : <div className="w-full h-full bg-stone-300" />}
 
                       {/* Hover info */}
-                      <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-black/40 to-transparent">
-                        <p className="text-xl font-normal text-black">{project.name}</p>
+                      <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-black/70 to-transparent">
+                        <p className="text-xl font-normal text-white">{project.name}</p>
                         <div className="flex items-center justify-between mt-1">
-                          <span className="text-base font-normal text-black">Name Surname</span>
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1">
-                              <LinkIcon size={24} className="text-black" />
-                              <span className="text-base font-normal text-black">1.5</span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                            <Heart size={20} className="text-black" />
-                            <span className="text-base font-normal text-black">1.5</span>
-                            </div>
+                          <span className="text-base font-normal text-white">
+                            {[user.firstName, user.lastName].filter(Boolean).join(" ") || user.userName}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <Heart size={20} className="text-white" />
+                            <span className="text-base font-normal text-white">{project.likesCount ?? 0}</span>
                           </div>
                         </div>
                       </div>

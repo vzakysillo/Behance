@@ -18,7 +18,7 @@ export default function RegisterPage() {
         className="relative min-h-svh grid place-items-center bg-[#71717a] max-[1024px]:min-h-[240px] max-[560px]:min-h-[180px]"
         aria-label="Featured project preview"
       >
-        <BackLink to={routes.welcome()} />
+        <BackLink to={routes.home()} />
         <p className="text-[#525252] text-[30px] font-normal leading-[1.2] max-[560px]:text-2xl">picture</p>
       </section>
 

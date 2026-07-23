@@ -7,7 +7,7 @@ import type { Context } from "koa";
 import { getPublicProjectsByUserService } from "../services/project.service.js";
 
 type UpdateUserBody = Partial<
-  Pick<IUser, "userName" | "firstName" | "lastName" | "socials" | "skills" | "avatar">
+  Pick<IUser, "userName" | "firstName" | "lastName" | "socials" | "skills" | "avatar" | "bio">
 >;
 
 const checkDuplicateUser = (error: unknown): never => {
@@ -39,6 +39,7 @@ export const updateMe = async (ctx: AuthContext): Promise<void> => {
         socials: body.socials,
         skills: body.skills,
         avatar: body.avatar,
+        bio: body.bio,
       },
       { new: true, runValidators: true }
     );

@@ -4,7 +4,7 @@ import { ChevronLeft, ChevronRight, Image } from "lucide-react";
 import { useProjectCreation } from "../context/ProjectCreationContext";
 import { routes } from "../routes";
 
-export default function UploadAssetPage() {
+export default function ProjectUploadPage() {
   const navigate = useNavigate();
   const { addFile } = useProjectCreation();
   const inputRef = useRef<HTMLInputElement>(null);

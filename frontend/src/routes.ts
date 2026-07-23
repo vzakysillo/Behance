@@ -1,5 +1,5 @@
 export const routes = {
-  home: () => "/",
+  home: () => "/feed",
   welcome: () => "/welcome",
   projectDetail: (id: string) => `/projects/${id}`,
   publicProfile: (id: string) => `/users/${id}`,
@@ -7,13 +7,14 @@ export const routes = {
     login: () => "/login",
     register: () => "/register",
     interests: () => "/interests",
+    verify: () => "/verify",
   },
   profile: {
     root: () => "/profile",
     edit: () => "/profile/edit",
-    projectNew: () => "/profile/projects/new",
+    projectUpload: () => "/profile/projects/new",
     projectAssets: () => "/profile/projects/new/assets",
-    projectDetails: () => "/profile/projects/new/details",
+    projectCreate: () => "/profile/projects/new/details",
     projectPublished: (id: string) => `/profile/projects/${id}/published`,
     projectDetail: (id: string) => `/profile/projects/${id}`,
   },

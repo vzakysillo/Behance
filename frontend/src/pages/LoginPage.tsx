@@ -23,7 +23,7 @@ export default function LoginPage() {
         className="relative min-h-svh grid place-items-center bg-[#8b8b8b] max-[1024px]:min-h-[240px] max-[560px]:min-h-[180px]"
         aria-label="Featured project preview"
       >
-        <BackLink to={routes.welcome()} />
+        <BackLink to={routes.home()} />
         <p className="text-[#575656] text-[30px] font-normal leading-[1.2] max-[560px]:text-2xl">picture</p>
       </section>
 

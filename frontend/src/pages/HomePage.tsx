@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getFeedProjects } from "../api/project.api";
 import { useAuth } from "../hooks/useAuth";
 import { Spinner, ErrorMessage } from "../components/ui";
 import { routes } from "../routes";
-import { Heart, MessageSquare, Search } from "lucide-react";
+import { Heart, MessageSquare, Search, SlidersHorizontal } from "lucide-react";
+import SearchFilterPanel, { type SortOption } from "../components/SearchFilterPanel";
 
 type Category = "All" | "Logo design" | "Branding" | "Illustration" | "Social media design" | "UI/UX";
 
@@ -19,13 +20,25 @@ export default function HomePage() {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<Category>("All");
+  const [sortBy, setSortBy] = useState<SortOption>("Oldest First");
+  const [selectedTool, setSelectedTool] = useState("");
+  const [showFilter, setShowFilter] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
 
-  const filteredProjects = (projects ?? []).filter((project) => {
-    const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory =
-      selectedCategory === "All" || project.categories?.some((c) => c.toLowerCase().includes(selectedCategory.toLowerCase()));
-    return matchesSearch && matchesCategory;
-  });
+  const filteredProjects = (projects ?? [])
+    .filter((project) => {
+      const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory =
+        selectedCategory === "All" || project.categories?.some((c) => c.toLowerCase().includes(selectedCategory.toLowerCase()));
+      const matchesTool =
+        !selectedTool || project.toolsUsed?.some((t) => t.toLowerCase() === selectedTool.toLowerCase());
+      return matchesSearch && matchesCategory && matchesTool;
+    })
+    .sort((a, b) => {
+      const dateA = new Date(a.createdAt ?? 0).getTime();
+      const dateB = new Date(b.createdAt ?? 0).getTime();
+      return sortBy === "Newest First" ? dateB - dateA : dateA - dateB;
+    });
 
   if (isLoading) return <Spinner className="ml-[200px]" />;
   if (isError) return <ErrorMessage message={error.message} className="ml-[200px]" />;
@@ -37,8 +50,32 @@ export default function HomePage() {
                       max-[1024px]:flex-col max-[1024px]:items-stretch
                       max-[768px]:px-5">
         {/* Search */}
-        <div className="flex-1 max-w-[873px] max-[1024px]:max-w-full">
-          <div className="flex items-center gap-[10px] px-5 py-[10px] bg-[#c6c2c2] rounded h-[45px]">
+        <div className="flex items-center gap-[10px] flex-1 max-w-[873px] max-[1024px]:max-w-full">
+          <div className="relative" ref={filterRef}>
+            <button
+              onClick={() => setShowFilter((v) => !v)}
+              className="h-[45px] px-[15px] py-[10px] border-none rounded text-base font-['Inter',sans-serif] font-normal text-black bg-[#c6c2c2] cursor-pointer transition-colors hover:bg-[#b8b8b8] shrink-0 flex items-center gap-2"
+            >
+              Search filter
+              <SlidersHorizontal size={18} />
+            </button>
+            {showFilter && (
+              <>
+                <div className="fixed inset-0 z-40" onClick={() => setShowFilter(false)} />
+                <div className="absolute left-0 top-full mt-2 z-50 border border-[#d9d9d9] shadow-lg">
+                  <SearchFilterPanel
+                    selectedCategory={selectedCategory}
+                    onCategoryChange={(cat) => setSelectedCategory(cat as Category)}
+                    sortBy={sortBy}
+                    onSortChange={setSortBy}
+                    selectedTool={selectedTool}
+                    onToolChange={setSelectedTool}
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <div className="flex items-center gap-[10px] px-5 py-[10px] bg-[#c6c2c2] rounded h-[45px] flex-1">
             <div className="flex items-center justify-center w-6 h-6 shrink-0">
               <Search size={24} className="text-black" />
             </div>
@@ -64,7 +101,7 @@ export default function HomePage() {
           </Link>
         )}
           <Link
-            to={routes.profile.projectNew()}
+            to={routes.profile.projectUpload()}
             className="px-[10px] h-[45px] flex items-center justify-center text-base font-['Inter',sans-serif] font-normal no-underline rounded bg-[#e8e7e7] text-black min-w-[284px] transition-colors hover:bg-[#d8d7d7]
                        max-[1024px]:w-full max-[768px]:w-full"
           >
