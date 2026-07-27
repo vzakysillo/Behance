@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { routes } from "../routes";
+import { Logo } from "./ui";
 
 interface MenuItem {
   icon: LucideIcon;
@@ -42,8 +43,7 @@ export default function Sidebar() {
         to={routes.home()}
         className="absolute top-[10px] left-0 w-[240px] px-[10px] pr-5 py-[10px] flex items-center gap-[10px] no-underline focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]"
       >
-        <div className="w-[18px] h-[18px] rounded-full border-2 border-black" />
-        <span className="text-base font-medium font-['Inter',sans-serif] text-black">LOGO</span>
+        <Logo size="md" />
       </Link>
 
       {/* Nav */}

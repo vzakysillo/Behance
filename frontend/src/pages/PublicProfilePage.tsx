@@ -1,24 +1,24 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getUserProjects } from "../api/project.api";
 import { getUser } from "../api/user.api";
 import { getFollowers, getFollowing, followUser, unfollowUser } from "../api/follow.api";
 import { useAuth } from "../hooks/useAuth";
-import { Spinner, ErrorMessage } from "../components/ui";
 import { routes } from "../routes";
-import { MessageSquare, Heart } from "lucide-react";
+import { MessageSquare } from "lucide-react";
 import ProfileSidebar from "../components/ProfileSidebar";
 import TabBar from "../components/TabBar";
+import { Button, Spinner, ErrorMessage, EmptyState } from "../components/ui";
+import { ProfileProjectCard } from "../components/layout/ProfileProjectCard";
 
-type Tab = "Work" | "Moodboards" | "For sale" | "Appreciations" | "Your stats";
-const TABS: Tab[] = ["Work", "Moodboards", "For sale", "Appreciations", "Your stats"];
+const TABS = ["Work", "Moodboards", "For sale", "Appreciations", "Your stats"] as const;
 
 export default function PublicProfilePage() {
   const { id } = useParams<{ id: string }>();
   const { user: currentUser, token } = useAuth();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<Tab>("Work");
+  const [activeTab, setActiveTab] = useState<string>("Work");
 
   const {
     data: profileUser,
@@ -87,24 +87,21 @@ export default function PublicProfilePage() {
         actionButtons={
           !isOwnProfile && token ? (
             <div className="flex flex-col gap-[18px] mt-6">
-              <button
+              <Button
+                variant={isFollowing ? "sidebar-light" : "sidebar"}
                 type="button"
                 onClick={() => followMutation.mutate()}
-                className={`w-full h-10 flex items-center justify-center text-sm font-normal transition-colors hover:brightness-95 ${
+                className={`transition-colors hover:brightness-95 ${
                   isFollowing
                     ? "bg-gray-200 text-black border border-neutral-600"
-                    : "bg-stone-300 text-black"
+                    : ""
                 }`}
               >
                 {isFollowing ? "Following" : "Follow"}
-              </button>
-              <button
-                type="button"
-                className="w-full h-10 flex items-center justify-center gap-2 bg-gray-200 text-black text-sm font-normal hover:brightness-95"
-              >
-                <MessageSquare size={14} />
+              </Button>
+              <Button variant="sidebar-light" icon={<MessageSquare size={14} />} className="gap-2">
                 Message
-              </button>
+              </Button>
             </div>
           ) : undefined
         }
@@ -125,26 +122,11 @@ export default function PublicProfilePage() {
               {!projectsLoading && !projectsError && (
                 <div className="grid grid-cols-3 gap-[22px]">
                   {(projects ?? []).map((project) => (
-                    <Link
+                    <ProfileProjectCard
                       key={project._id}
-                      to={routes.projectDetail(project._id)}
-                      className="w-96 h-96 bg-zinc-300 relative block overflow-hidden no-underline group"
-                    >
-                      {project.cover
-                        ? <img src={project.cover} alt={project.name} className="w-full h-full object-cover" />
-                        : <div className="w-full h-full bg-stone-300" />}
-
-                      {/* Hover info */}
-                      <div className="absolute bottom-0 left-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-t from-black/70 to-transparent">
-                        <p className="text-xl font-normal text-white">{project.name}</p>
-                        <div className="flex items-center gap-4 mt-1">
-                          <div className="flex items-center gap-1">
-                            <Heart size={20} className="text-white" />
-                            <span className="text-base font-normal text-white">{project.likesCount ?? 0}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </Link>
+                      project={project}
+                      linkTo={routes.projectDetail(project._id)}
+                    />
                   ))}
                 </div>
               )}
@@ -152,9 +134,7 @@ export default function PublicProfilePage() {
           )}
 
           {activeTab !== "Work" && (
-            <div className="flex items-center justify-center h-64 text-stone-400 text-base">
-              {activeTab} — coming soon
-            </div>
+            <EmptyState variant="centered" message={`${activeTab} — coming soon`} />
           )}
         </div>
       </main>

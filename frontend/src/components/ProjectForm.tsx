@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { X } from "lucide-react";
 import type { ProjectPayload } from "../api/project.api";
 import CategoryPicker from "./CategoryPicker";
 import TagInput from "./TagInput";
 import { MAX_CATEGORIES } from "../utils/categories";
 import { TAGS, MAX_TAGS } from "../utils/tags";
 import { TOOLS } from "../utils/tools";
+import { Button, Checkbox, FormError, TextInput, Tag } from "./ui";
 
 const projectSchema = z.object({
   name: z.string().min(1, "Title is required"),
@@ -68,7 +68,7 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
   const onSubmitForm = async (data: ProjectFormValues) => {
     setError("");
     try {
-      let coverUrl = data.cover;
+      const coverUrl = data.cover;
 
       const payload = { name: data.name, description: data.description, cover: coverUrl, tags: selectedTags, categories: selectedCategories, toolsUsed: selectedTools, disableComments: data.disableComments };
       await onSubmit(payload, coverFile ?? undefined);
@@ -76,9 +76,6 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
       setError(err instanceof Error ? err.message : "Could not save project.");
     }
   };
-
-  const inputClass =
-    "w-full h-11 px-2.5 border border-[#a2a0a0] text-sm font-normal font-['Inter'] leading-5 text-black bg-white outline-none placeholder:text-[#676767] focus:border-black";
 
   return (
     <form
@@ -117,11 +114,12 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
           />
         </label>
 
-        <input
+        <TextInput
+          variant="project"
           type="url"
           placeholder="Or paste a cover image URL..."
           {...register("cover", { onChange: () => setCoverFile(null) })}
-          className="mt-3 w-full max-w-[726px] h-9 px-2.5 border border-[#a2a0a0] text-sm font-['Inter'] text-black placeholder:text-[#676767] outline-none focus:border-black bg-white"
+          className="mt-3 w-full max-w-[726px] h-9"
         />
       </section>
 
@@ -130,17 +128,17 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
           Project Information
         </p>
 
-        <label className="flex flex-col gap-2 mb-6">
+        <div className="flex flex-col gap-2 mb-6">
           <span className="text-sm leading-5 text-black">
             <strong className="font-semibold">Title</strong>{" "}
             <span className="font-normal">(required)</span>
           </span>
-          <input
-            className={inputClass}
+          <TextInput
+            variant="project"
             placeholder="Give your project a title"
             {...register("name")}
           />
-        </label>
+        </div>
 
         <div className="mb-6">
           <p className="mb-2 text-sm leading-5 text-black">
@@ -163,27 +161,23 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
             <strong className="font-semibold">Categories</strong>{" "}
             <span className="font-normal">(required, limit of {MAX_CATEGORIES})</span>
           </p>
-          <button
+          <TextInput
+            variant="project"
             type="button"
             onClick={() => setShowPicker(true)}
-            className={`${inputClass} text-left truncate`}
-          >
-            {selectedCategories.length > 0 ? selectedCategories.join(", ") : "Select categories..."}
-          </button>
+            readOnly
+            value={selectedCategories.length > 0 ? selectedCategories.join(", ") : "Select categories..."}
+            className="text-left truncate cursor-pointer"
+          />
           {selectedCategories.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-2">
               {selectedCategories.map((cat) => (
-                <span key={cat} className="inline-flex h-7 items-center gap-1.5 bg-[#e8e5e5] pl-3 pr-1.5 text-xs">
-                  {cat}
-                  <button
-                    type="button"
-                    onClick={() => setSelectedCategories((prev) => prev.filter((c) => c !== cat))}
-                    className="text-neutral-500 hover:text-black"
-                    aria-label={`Remove ${cat}`}
-                  >
-                    <X size={12} />
-                  </button>
-                </span>
+                <Tag
+                  key={cat}
+                  label={cat}
+                  dismissible
+                  onDismiss={() => setSelectedCategories((prev) => prev.filter((c) => c !== cat))}
+                />
               ))}
             </div>
           )}
@@ -208,37 +202,35 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
           </div>
         </div>
 
-        <label className="flex flex-col gap-2 mb-6">
+        <div className="flex flex-col gap-2 mb-6">
           <span className="text-sm font-semibold leading-5 text-black">Description</span>
-          <textarea
-            className={`${inputClass} h-[100px] py-2 resize-none`}
+          <TextInput
+            variant="project"
+            className="h-[100px] py-2 resize-none"
             placeholder="Add short description for your project"
             {...register("description")}
           />
-        </label>
+        </div>
 
         <div className="flex flex-col gap-2">
           <span className="text-sm font-semibold leading-5 text-black">Comments</span>
           <label className="flex items-center gap-2 text-sm font-normal text-black">
-            <input
-              type="checkbox"
-              {...register("disableComments")}
-              className="w-4 h-4 accent-black"
-            />
+            <Checkbox variant="purple" {...register("disableComments")} />
             Disable comments on this project
           </label>
         </div>
 
-        {error && <p className="mt-4 text-red-600 text-sm font-['Inter']">{error}</p>}
+        {error && <FormError message={error} className="mt-4" />}
 
         <div className="flex justify-end mt-[124px]">
-          <button
+          <Button
+            variant="primary"
             type="submit"
             disabled={isSubmitting}
-            className="flex justify-center items-center w-[284px] h-[45px] bg-[#b5b5b5] text-sm font-normal text-black hover:brightness-95 disabled:opacity-50"
+            className="w-[284px] h-[45px] bg-[#b5b5b5] text-sm font-normal"
           >
             {isSubmitting ? "Publishing..." : submitLabel || "Publish"}
-          </button>
+          </Button>
         </div>
       </section>
     </form>

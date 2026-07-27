@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { LayoutGrid, Calendar, Wrench, ChevronDown, Search } from "lucide-react";
+import { LayoutGrid, Calendar, Wrench, ChevronDown } from "lucide-react";
 import { CATEGORIES, POPULAR_CATEGORIES } from "../utils/categories";
 import { TOOLS } from "../utils/tools";
+import { SearchInput } from "./ui";
 
-const POPULAR_CATEGORIES_SET = new Set(POPULAR_CATEGORIES);
+const POPULAR_CATEGORIES_SET = new Set<string>(POPULAR_CATEGORIES);
 const POPULAR_TOOLS = ["Adobe Photoshop", "Adobe Illustrator", "Adobe InDesign", "Adobe After Effects", "Adobe Lightroom"];
-const POPULAR_TOOLS_SET = new Set(POPULAR_TOOLS);
+const POPULAR_TOOLS_SET = new Set<string>(POPULAR_TOOLS);
 
 export const SORT_OPTIONS = ["Oldest First", "Newest First"] as const;
 export type SortOption = (typeof SORT_OPTIONS)[number];
@@ -54,21 +55,6 @@ function ItemRow({ label, selected, onClick, subtitle }: { label: string; select
   );
 }
 
-function SearchInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder: string }) {
-  return (
-    <div className="flex items-center gap-2 px-5 py-2.5 border border-[#d9d9d9] mx-5 mb-2">
-      <Search size={14} className="text-[#5B5B5B] shrink-0" />
-      <input
-        type="text"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="flex-1 bg-transparent text-sm text-black outline-none placeholder:text-[#aeaeae] border-none"
-      />
-    </div>
-  );
-}
-
 export default function SearchFilterPanel({
   selectedCategory,
   onCategoryChange,
@@ -89,10 +75,11 @@ export default function SearchFilterPanel({
 
   const [toolSearch, setToolSearch] = useState("");
 
-  const filteredCategories = categorySearch
-    ? CATEGORIES.filter((c) => c.toLowerCase().includes(categorySearch.toLowerCase()))
+  const allCategories: string[] = [...CATEGORIES];
+  const filteredCategories: string[] = categorySearch
+    ? allCategories.filter((c) => c.toLowerCase().includes(categorySearch.toLowerCase()))
     : showAllCategories
-      ? [...CATEGORIES]
+      ? allCategories
       : ["All", ...POPULAR_CATEGORIES];
 
   const popularFiltered = filteredCategories.filter((c) => c === "All" || POPULAR_CATEGORIES_SET.has(c));

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { MapPin, Link as LinkIcon, Briefcase, ChevronRight } from "lucide-react";
 import { SOCIAL_ICONS, parseSocials } from "../utils/socials";
 import type { IUser } from "../types";
+import { Divider } from "./ui";
 
 const getMemberSinceDate = (id: string): string => {
   const timestamp = parseInt(id.slice(0, 8), 16) * 1000;
@@ -63,8 +64,7 @@ export default function ProfileSidebar({
       {/* Action buttons slot */}
       {actionButtons}
 
-      {/* Divider */}
-      <div className="w-full h-px bg-stone-300 my-6" />
+      <Divider />
 
       {/* Statistics */}
       <p className="text-base font-normal text-black mb-2">Statistics</p>
@@ -81,8 +81,7 @@ export default function ProfileSidebar({
         ))}
       </div>
 
-      {/* Divider */}
-      <div className="w-full h-px bg-stone-300 my-6" />
+      <Divider />
 
       {/* Socials */}
       <p className="text-base font-normal text-black mb-2">Socials</p>
@@ -107,8 +106,7 @@ export default function ProfileSidebar({
         )}
       </div>
 
-      {/* Divider */}
-      <div className="w-full h-px bg-stone-300 my-6" />
+      <Divider />
 
       {/* Teams */}
       <div className="flex flex-col mb-6">
@@ -126,7 +124,7 @@ export default function ProfileSidebar({
             </div>
           </div>
         ))}
-        <div className="w-full h-px bg-stone-300 mt-3" />
+        <Divider className="mt-3" />
       </div>
 
       {/* About me */}

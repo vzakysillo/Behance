@@ -8,7 +8,7 @@ import { useAuth } from "../hooks/useAuth";
 import { updateMe } from "../api/user.api";
 import { routes } from "../routes";
 import { SOCIAL_ICONS, SOCIAL_PLATFORMS, getSocialUrl, setSocialUrl } from "../utils/socials";
-import { Divider } from "../components/ui";
+import { Divider, TextInput } from "../components/ui";
 
 type Section = "Base information" | "Work Experience" | "Teams" | "Socials" | "Links" | "Add section";
 const SECTIONS: Section[] = ["Base information", "Work Experience", "Teams", "Socials", "Links", "Add section"];
@@ -83,9 +83,6 @@ export default function ProfileEditPage() {
     setValue("socials", setSocialUrl(socials, platform, url), { shouldDirty: true });
   };
 
-  const inputClass =
-    "h-10 px-2.5 border border-[#676767] text-sm text-black font-['Inter'] bg-white w-full outline-none focus:border-black placeholder:text-[#676767]";
-
   return (
     <div className="min-h-screen bg-white font-['Inter',sans-serif]">
 
@@ -114,7 +111,7 @@ export default function ProfileEditPage() {
 
       <div className="flex">
 
-        {/* ── Left nav — sticky ── */}
+        {/* Left nav — sticky */}
         <nav className="ml-[20px] w-[200px] shrink-0 pt-10 sticky top-0 h-screen flex flex-col gap-0">
           {SECTIONS.map((section) => (
             <button
@@ -137,10 +134,10 @@ export default function ProfileEditPage() {
           ))}
         </nav>
 
-        {/* ── Scrollable content ── */}
+        {/* Scrollable content */}
         <div className="flex-1 px-16 py-10 max-w-[960px]">
 
-          {/* ── Base information ── */}
+          {/* Base information */}
           <section id="base-information">
             <div className="flex gap-10">
 
@@ -168,39 +165,40 @@ export default function ProfileEditPage() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
                     <label className="text-sm text-black">First name</label>
-                    <input className={inputClass} placeholder="First name" {...register("firstName")} />
+                    <TextInput variant="edit" placeholder="First name" {...register("firstName")} />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-sm text-black">Last name</label>
-                    <input className={inputClass} placeholder="Last name" {...register("lastName")} />
+                    <TextInput variant="edit" placeholder="Last name" {...register("lastName")} />
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-1">
                   <label className="text-sm text-black">Headline</label>
-                  <input className={inputClass} placeholder="Headline" {...register("headline")} />
+                  <TextInput variant="edit" placeholder="Headline" {...register("headline")} />
                 </div>
 
                 <div className="flex flex-col gap-1">
                   <label className="text-sm text-black">Company</label>
-                  <input className={inputClass} placeholder="Company" {...register("company")} />
+                  <TextInput variant="edit" placeholder="Company" {...register("company")} />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
                     <label className="text-sm text-black">Location</label>
-                    <input className={inputClass} placeholder="Location" {...register("location")} />
+                    <TextInput variant="edit" placeholder="Location" {...register("location")} />
                   </div>
                   <div className="flex flex-col gap-1">
                     <label className="text-sm text-black">City</label>
-                    <input className={inputClass} placeholder="City" {...register("city")} />
+                    <TextInput variant="edit" placeholder="City" {...register("city")} />
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-1">
                   <label className="text-sm text-black">Bio</label>
-                  <textarea
-                    className={`${inputClass} h-[100px] py-2 resize-none`}
+                  <TextInput
+                    variant="edit"
+                    className="h-[100px] py-2 resize-none"
                     placeholder="Tell us about yourself"
                     {...register("bio")}
                   />
@@ -211,7 +209,7 @@ export default function ProfileEditPage() {
 
           <Divider className={editDividerClass} />
 
-          {/* ── Work Experience ── */}
+          {/* Work Experience */}
           <section id="work-experience">
             <p className="text-base text-black mb-3">Work Experience | Education</p>
             <div className="flex items-start gap-8">
@@ -231,11 +229,11 @@ export default function ProfileEditPage() {
 
           <Divider className={editDividerClass} />
 
-          {/* ── Teams ── */}
+          {/* Teams */}
           <section id="teams">
             <p className="text-base text-black mb-3">Teams</p>
-            <input
-              className={inputClass}
+            <TextInput
+              variant="edit"
               placeholder="Team's link"
               {...register("teamLink")}
             />
@@ -243,7 +241,7 @@ export default function ProfileEditPage() {
 
           <Divider className={editDividerClass} />
 
-          {/* ── Socials ── */}
+          {/* Socials */}
           <section id="socials">
             <p className="text-base text-black mb-1">Socials</p>
             <p className="text-sm text-black mb-4">
@@ -265,7 +263,7 @@ export default function ProfileEditPage() {
                       className="flex-1 h-10 px-2.5 border border-[#a2a0a0] text-sm text-black font-['Inter'] bg-white outline-none focus:border-black placeholder:text-[#a2a0a0]"
                       placeholder="https://..."
                       value={url}
-                      onChange={(e) => updateSocial(platform, e.target.value)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateSocial(platform, e.target.value)}
                     />
                     {url && (
                       <button
@@ -284,17 +282,17 @@ export default function ProfileEditPage() {
 
           <Divider className={editDividerClass} />
 
-          {/* ── Links ── */}
+          {/* Links */}
           <section id="links">
             <p className="text-base text-black mb-4">Links</p>
             <div className="flex items-end gap-3">
               <div className="flex flex-col gap-1 flex-1">
                 <label className="text-sm text-black">Link title</label>
-                <input className={inputClass} placeholder="Link title" {...register("linkTitle")} />
+                <TextInput variant="edit" placeholder="Link title" {...register("linkTitle")} />
               </div>
               <div className="flex flex-col gap-1 flex-1">
                 <label className="text-sm text-black">URL</label>
-                <input className={inputClass} placeholder="URL" {...register("linkUrl")} />
+                <TextInput variant="edit" placeholder="URL" {...register("linkUrl")} />
               </div>
               <button
                 type="button"
@@ -307,7 +305,7 @@ export default function ProfileEditPage() {
 
           <Divider className={editDividerClass} />
 
-          {/* ── Add section ── */}
+          {/* Add section */}
           <section id="add-section">
             <button
               type="button"

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { routes } from "../routes";
+import { Logo, LinkButton } from "../components/ui";
 
 export default function WelcomePage() {
   return (
@@ -13,8 +14,7 @@ export default function WelcomePage() {
           className="inline-flex items-center gap-[clamp(16px,1.98vw,38px)] text-[#575656] text-[clamp(24px,1.67vw,32px)] font-bold leading-[1.2] no-underline focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]"
           aria-label="Home"
         >
-          <span className="w-8 h-8 shrink-0 border-4 border-[#575656] rounded-full box-border" aria-hidden="true" />
-          <span>LOGO</span>
+          <Logo size="lg" />
         </Link>
       </header>
 
@@ -42,23 +42,23 @@ export default function WelcomePage() {
 
         <div className="w-full grid grid-cols-[minmax(220px,440px)_auto_minmax(220px,440px)] items-center justify-center gap-7 mt-[clamp(40px,4.07vw,78px)]
                         max-[720px]:grid-cols-1 max-[720px]:gap-4 max-[720px]:mt-10">
-          <Link
+          <LinkButton
             to={routes.auth.login()}
-            className="min-h-[45px] inline-flex items-center justify-center px-6 py-[10px] box-border text-black text-base font-medium leading-[1.2] no-underline bg-[#b3b3b3] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]
-                       max-[720px]:w-full"
+            variant="primary"
+            className="max-[720px]:w-full"
           >
             Log in
-          </Link>
+          </LinkButton>
 
           <span className="text-[#575656] text-base font-medium leading-[1.2]">or</span>
 
-          <Link
+          <LinkButton
             to={routes.auth.register()}
-            className="min-h-[45px] inline-flex items-center justify-center px-6 py-[10px] box-border text-[#575656] text-base font-medium leading-[1.2] no-underline border border-[#575656] hover:brightness-95 focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]
-                       max-[720px]:w-full"
+            variant="outline"
+            className="max-[720px]:w-full"
           >
             Create account
-          </Link>
+          </LinkButton>
         </div>
       </section>
     </main>

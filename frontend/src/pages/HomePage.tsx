@@ -3,10 +3,10 @@ import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getFeedProjects } from "../api/project.api";
 import { useAuth } from "../hooks/useAuth";
-import { Spinner, ErrorMessage } from "../components/ui";
 import { routes } from "../routes";
 import { Heart, MessageSquare, Search, SlidersHorizontal } from "lucide-react";
 import SearchFilterPanel, { type SortOption } from "../components/SearchFilterPanel";
+import { Spinner, ErrorMessage, FilterPill, Stat } from "../components/ui";
 
 type Category = "All" | "Logo design" | "Branding" | "Illustration" | "Social media design" | "UI/UX";
 
@@ -113,17 +113,13 @@ export default function HomePage() {
       {/* Category Filters */}
       <div className="flex gap-[15px] px-[50px] py-5 flex-wrap max-[768px]:px-5 max-[768px]:gap-[10px]">
         {categories.map((category) => (
-          <button
+          <FilterPill
             key={category}
+            selected={selectedCategory === category}
             onClick={() => setSelectedCategory(category)}
-            className={[
-              "h-[45px] px-[15px] py-[10px] border-none rounded text-base font-['Inter',sans-serif] font-normal text-black cursor-pointer transition-colors whitespace-nowrap",
-              "max-[768px]:text-sm max-[768px]:px-3 max-[768px]:py-2",
-              selectedCategory === category ? "bg-[#c3c3c3]" : "bg-[#e8e7e7] hover:bg-[#d8d7d7]",
-            ].join(" ")}
           >
             {category}
-          </button>
+          </FilterPill>
         ))}
       </div>
 
@@ -178,15 +174,9 @@ export default function HomePage() {
                   {project.description || "No description available"}
                 </p>
                 <div className="flex gap-[30px]">
-                  <div className="flex items-center gap-2">
-                    <Heart size={18} className="text-gray-700" />
-                    <span className="text-base font-['Inter',sans-serif] font-medium text-gray-700">{project.likesCount ?? 0}</span>
-                  </div>
+                  <Stat icon={Heart} value={project.likesCount ?? 0} />
                   {!project.disableComments && (
-                    <div className="flex items-center gap-2">
-                      <MessageSquare size={18} className="text-gray-700" />
-                      <span className="text-base font-['Inter',sans-serif] font-medium text-gray-700">{project.commentsCount ?? 0}</span>
-                    </div>
+                    <Stat icon={MessageSquare} value={project.commentsCount ?? 0} />
                   )}
                 </div>
               </div>

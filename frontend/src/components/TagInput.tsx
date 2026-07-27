@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { Tag } from "./ui";
 
 interface TagInputProps {
   selected: string[];
@@ -75,17 +75,12 @@ export default function TagInput({ selected, onSelect, options, placeholder, max
     <div className="relative">
       <div className="flex flex-wrap items-center gap-1.5">
         {selected.map((item) => (
-          <span key={item} className="inline-flex h-7 items-center gap-1.5 bg-[#e8e5e5] pl-3 pr-1.5 text-xs">
-            {item}
-            <button
-              type="button"
-              onClick={() => remove(item)}
-              className="text-neutral-500 hover:text-black"
-              aria-label={`Remove ${item}`}
-            >
-              <X size={12} />
-            </button>
-          </span>
+          <Tag
+            key={item}
+            label={item}
+            dismissible
+            onDismiss={() => remove(item)}
+          />
         ))}
         <input
           ref={inputRef}

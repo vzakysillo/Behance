@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Search, X } from "lucide-react";
+import { X } from "lucide-react";
 import { CATEGORIES, POPULAR_CATEGORIES, MAX_CATEGORIES, getCategoriesByLetter } from "../utils/categories";
+import { Button, Checkbox, SearchInput } from "./ui";
 
 const LETTERS_ORDER = ["#", "A", "B", "C", "D", "E", "F", "G", "I", "J", "L", "M", "P", "R", "S", "T", "U", "V", "W"];
 
@@ -65,13 +66,11 @@ export default function CategoryPicker({ selected, onSelect, onClose }: Category
             <span className="ml-2 text-base font-normal">(required, limit of {MAX_CATEGORIES})</span>
           </p>
           <div className="flex h-11 items-center gap-2.5 border border-[#c6c2c2] bg-[#c6c2c2] px-5">
-            <Search size={24} className="shrink-0 text-black" />
-            <input
-              type="text"
+            <SearchInput
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={setSearch}
               placeholder="Search"
-              className="h-full flex-1 bg-transparent text-base text-black outline-none placeholder:text-black"
+              className="border-none mx-0 mb-0"
             />
           </div>
         </div>
@@ -91,12 +90,11 @@ export default function CategoryPicker({ selected, onSelect, onClose }: Category
                       key={cat}
                       className={`flex cursor-pointer items-center gap-3 py-1.5 text-base text-black ${disabled ? "opacity-40" : "hover:bg-neutral-50"}`}
                     >
-                      <input
-                        type="checkbox"
+                      <Checkbox
+                        variant="purple"
                         checked={checked}
                         disabled={disabled}
                         onChange={() => toggle(cat)}
-                        className="h-4 w-4 accent-[#6146ea]"
                       />
                       {cat}
                     </label>
@@ -123,12 +121,11 @@ export default function CategoryPicker({ selected, onSelect, onClose }: Category
                         key={cat}
                         className={`flex cursor-pointer items-center gap-3 py-1.5 text-base text-black ${disabled ? "opacity-40" : "hover:bg-neutral-50"}`}
                       >
-                        <input
-                          type="checkbox"
+                        <Checkbox
+                          variant="purple"
                           checked={checked}
                           disabled={disabled}
                           onChange={() => toggle(cat)}
-                          className="h-4 w-4 accent-[#6146ea]"
                         />
                         {cat}
                       </label>
@@ -145,20 +142,22 @@ export default function CategoryPicker({ selected, onSelect, onClose }: Category
         </div>
 
         <div className="flex shrink-0 items-center gap-4 border-t border-[#c6c2c2] px-[50px] py-4">
-          <button
+          <Button
+            variant="outline-purple"
             type="button"
             onClick={handleCancel}
-            className="h-10 w-[110px] rounded-[30px] border border-[#6146ea] text-base font-medium text-[#6146ea] hover:bg-[#6146ea]/5"
+            className="h-10 w-[110px]"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="purple"
             type="button"
             onClick={handleDone}
-            className="h-10 w-[110px] rounded-[30px] bg-[#6146ea] text-base font-medium text-white hover:opacity-90"
+            className="h-10 w-[110px]"
           >
             Done
-          </button>
+          </Button>
         </div>
       </div>
     </div>

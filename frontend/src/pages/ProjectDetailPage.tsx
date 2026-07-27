@@ -25,17 +25,17 @@ import {
   removeProjectLike,
 } from "../api/project.api";
 import { useAuth } from "../hooks/useAuth";
-import { Spinner, ErrorMessage } from "../components/ui";
+import { Spinner, ErrorMessage, Button, Tag, EmptyState } from "../components/ui";
 import AuthorPanel from "../components/AuthorPanel";
 import ProjectPreview from "../components/ProjectPreview";
 import { routes } from "../routes";
-import type { IComment, ILike, IProject, IUser } from "../types";
+import type { IUser } from "../types";
 
 interface ProjectDetailPageProps {
   publicView?: boolean;
 }
 
-const buttonClass =
+const chipButtonClass =
   "h-7 px-3 bg-[#e8e5e5] text-black text-xs font-normal inline-flex items-center justify-center gap-2 transition-colors hover:bg-[#d8d5d5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black";
 
 const dividerClass = "border-t border-[#b8b8b8]";
@@ -93,11 +93,11 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
   );
 
   const likeMutation = useMutation({
-    mutationFn: () => {
+    mutationFn: (): Promise<void> => {
       if (!id) throw new Error("No project id");
       const existingLike = likes.find((l) => l.userId === currentUser?._id);
-      if (existingLike) return removeProjectLike(id, existingLike._id);
-      return addProjectLike(id);
+      if (existingLike) return removeProjectLike(id, existingLike._id).then(() => {});
+      return addProjectLike(id).then(() => {});
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projectLikes", id] });
@@ -269,29 +269,29 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
+              <Button
+                variant="chip"
+                className={`${chipButtonClass} min-w-24 ${isLiked ? "bg-black text-white hover:bg-neutral-800" : ""}`}
                 onClick={handleLike}
-                className={`${buttonClass} min-w-24 ${isLiked ? "bg-black text-white hover:bg-neutral-800" : ""}`}
               >
                 <Heart size={12} fill={isLiked ? "currentColor" : "none"} />
                 {isLiked ? "Liked" : "Like"}
-              </button>
-              <button type="button" className={`${buttonClass} min-w-24`}>
+              </Button>
+              <Button variant="chip" className={`${chipButtonClass} min-w-24`}>
                 <Bookmark size={12} />
                 Save
-              </button>
-              <button type="button" className={`${buttonClass} min-w-24`}>
+              </Button>
+              <Button variant="chip" className={`${chipButtonClass} min-w-24`}>
                 <Share2 size={12} />
                 Share
-              </button>
+              </Button>
               {!project.disableComments && (
-                <a href="#comments" className={`${buttonClass} min-w-40 no-underline`}>
+                <a href="#comments" className={`${chipButtonClass} min-w-40 no-underline`}>
                   <MessageSquare size={12} />
                   Add comment
                 </a>
               )}
-              <div className={`${buttonClass} ml-auto min-w-52 max-[768px]:ml-0 max-[768px]:min-w-0`}>
+              <div className={`${chipButtonClass} ml-auto min-w-52 max-[768px]:ml-0 max-[768px]:min-w-0`}>
                 <CalendarDays size={12} />
                 {formatDate(project.createdAt)}
               </div>
@@ -306,13 +306,11 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
               {(project.tags ?? []).length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {project.tags!.map((tag) => (
-                    <span key={tag} className="inline-flex h-7 items-center bg-[#e8e5e5] px-3 text-xs">
-                      {tag}
-                    </span>
+                    <Tag key={tag} label={tag} />
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-neutral-500">No tags yet.</p>
+                <EmptyState message="No tags yet." />
               )}
             </section>
 
@@ -323,13 +321,11 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
               {(project.toolsUsed ?? []).length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {project.toolsUsed?.map((tool) => (
-                    <span key={tool} className="inline-flex h-7 items-center bg-[#e8e5e5] px-3 text-xs">
-                      {tool}
-                    </span>
+                    <Tag key={tool} label={tool} />
                   ))}
                 </div>
               ) : (
-                <p className="text-xs text-neutral-500">No tools listed yet.</p>
+                <EmptyState message="No tools listed yet." />
               )}
             </section>
 
@@ -385,15 +381,15 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
                       onChange={(e) => setCommentText(e.target.value)}
                       placeholder="Write a comment"
                     />
-                    <button type="submit" className={`${buttonClass} w-10 px-0`} aria-label="Post comment">
+                    <Button variant="chip" className={`${chipButtonClass} w-10 px-0`} type="submit" aria-label="Post comment">
                       <Send size={12} />
-                    </button>
+                    </Button>
                   </div>
                 </form>
               )}
 
               {!project.disableComments && comments.length === 0 && (
-                <p className="text-xs text-neutral-500">No comments yet.</p>
+                <EmptyState message="No comments yet." />
               )}
 
               {!project.disableComments && comments.length > 0 && (

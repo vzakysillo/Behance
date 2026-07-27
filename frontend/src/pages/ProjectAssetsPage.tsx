@@ -1,13 +1,15 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight, X, Paperclip } from "lucide-react";
+import { X, Paperclip } from "lucide-react";
 import { useProjectCreation } from "../context/ProjectCreationContext";
 import { routes } from "../routes";
+import { ProjectCreationHeader } from "../components/layout/ProjectCreationHeader";
+import { ProjectCreationFooter } from "../components/layout/ProjectCreationFooter";
+import { HiddenFileUpload, Button } from "../components/ui";
 
 export default function ProjectAssetsPage() {
   const navigate = useNavigate();
   const { files, addFile, removeFile } = useProjectCreation();
-  const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
 
   const handleFile = useCallback(
@@ -21,22 +23,7 @@ export default function ProjectAssetsPage() {
 
   return (
     <div className="h-full overflow-hidden bg-[#f8f8f8] font-['Inter',sans-serif] flex flex-col">
-      <header className="flex items-center justify-between px-[37px] pt-[43px] shrink-0">
-        <button
-          onClick={() => navigate(routes.profile.projectUpload())}
-          className="inline-flex items-center gap-3.5 text-base font-medium text-[#6146ea] hover:opacity-80"
-        >
-          <ChevronLeft size={16} strokeWidth={2} className="text-[#6146ea]" />
-          Back
-        </button>
-
-        <button
-          onClick={() => navigate(routes.profile.root())}
-          className="flex items-center justify-center h-[45px] px-7 text-base font-medium text-[#6146ea] rounded-[30px] border border-[#6146ea] hover:bg-[#6146ea]/5"
-        >
-          Save as draft
-        </button>
-      </header>
+      <ProjectCreationHeader backTo={routes.profile.projectUpload()} />
 
       <div className="flex-1 flex min-h-0 px-[49px] pt-[40px] pb-0 gap-[38px]">
         <div className="flex-1 flex flex-col min-h-0 min-w-0">
@@ -57,12 +44,19 @@ export default function ProjectAssetsPage() {
           <div className="border-t border-[#5b5b5b] my-0" />
 
           <div className="flex justify-center py-4">
-            <button
-              onClick={() => inputRef.current?.click()}
-              className="flex justify-center items-center w-[220px] h-14 bg-white border border-[#5b5b5b] text-base font-medium text-black hover:bg-gray-50 transition-colors"
+            <HiddenFileUpload
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              multiple
+              onChange={(fileList) => {
+                for (let i = 0; i < fileList.length; i++) {
+                  handleFile(fileList[i]);
+                }
+              }}
             >
-              + Add media
-            </button>
+              <Button variant="outline" className="w-[220px] h-14 border-[#5b5b5b] text-base font-medium">
+                + Add media
+              </Button>
+            </HiddenFileUpload>
           </div>
         </div>
 
@@ -73,47 +67,30 @@ export default function ProjectAssetsPage() {
           <p className="text-sm text-[#747474] mb-6 leading-5">
             Add files like fonts, illustrations, photos, zips, or templates.
           </p>
-          <button
-            onClick={() => inputRef.current?.click()}
-            className="flex items-center gap-3 w-fit px-[15px] py-2.5 bg-white hover:bg-gray-50 transition-colors"
+          <HiddenFileUpload
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+            onChange={(fileList) => {
+              for (let i = 0; i < fileList.length; i++) {
+                handleFile(fileList[i]);
+              }
+            }}
           >
-            <Paperclip size={18} className="text-[#4C4C4C]" strokeWidth={2} />
-            <span className="text-base font-medium text-black">Attach Assets</span>
-          </button>
+            <Button variant="outline" className="w-fit px-[15px] py-2.5 bg-white hover:bg-gray-50" icon={<Paperclip size={18} className="text-[#4C4C4C]" strokeWidth={2} />}>
+              Attach Assets
+            </Button>
+          </HiddenFileUpload>
         </div>
       </div>
-
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/jpeg,image/png,image/webp,image/gif"
-        className="sr-only"
-        multiple
-        onChange={(e) => {
-          const fileList = e.target.files;
-          if (fileList) {
-            for (let i = 0; i < fileList.length; i++) {
-              handleFile(fileList[i]);
-            }
-          }
-          e.target.value = "";
-        }}
-      />
 
       {error && (
         <p className="text-center text-red-600 text-sm shrink-0">{error}</p>
       )}
 
-      <div className="flex justify-end px-[37px] pb-[43px] pt-4 shrink-0">
-        <button
-          onClick={() => navigate(routes.profile.projectCreate())}
-          disabled={files.length === 0}
-          className="flex items-center justify-center gap-[5px] h-[45px] px-7 rounded-[30px] bg-[#6146ea] text-base font-medium text-white hover:brightness-110 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          Continue
-          <ChevronRight size={24} strokeWidth={2} className="text-white" />
-        </button>
-      </div>
+      <ProjectCreationFooter
+        disabled={files.length === 0}
+        onClick={() => navigate(routes.profile.projectCreate())}
+      />
     </div>
   );
 }

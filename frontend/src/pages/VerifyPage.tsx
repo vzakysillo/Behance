@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { AxiosApi } from "../api/axios.api";
 import { routes } from "../routes";
+import { Spinner } from "../components/ui";
 
 type Status = "loading" | "success" | "error";
 
@@ -46,7 +47,7 @@ export default function VerifyPage() {
 
         {status === "loading" && (
           <>
-            <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-700 rounded-full animate-spin mx-auto mb-6" />
+            <Spinner className="min-h-0 mb-6" />
             <p className="text-[15px] text-[#575656]">{message}</p>
           </>
         )}

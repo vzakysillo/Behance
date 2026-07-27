@@ -3,8 +3,8 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { updateMe } from "../api/user.api";
 import { useAuth } from "../hooks/useAuth";
-import { Spinner } from "../components/ui";
 import { routes } from "../routes";
+import { Button, Logo, ToggleButton, Spinner } from "../components/ui";
 
 const MAX_INTERESTS = 3;
 
@@ -79,18 +79,18 @@ export default function InterestsPage() {
           className="absolute top-[50px] left-[50px] inline-flex items-center gap-[7px] text-[#575656] text-[32px] font-bold leading-[1.2] no-underline pointer-events-auto
                      max-[1160px]:static max-[640px]:text-2xl focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]"
         >
-          <span className="w-8 h-8 border-4 border-[#575656] rounded-full box-border max-[640px]:w-7 max-[640px]:h-7" aria-hidden="true" />
-          <span>LOGO</span>
+          <Logo size="sm" />
         </Link>
 
-        <button
-          className="absolute top-[158px] right-[50px] w-[142px] h-[45px] border border-[#575656] rounded-none bg-white text-[#575656] text-base font-medium leading-[1.2] cursor-pointer pointer-events-auto hover:brightness-95 focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]
-                     max-[1160px]:static max-[640px]:w-24"
+        <Button
+          variant="outline"
           type="button"
           onClick={skip}
+          className="absolute top-[158px] right-[50px] w-[142px] h-[45px] border border-[#575656] rounded-none bg-white text-[#575656] text-base font-medium leading-[1.2] cursor-pointer pointer-events-auto hover:brightness-95 focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]
+                     max-[1160px]:static max-[640px]:w-24"
         >
           Skip
-        </button>
+        </Button>
       </header>
 
       <section
@@ -120,19 +120,14 @@ export default function InterestsPage() {
           {INTERESTS.map((interest) => {
             const isSelected = selected.includes(interest);
             return (
-              <button
+              <ToggleButton
                 key={interest}
-                type="button"
+                selected={isSelected}
                 aria-pressed={isSelected}
                 onClick={() => toggleInterest(interest)}
-                className={[
-                  "min-h-[59px] px-5 py-[18px] border rounded-none text-white text-base font-semibold leading-[1.2] cursor-pointer hover:brightness-95 focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]",
-                  "max-[640px]:min-h-[48px] max-[640px]:px-4 max-[640px]:py-[14px] max-[640px]:text-sm",
-                  isSelected ? "bg-[#575656] border-[#575656]" : "bg-[#bdbdbd] border-transparent",
-                ].join(" ")}
               >
                 {interest}
-              </button>
+              </ToggleButton>
             );
           })}
         </div>
@@ -142,15 +137,16 @@ export default function InterestsPage() {
           <p className="min-h-[18px] m-0 text-[#575656] text-sm font-medium leading-[1.2]" aria-live="polite">
             {message || (selectedCount > 0 ? `${selectedCount}/${MAX_INTERESTS} selected` : "")}
           </p>
-          <button
+          <Button
+            variant="primary"
             type="button"
             disabled={saveMutation.isPending}
             onClick={() => persistAndLeave(selected)}
-            className="w-[295px] h-[45px] border-0 rounded-none bg-[#b3b3b3] text-black text-base font-medium leading-[1.2] cursor-pointer disabled:cursor-wait disabled:opacity-70 hover:brightness-95 focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]
+            className="w-[295px] h-[45px] disabled:cursor-wait disabled:opacity-70
                        max-[640px]:w-full"
           >
             {saveMutation.isPending ? "Saving..." : "Continue"}
-          </button>
+          </Button>
         </div>
       </section>
     </main>
