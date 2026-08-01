@@ -63,7 +63,7 @@ export default function Sidebar() {
               ].join(" ")}
             >
               <Icon size={18} strokeWidth={2} className="shrink-0 text-black" />
-              <span className="text-base font-medium font-['Inter',sans-serif] leading-6 whitespace-nowrap">
+              <span className="text-base font-medium font-sans leading-6 whitespace-nowrap">
                 {item.label}
               </span>
             </Link>

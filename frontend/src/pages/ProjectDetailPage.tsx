@@ -226,7 +226,7 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
   const commentsCount = comments.length || project.commentsCount || 0;
 
   return (
-    <div className="min-h-screen bg-white font-['Inter',sans-serif] text-black">
+    <div className="min-h-screen bg-white font-sans text-black">
       <div className="mx-auto grid min-h-screen max-w-[1756px] grid-cols-[minmax(0,1fr)_494px] max-[1280px]:grid-cols-1">
         <main className="min-w-0 px-[50px] pb-20 pt-[30px] max-[768px]:px-5">
           <Link

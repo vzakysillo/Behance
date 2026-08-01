@@ -54,7 +54,7 @@ export default function HomePage() {
           <div className="relative" ref={filterRef}>
             <button
               onClick={() => setShowFilter((v) => !v)}
-              className="h-[45px] px-[15px] py-[10px] border-none rounded text-base font-['Inter',sans-serif] font-normal text-black bg-[#c6c2c2] cursor-pointer transition-colors hover:bg-[#b8b8b8] shrink-0 flex items-center gap-2"
+              className="h-[45px] px-[15px] py-[10px] border-none rounded text-base font-sans font-normal text-black bg-[#c6c2c2] cursor-pointer transition-colors hover:bg-[#b8b8b8] shrink-0 flex items-center gap-2"
             >
               Search filter
               <SlidersHorizontal size={18} />
@@ -84,7 +84,7 @@ export default function HomePage() {
               placeholder="Search"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 border-none bg-transparent text-base font-['Inter',sans-serif] font-normal text-black outline-none placeholder:text-black"
+              className="flex-1 border-none bg-transparent text-base font-sans font-normal text-black outline-none placeholder:text-black"
             />
           </div>
         </div>
@@ -92,17 +92,16 @@ export default function HomePage() {
         {/* Action buttons */}
         <div className="flex gap-[15px] max-[1024px]:flex-col">
         {token && (
-          <Link
-            to={routes.welcome()}
-            className="px-[10px] h-[45px] flex items-center justify-center text-base font-['Inter',sans-serif] font-normal no-underline rounded bg-[#e8e7e7] text-black min-w-[285px] transition-colors hover:bg-[#d8d7d7]
+          <span
+            className="px-[10px] h-[45px] flex items-center justify-center text-base font-sans font-normal no-underline rounded bg-[#e8e7e7] text-black min-w-[285px] cursor-pointer
                        max-[1024px]:w-full max-[768px]:w-full"
           >
             Start free trial
-          </Link>
+          </span>
         )}
           <Link
             to={routes.profile.projectUpload()}
-            className="px-[10px] h-[45px] flex items-center justify-center text-base font-['Inter',sans-serif] font-normal no-underline rounded bg-[#e8e7e7] text-black min-w-[284px] transition-colors hover:bg-[#d8d7d7]
+            className="px-[10px] h-[45px] flex items-center justify-center text-base font-sans font-normal no-underline rounded bg-[#e8e7e7] text-black min-w-[284px] transition-colors hover:bg-[#d8d7d7]
                        max-[1024px]:w-full max-[768px]:w-full"
           >
             Share work
@@ -125,14 +124,14 @@ export default function HomePage() {
 
       {/* Section header */}
       <div className="px-[50px] mb-5 max-[768px]:px-5">
-        <h2 className="text-base font-['Inter',sans-serif] font-normal text-black m-0">Recommended for you</h2>
+        <h2 className="text-base font-sans font-normal text-black m-0">Recommended for you</h2>
       </div>
 
       {/* Projects grid */}
       <div className="grid grid-cols-4 gap-[30px] px-[50px] pb-[50px]
                       max-[1400px]:grid-cols-3 max-[1024px]:grid-cols-2 max-[768px]:grid-cols-1 max-[768px]:px-5 max-[768px]:pb-5">
         {filteredProjects.length === 0 ? (
-          <div className="col-span-full flex justify-center items-center min-h-[400px] text-lg font-['Inter',sans-serif] text-[#666]">
+          <div className="col-span-full flex justify-center items-center min-h-[400px] text-lg font-sans text-[#666]">
             No projects found
           </div>
         ) : (
@@ -152,7 +151,7 @@ export default function HomePage() {
                 {/* Hover overlay (decorative "..." menu only) */}
                 <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="absolute top-5 right-5">
-                    <span className="text-white text-[32px] font-semibold font-['Inter',sans-serif] cursor-pointer select-none">...</span>
+                    <span className="text-white text-[32px] font-semibold font-sans cursor-pointer select-none">...</span>
                   </div>
                 </div>
               </div>
@@ -165,12 +164,12 @@ export default function HomePage() {
                       <img src={project.author.avatar} alt="" className="w-full h-full object-cover" />
                     )}
                   </div>
-                  <span className="text-base font-['Inter',sans-serif] font-medium text-gray-800">
+                  <span className="text-base font-sans font-medium text-gray-800">
                     {[project.author?.firstName, project.author?.lastName].filter(Boolean).join(" ") || project.author?.userName || "User"}
                   </span>
                 </div>
-                <h3 className="text-xl font-['Inter',sans-serif] font-semibold text-gray-900 m-0 mb-2">{project.name}</h3>
-                <p className="text-base font-['Inter',sans-serif] font-normal text-gray-600 m-0 mb-[15px] leading-[1.4] line-clamp-2">
+                <h3 className="text-xl font-sans font-semibold text-gray-900 m-0 mb-2">{project.name}</h3>
+                <p className="text-base font-sans font-normal text-gray-600 m-0 mb-[15px] leading-[1.4] line-clamp-2">
                   {project.description || "No description available"}
                 </p>
                 <div className="flex gap-[30px]">

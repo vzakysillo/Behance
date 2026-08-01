@@ -1,11 +1,11 @@
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ChevronLeft } from "lucide-react";
 import { createProject } from "../api/project.api";
 import { uploadImage } from "../api/upload.api";
 import ProjectForm from "../components/ProjectForm";
 import { useProjectCreation } from "../context/ProjectCreationContext";
 import { routes } from "../routes";
+import { BackLarge, Button } from "../components/ui";
 
 export default function ProjectCreatePage() {
   const navigate = useNavigate();
@@ -22,15 +22,17 @@ export default function ProjectCreatePage() {
   });
 
   return (
-    <div className="min-h-screen bg-white font-['Inter',sans-serif] text-black">
-      <div className="px-[50px] pt-10 flex items-center">
-        <Link
-          to={routes.profile.projectAssets()}
-          className="inline-flex items-center gap-2 text-sm font-normal text-black no-underline hover:text-zinc-500"
+    <div className="h-svh overflow-hidden bg-white font-sans text-black">
+      <div className="px-[50px] pt-10 flex items-center justify-between">
+        <BackLarge to={routes.profile.projectAssets()} />
+        <Button
+          variant="secondary"
+          type="button"
+          onClick={() => navigate(routes.profile.root())}
+          className="px-7"
         >
-          <ChevronLeft size={16} strokeWidth={2} />
-          Back
-        </Link>
+          Save as draft
+        </Button>
       </div>
 
       <ProjectForm

@@ -22,22 +22,22 @@ export default function ProjectAssetsPage() {
   );
 
   return (
-    <div className="h-full overflow-hidden bg-[#f8f8f8] font-['Inter',sans-serif] flex flex-col">
+    <div className="h-full overflow-y-auto bg-[#f8f8f8] font-sans flex flex-col">
       <ProjectCreationHeader backTo={routes.profile.projectUpload()} />
 
-      <div className="flex-1 flex min-h-0 px-[49px] pt-[40px] pb-0 gap-[38px]">
-        <div className="flex-1 flex flex-col min-h-0 min-w-0">
-          <div className="flex-1 min-h-0 bg-[#a39f9f] flex items-center justify-center relative">
+      <div className="flex-1 flex px-[49px] pt-[40px] pb-0 gap-[38px]">
+        <div className="flex-1 flex flex-col min-w-0">
+          <div className="flex-1 relative">
             {files.length > 0 ? (
-              <div className="w-full h-full overflow-auto p-4">
-                <div className="grid grid-cols-2 gap-3">
-                  {files.map((file, i) => (
-                    <AssetPreview key={i} file={file} onRemove={() => removeFile(i)} />
-                  ))}
-                </div>
+              <div className="flex flex-col gap-3">
+                {files.map((file, i) => (
+                  <AssetPreview key={i} file={file} onRemove={() => removeFile(i)} />
+                ))}
               </div>
             ) : (
-              <p className="text-3xl text-[#575656]">media</p>
+              <div className="flex-1 min-h-0 bg-[#a39f9f] flex items-center justify-center relative">
+                <p className="text-3xl text-[#575656]">media</p>
+              </div>
             )}
           </div>
 
@@ -53,14 +53,14 @@ export default function ProjectAssetsPage() {
                 }
               }}
             >
-              <Button variant="outline" className="w-[220px] h-14 border-[#5b5b5b] text-base font-medium">
+              <Button variant="secondary" className="w-[220px]">
                 + Add media
               </Button>
             </HiddenFileUpload>
           </div>
         </div>
 
-        <div className="w-[334px] shrink-0 bg-[#d9d9d9] flex flex-col pt-[45px] px-[29px]">
+        <div className="w-[334px] shrink-0 bg-white flex flex-col pt-[45px] px-[29px]">
           <h2 className="text-2xl font-medium text-black mb-4">
             Attach Assets
           </h2>
@@ -76,7 +76,11 @@ export default function ProjectAssetsPage() {
               }
             }}
           >
-            <Button variant="outline" className="w-fit px-[15px] py-2.5 bg-white hover:bg-gray-50" icon={<Paperclip size={18} className="text-[#4C4C4C]" strokeWidth={2} />}>
+            <Button
+              variant="secondary"
+              className="inline-flex items-center justify-center gap-2"
+              icon={<Paperclip size={18} strokeWidth={2} />}
+            >
               Attach Assets
             </Button>
           </HiddenFileUpload>
@@ -100,7 +104,11 @@ function AssetPreview({ file, onRemove }: { file: File; onRemove: () => void }) 
 
   return (
     <div className="relative aspect-video bg-white border border-[#e0e0e0]">
-      <img src={preview} alt={file.name} className="w-full h-full object-cover" />
+      <img
+        src={preview}
+        alt={file.name}
+        className="absolute inset-0 w-full h-full object-cover"
+      />
       <button
         onClick={onRemove}
         className="absolute top-2 right-2 w-7 h-7 flex items-center justify-center bg-black/50 text-white rounded-full hover:bg-black/70"

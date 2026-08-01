@@ -4,7 +4,7 @@ import { Logo, LinkButton } from "../components/ui";
 
 export default function WelcomePage() {
   return (
-    <main className="min-h-svh w-[min(100vw,1920px)] mx-auto relative overflow-hidden bg-white text-[#575656] font-['Inter',system-ui,sans-serif]">
+    <main className="min-h-svh w-[min(100vw,1920px)] mx-auto relative overflow-hidden bg-white text-[#575656] font-sans">
       <header
         className="absolute top-[clamp(24px,4.63vw,50px)] left-[clamp(24px,4.64vw,89px)] z-10"
         aria-label="Site header"
@@ -24,20 +24,14 @@ export default function WelcomePage() {
       >
         <h1
           id="welcome-title"
-          className="max-w-[820px] mt-0 mb-[clamp(40px,4.63vw,89px)] text-[#525252] text-[clamp(52px,5.21vw,100px)] font-bold leading-[1.2]"
+          className="flex flex-col items-center max-w-full mt-0 mb-[clamp(40px,4.63vw,89px)] text-[#525252] text-[clamp(52px,5.21vw,100px)] font-bold leading-[1.2]"
         >
-          Welcome to our service
+          <span className="whitespace-nowrap">Welcome to</span>
+          <span className="whitespace-nowrap">Moddo Community</span>
         </h1>
 
         <p className="w-full m-0 text-[#575656] text-base font-medium leading-[1.2]">
-          Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-          <br />
-          <br />
-          Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a
-          galley of type and scrambled it to make a type specimen book.
-          <br />
-          It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially
-          unchanged.
+          A creative platform where designers showcase their work, discover new ideas, connect with professionals, and turn their creativity into new opportunities.
         </p>
 
         <div className="w-full grid grid-cols-[minmax(220px,440px)_auto_minmax(220px,440px)] items-center justify-center gap-7 mt-[clamp(40px,4.07vw,78px)]
@@ -54,7 +48,7 @@ export default function WelcomePage() {
 
           <LinkButton
             to={routes.auth.register()}
-            variant="outline"
+            variant="secondary"
             className="max-[720px]:w-full"
           >
             Create account

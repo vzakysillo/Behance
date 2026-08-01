@@ -4,7 +4,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { login } from "../api/auth.api";
 import { useAuth } from "../hooks/useAuth";
-import { Button, Checkbox, FormError, FormField, TextInput } from "./ui";
+import { Button, Checkbox, FormError, LabeledInput, TextLink } from "./ui";
 
 const loginSchema = z.object({
   email: z.string().min(1, "Email is required").email("Invalid email"),
@@ -22,7 +22,11 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
   const { login: setAuth } = useAuth();
   const [error, setError] = useState("");
 
-  const { register, handleSubmit, formState: { isSubmitting } } = useForm<LoginValues>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: "", password: "", rememberMe: false },
   });
@@ -40,33 +44,27 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
 
   return (
     <form className="flex flex-col gap-6" onSubmit={handleSubmit(onSubmit)}>
-      <FormField label="Email">
-        <TextInput
-          variant="auth-dark"
-          type="text"
-          placeholder="user@mail.com"
-          {...register("email", { onChange: () => setError("") })}
-        />
-      </FormField>
+      <LabeledInput
+        label="Email"
+        type="text"
+        placeholder="user@mail.com"
+        error={errors.email?.message}
+        {...register("email", { onChange: () => setError("") })}
+      />
 
-      <FormField label="Password">
-        <TextInput
-          variant="auth-dark"
-          className="text-[26px] tracking-[1px]"
-          type="password"
-          placeholder="............"
-          {...register("password", { onChange: () => setError("") })}
-        />
-      </FormField>
+      <LabeledInput
+        label="Password"
+        type="password"
+        placeholder="............"
+        error={errors.password?.message}
+        {...register("password", { onChange: () => setError("") })}
+      />
 
-      <div className="flex items-center justify-between gap-[18px] -mt-2 text-[#575656] text-base font-normal leading-[1.25] max-[560px]:flex-col max-[560px]:items-start max-[560px]:gap-[14px] max-[560px]:text-sm">
-        <label className="inline-grid grid-cols-[15px_1fr] items-center gap-[15px]">
-          <Checkbox variant="dark" {...register("rememberMe")} />
-          <span>Remember me</span>
-        </label>
-        <a href="/forgot-password" className="text-inherit no-underline whitespace-nowrap focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]">
+      <div className="flex items-center justify-between gap-[18px] -mt-2 max-[560px]:flex-col max-[560px]:items-start max-[560px]:gap-[14px]">
+        <Checkbox variant="purple" label="Remember me" {...register("rememberMe")} />
+        <TextLink href="/forgot-password" className="whitespace-nowrap max-[560px]:text-sm">
           Forget password?
-        </a>
+        </TextLink>
       </div>
 
       {error && <FormError message={error} />}
@@ -83,3 +81,4 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
     </form>
   );
 }
+

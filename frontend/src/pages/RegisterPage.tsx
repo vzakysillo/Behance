@@ -1,10 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthRedirect } from "../hooks/useAuthRedirect";
 import RegisterForm from "../components/RegisterForm";
-import BackLink from "../components/BackLink";
 import { routes } from "../routes";
 import { AuthPageLayout } from "../components/layout/AuthPageLayout";
-import { LinkButton, OrDivider, SocialButton } from "../components/ui";
+import { ContinueWith } from "../components/ui";
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -19,14 +18,21 @@ export default function RegisterPage() {
           className="relative min-h-svh grid place-items-center bg-[#71717a] max-[1024px]:min-h-[240px] max-[560px]:min-h-[180px]"
           aria-label="Featured project preview"
         >
-          <BackLink to={routes.home()} />
           <p className="text-[#525252] text-[30px] font-normal leading-[1.2] max-[560px]:text-2xl">picture</p>
+          <div className="absolute left-[clamp(24px,3.5vw,64px)] bottom-[clamp(24px,3.5vw,64px)] max-w-[520px] z-10 text-white max-[1024px]:hidden">
+            <p className="m-0 text-base font-normal leading-[1.4] text-white">
+              Create your account to start sharing your ideas and growing your portfolio today.
+            </p>
+            <h2 className="mt-4 m-0 text-[26px] font-medium leading-[1.3] text-white">
+              Join a community where designers can showcase their work, sell products, participate in contests, and discover new opportunities.
+            </h2>
+          </div>
         </section>
       }
       formPanel={
         <section
-          className="w-[min(600px,calc(100%-80px))] min-h-svh ml-[clamp(56px,8.49vw,163px)] flex flex-col justify-start pt-[112px] pb-16 box-border
-                     max-[1024px]:w-[min(600px,calc(100%-40px))] max-[1024px]:min-h-0 max-[1024px]:mx-auto max-[1024px]:pt-[52px] max-[1024px]:pb-12"
+          className="w-[min(600px,calc(100%-80px))] h-svh overflow-hidden ml-[clamp(56px,8.49vw,163px)] flex flex-col justify-start pt-[112px] pb-16 box-border
+                     max-[1024px]:w-[min(600px,calc(100%-40px))] max-[1024px]:h-auto max-[1024px]:overflow-visible max-[1024px]:mx-auto max-[1024px]:pt-[52px] max-[1024px]:pb-12"
           aria-labelledby="register-title"
         >
           <div className="mb-[45px] max-[560px]:mb-9">
@@ -37,28 +43,20 @@ export default function RegisterPage() {
               Create an account
             </h1>
             <p className="max-w-[594px] text-[#525252] text-base font-medium leading-[1.35]">
-              Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took.
+              Fill in your information to get started.
+              <br />
+              All fields are required.
             </p>
           </div>
 
           <RegisterForm onSuccess={() => navigate(routes.auth.login())} />
 
-          <div className="mt-[75px] max-[560px]:mt-14">
-            <OrDivider />
-          </div>
-
-          <div className="flex justify-center gap-[31px] mt-[34px]" aria-label="Social sign up options">
-            <SocialButton provider="google" className="w-9 h-9 bg-[#a1a1aa]" />
-            <SocialButton provider="facebook" className="w-9 h-9 bg-[#a1a1aa]" />
-            <SocialButton provider="apple" className="w-9 h-9 bg-[#a1a1aa]" />
-          </div>
-
-          <p className="mt-[31px] text-[#525252] text-sm font-normal leading-[1.2] text-center">
-            Already have an account?{" "}
-            <LinkButton to={routes.auth.login()} variant="text" className="font-medium">
-              Log IN
-            </LinkButton>
-          </p>
+          <ContinueWith
+            className="mt-[50px] max-[560px]:mt-10"
+            prompt="Already have an account?"
+            cta="Log IN"
+            ctaTo={routes.auth.login()}
+          />
         </section>
       }
     />

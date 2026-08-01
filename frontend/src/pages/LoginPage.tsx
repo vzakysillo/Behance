@@ -2,10 +2,9 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useAuthRedirect } from "../hooks/useAuthRedirect";
 import LoginForm from "../components/LoginForm";
-import BackLink from "../components/BackLink";
 import { routes } from "../routes";
 import { AuthPageLayout } from "../components/layout/AuthPageLayout";
-import { LinkButton, OrDivider, SocialButton } from "../components/ui";
+import { ContinueWith } from "../components/ui";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -25,8 +24,15 @@ export default function LoginPage() {
           className="relative min-h-svh grid place-items-center bg-[#8b8b8b] max-[1024px]:min-h-[240px] max-[560px]:min-h-[180px]"
           aria-label="Featured project preview"
         >
-          <BackLink to={routes.home()} />
           <p className="text-[#575656] text-[30px] font-normal leading-[1.2] max-[560px]:text-2xl">picture</p>
+          <div className="absolute left-[clamp(24px,3.5vw,64px)] bottom-[clamp(24px,3.5vw,64px)] max-w-[520px] z-10 text-white max-[1024px]:hidden">
+            <p className="m-0 text-base font-normal leading-[1.4] text-white">
+              Log in to continue building your portfolio and finding new creative opportunities
+            </p>
+            <h2 className="mt-4 m-0 text-[26px] font-medium leading-[1.3] text-white">
+              Discover inspiring projects, explore high-quality design resources, and connect with creators from around the world.
+            </h2>
+          </div>
         </section>
       }
       formPanel={
@@ -49,22 +55,12 @@ export default function LoginPage() {
 
           <LoginForm onSuccess={handleSuccess} />
 
-          <div className="flex justify-center mt-[76px] max-[560px]:mt-14" aria-hidden="true">
-            <OrDivider variant="plain" />
-          </div>
-
-          <div className="flex justify-center gap-[29px] mt-[33px]" aria-label="Social login options">
-            <SocialButton provider="google" />
-            <SocialButton provider="facebook" />
-            <SocialButton provider="apple" />
-          </div>
-
-          <p className="mt-8 text-[#575656] text-sm font-normal leading-[1.2] text-center">
-            Don't have an account?{" "}
-            <LinkButton to={routes.auth.register()} variant="text" className="font-medium">
-              Sign UP
-            </LinkButton>
-          </p>
+          <ContinueWith
+            className="mt-[50px] max-[560px]:mt-10"
+            prompt="Don't have an account?"
+            cta="Sign UP"
+            ctaTo={routes.auth.register()}
+          />
         </section>
       }
     />

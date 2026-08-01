@@ -37,7 +37,7 @@ export default function VerifyPage() {
   const { status, message } = useVerifyToken(token);
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-[#f5f5f5] font-['Inter',system-ui,sans-serif] px-5">
+    <main className="min-h-screen flex items-center justify-center bg-[#f5f5f5] font-sans px-5">
       <div className="w-full max-w-[480px] bg-white p-10 text-center">
         {/* Logo */}
         <Link to="/" className="inline-flex items-center gap-2.5 no-underline mb-10">

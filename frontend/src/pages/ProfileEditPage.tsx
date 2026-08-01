@@ -13,7 +13,8 @@ import { Divider, TextInput } from "../components/ui";
 type Section = "Base information" | "Work Experience" | "Teams" | "Socials" | "Links" | "Add section";
 const SECTIONS: Section[] = ["Base information", "Work Experience", "Teams", "Socials", "Links", "Add section"];
 
-import { GripHorizontal, User, ArrowLeft, Upload } from "lucide-react";
+import { GripHorizontal, User, ArrowLeft, Upload, Plus } from "lucide-react";
+import { uploadAvatar } from "../api/upload.api";
 
 const DragIcon = () => <GripHorizontal size={16} className="shrink-0 text-black" />;
 
@@ -40,6 +41,7 @@ export default function ProfileEditPage() {
   const queryClient = useQueryClient();
   const [error, setError] = useState("");
   const [activeSection, setActiveSection] = useState<Section>("Base information");
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   const { register, handleSubmit, watch, setValue, formState: { isSubmitting } } = useForm<ProfileEditValues>({
     resolver: zodResolver(profileEditSchema),
@@ -83,8 +85,31 @@ export default function ProfileEditPage() {
     setValue("socials", setSocialUrl(socials, platform, url), { shouldDirty: true });
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAvatarUploading(true);
+    try {
+      await uploadAvatar(file);
+      await refreshUser();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not upload avatar.");
+    } finally {
+      setAvatarUploading(false);
+    }
+  };
+
+  const handleRemoveAvatar = async () => {
+    try {
+      await updateMe({ avatar: "" });
+      refreshUser();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not remove avatar.");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-white font-['Inter',sans-serif]">
+    <div className="min-h-screen bg-white font-sans">
 
       {/* Top bar */}
       <div className="flex items-center justify-between h-16 px-8 border-b border-[#dadada]">
@@ -123,7 +148,7 @@ export default function ProfileEditPage() {
                 document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
               }}
               className={[
-                "w-full h-10 px-2.5 text-left text-sm font-['Inter'] transition-colors",
+                "w-full h-10 px-2.5 text-left text-sm font-sans transition-colors",
                 activeSection === section
                   ? "bg-[#d3d3d3] text-black"
                   : "bg-[#f0efef] text-black hover:bg-[#e0e0e0]",
@@ -143,18 +168,30 @@ export default function ProfileEditPage() {
 
               {/* Avatar column */}
               <div className="flex flex-col items-center shrink-0">
-                <div className="w-[137px] h-[137px] rounded-full bg-[#D9D9D9] overflow-hidden relative">
+                <label className="w-[137px] h-[137px] rounded-full bg-[#D9D9D9] overflow-hidden relative cursor-pointer group">
                   {user?.avatar ? (
                     <img src={user.avatar} alt="avatar" className="w-full h-full object-cover" />
                   ) : (
                     <User size={137} className="text-white bg-[#D9D9D9] p-4" />
                   )}
-                </div>
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <Plus size={32} className="text-white" />
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/gif"
+                    className="hidden"
+                    onChange={handleAvatarUpload}
+                    disabled={avatarUploading}
+                  />
+                </label>
                 <button
                   type="button"
-                  className="w-[137px] h-7 bg-[#e3dddd] text-sm text-black mt-1 hover:brightness-95"
+                  onClick={handleRemoveAvatar}
+                  disabled={!user?.avatar}
+                  className="w-[137px] h-7 bg-[#e3dddd] text-sm text-black mt-1 hover:brightness-95 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  Remove image
+                  {avatarUploading ? "Uploading..." : "Remove image"}
                 </button>
               </div>
 
@@ -260,7 +297,7 @@ export default function ProfileEditPage() {
                     </div>
                     <input
                       type="url"
-                      className="flex-1 h-10 px-2.5 border border-[#a2a0a0] text-sm text-black font-['Inter'] bg-white outline-none focus:border-black placeholder:text-[#a2a0a0]"
+                      className="flex-1 h-10 px-2.5 border border-[#a2a0a0] text-sm text-black font-sans bg-white outline-none focus:border-black placeholder:text-[#a2a0a0]"
                       placeholder="https://..."
                       value={url}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateSocial(platform, e.target.value)}

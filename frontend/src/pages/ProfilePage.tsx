@@ -40,7 +40,7 @@ export default function ProfilePage() {
   const likesCount = (projects ?? []).reduce((sum, p) => sum + (p.likesCount ?? 0), 0);
 
   return (
-    <div className="flex min-h-screen bg-white font-['Inter',sans-serif]">
+    <div className="flex min-h-screen bg-white font-sans">
 
       {/* Left info panel */}
       <ProfileSidebar

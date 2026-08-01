@@ -3,12 +3,13 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { ProjectPayload } from "../api/project.api";
+import CategoryInput from "./CategoryInput";
 import CategoryPicker from "./CategoryPicker";
 import TagInput from "./TagInput";
 import { MAX_CATEGORIES } from "../utils/categories";
 import { TAGS, MAX_TAGS } from "../utils/tags";
 import { TOOLS } from "../utils/tools";
-import { Button, Checkbox, FormError, TextInput, Tag } from "./ui";
+import { Button, Checkbox, FormError, LabeledInput } from "./ui";
 
 const projectSchema = z.object({
   name: z.string().min(1, "Title is required"),
@@ -81,7 +82,7 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
     <form
       id="project-form"
       onSubmit={handleSubmit(onSubmitForm)}
-      className="grid grid-cols-[minmax(520px,1fr)_minmax(420px,726px)] gap-[120px] px-[120px] pt-[92px] pb-20 min-h-[calc(100vh-80px)] bg-white text-black font-['Inter',sans-serif]"
+      className="grid grid-cols-[minmax(520px,1fr)_minmax(420px,726px)] gap-[120px] px-[120px] pt-[40px] pb-20 bg-white text-black font-sans"
     >
       <section className="flex flex-col pt-[88px]">
         <p className="mb-4 text-sm font-semibold leading-5 text-black">
@@ -94,12 +95,12 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
           ) : (
             <>
               <span className="text-xl font-semibold uppercase leading-8 text-black">
-                Upload cover image
+                Upload image
               </span>
               <span className="text-center text-sm font-normal leading-5 text-[#676767]">
-                Minimum size of "808 x 632px"
+                Recommended: 1200 x 800 px
                 <br />
-                GIF files will not animate.
+                JPG, PNG, WEBP (Max 10 MB)
               </span>
             </>
           )}
@@ -113,14 +114,6 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
             }}
           />
         </label>
-
-        <TextInput
-          variant="project"
-          type="url"
-          placeholder="Or paste a cover image URL..."
-          {...register("cover", { onChange: () => setCoverFile(null) })}
-          className="mt-3 w-full max-w-[726px] h-9"
-        />
       </section>
 
       <section className="flex flex-col">
@@ -128,24 +121,16 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
           Project Information
         </p>
 
-        <div className="flex flex-col gap-2 mb-6">
-          <span className="text-sm leading-5 text-black">
-            <strong className="font-semibold">Title</strong>{" "}
-            <span className="font-normal">(required)</span>
-          </span>
-          <TextInput
-            variant="project"
+        <div className="mb-6">
+          <LabeledInput
+            label="Title (required)"
             placeholder="Give your project a title"
             {...register("name")}
           />
         </div>
 
         <div className="mb-6">
-          <p className="mb-2 text-sm leading-5 text-black">
-            <strong className="font-semibold">Tags</strong>{" "}
-            <span className="font-normal">(limit of {MAX_TAGS})</span>
-          </p>
-          <div className="w-full px-2.5 py-2 border border-[#a2a0a0] bg-white outline-none focus-within:border-black">
+          <LabeledInput label={`Tags (limit of ${MAX_TAGS})`}>
             <TagInput
               selected={selectedTags}
               onSelect={setSelectedTags}
@@ -153,34 +138,18 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
               placeholder="Add up to 10 keywords to help people discover your project"
               maxItems={MAX_TAGS}
             />
-          </div>
+          </LabeledInput>
         </div>
 
         <div className="mb-6">
-          <p className="mb-2 text-sm leading-5 text-black">
-            <strong className="font-semibold">Categories</strong>{" "}
-            <span className="font-normal">(required, limit of {MAX_CATEGORIES})</span>
-          </p>
-          <TextInput
-            variant="project"
-            type="button"
-            onClick={() => setShowPicker(true)}
-            readOnly
-            value={selectedCategories.length > 0 ? selectedCategories.join(", ") : "Select categories..."}
-            className="text-left truncate cursor-pointer"
-          />
-          {selectedCategories.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-2">
-              {selectedCategories.map((cat) => (
-                <Tag
-                  key={cat}
-                  label={cat}
-                  dismissible
-                  onDismiss={() => setSelectedCategories((prev) => prev.filter((c) => c !== cat))}
-                />
-              ))}
-            </div>
-          )}
+          <LabeledInput label={`Categories (required, limit of ${MAX_CATEGORIES})`}>
+            <CategoryInput
+              selected={selectedCategories}
+              onRemove={(cat) => setSelectedCategories((prev) => prev.filter((c) => c !== cat))}
+              onOpen={() => setShowPicker(true)}
+              placeholder="Select categories..."
+            />
+          </LabeledInput>
           {showPicker && (
             <CategoryPicker
               selected={selectedCategories}
@@ -191,22 +160,19 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
         </div>
 
         <div className="mb-6">
-          <p className="mb-2 text-sm font-semibold leading-5 text-black">Tools used</p>
-          <div className="w-full px-2.5 py-2 border border-[#a2a0a0] bg-white outline-none focus-within:border-black">
+          <LabeledInput label="Tools used">
             <TagInput
               selected={selectedTools}
               onSelect={setSelectedTools}
               options={TOOLS}
               placeholder="What software, hardware, or materials did you use?"
             />
-          </div>
+          </LabeledInput>
         </div>
 
-        <div className="flex flex-col gap-2 mb-6">
-          <span className="text-sm font-semibold leading-5 text-black">Description</span>
-          <TextInput
-            variant="project"
-            className="h-[100px] py-2 resize-none"
+        <div className="mb-6">
+          <LabeledInput
+            label="Description"
             placeholder="Add short description for your project"
             {...register("description")}
           />
@@ -222,12 +188,12 @@ export default function ProjectForm({ initial = {}, onSubmit, submitLabel }: Pro
 
         {error && <FormError message={error} className="mt-4" />}
 
-        <div className="flex justify-end mt-[124px]">
+        <div className="flex justify-end mt-8">
           <Button
             variant="primary"
             type="submit"
             disabled={isSubmitting}
-            className="w-[284px] h-[45px] bg-[#b5b5b5] text-sm font-normal"
+            className="w-[284px]"
           >
             {isSubmitting ? "Publishing..." : submitLabel || "Publish"}
           </Button>

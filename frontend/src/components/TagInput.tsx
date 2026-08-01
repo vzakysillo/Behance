@@ -72,7 +72,7 @@ export default function TagInput({ selected, onSelect, options, placeholder, max
   const showDropdown = isOpen && query.trim() && visibleOptions.length > 0;
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <div className="flex flex-wrap items-center gap-1.5">
         {selected.map((item) => (
           <Tag

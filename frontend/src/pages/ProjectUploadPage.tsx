@@ -53,7 +53,7 @@ export default function ProjectUploadPage() {
   };
 
   return (
-    <div className="h-full overflow-hidden bg-[#f8f8f8] font-['Inter',sans-serif] flex flex-col">
+    <div className="h-full overflow-hidden bg-[#f8f8f8] font-sans flex flex-col">
       <ProjectCreationHeader backTo={routes.profile.root()} />
 
       <div className="flex-1 flex flex-col items-center justify-center px-[342px] min-h-0">

@@ -76,7 +76,7 @@ export default function PublicProfilePage() {
   const isOwnProfile = currentUser?._id === profileUser._id;
 
   return (
-    <div className="flex min-h-screen bg-white font-['Inter',sans-serif]">
+    <div className="flex min-h-screen bg-white font-sans">
 
       {/* Left info panel */}
       <ProfileSidebar

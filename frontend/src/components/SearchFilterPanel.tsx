@@ -92,7 +92,7 @@ export default function SearchFilterPanel({
   const otherToolsFiltered = filteredTools.filter((t) => !POPULAR_TOOLS_SET.has(t));
 
   return (
-    <div className={`w-[380px] bg-white overflow-y-auto font-['Inter',sans-serif] ${className}`}>
+    <div className={`w-[380px] bg-white overflow-y-auto font-sans ${className}`}>
       <p className="px-[29px] pt-[22px] pb-2 text-base text-black font-normal">Search filter</p>
 
       {/* ── Categories ── */}

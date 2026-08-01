@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { CATEGORIES, POPULAR_CATEGORIES, MAX_CATEGORIES, getCategoriesByLetter } from "../utils/categories";
-import { Button, Checkbox, SearchInput } from "./ui";
+import { Button, CategoryHeader, Checkbox, Search } from "./ui";
 
 const LETTERS_ORDER = ["#", "A", "B", "C", "D", "E", "F", "G", "I", "J", "L", "M", "P", "R", "S", "T", "U", "V", "W"];
 
@@ -50,7 +50,7 @@ export default function CategoryPicker({ selected, onSelect, onClose }: Category
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-      <div className="relative flex h-[90vh] w-[859px] flex-col overflow-hidden rounded-[20px] bg-white font-['Inter',sans-serif]">
+      <div className="relative flex h-[90vh] w-[859px] flex-col overflow-hidden rounded-[20px] bg-white font-sans">
         <button
           type="button"
           onClick={handleCancel}
@@ -65,22 +65,13 @@ export default function CategoryPicker({ selected, onSelect, onClose }: Category
             Category
             <span className="ml-2 text-base font-normal">(required, limit of {MAX_CATEGORIES})</span>
           </p>
-          <div className="flex h-11 items-center gap-2.5 border border-[#c6c2c2] bg-[#c6c2c2] px-5">
-            <SearchInput
-              value={search}
-              onChange={setSearch}
-              placeholder="Search"
-              className="border-none mx-0 mb-0"
-            />
-          </div>
+          <Search value={search} onChange={setSearch} placeholder="Search" />
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto border-x border-b border-[#c6c2c2] px-[50px] py-5">
           {showPopular && (
             <div className="mb-2">
-              <div className="flex h-[45px] items-center bg-[#c6c2c2] px-5">
-                <p className="text-base font-medium text-black">Most popular</p>
-              </div>
+              <CategoryHeader>Most popular</CategoryHeader>
               <div className="py-3 pl-[51px]">
                 {POPULAR_CATEGORIES.map((cat) => {
                   const checked = localSelected.includes(cat);
@@ -109,9 +100,7 @@ export default function CategoryPicker({ selected, onSelect, onClose }: Category
             if (!cats || cats.length === 0) return null;
             return (
               <div key={letter} className="mb-2">
-                <div className="flex h-[45px] items-center bg-[#c6c2c2] px-5">
-                  <p className="text-base font-medium text-black">{letter}</p>
-                </div>
+                <CategoryHeader>{letter}</CategoryHeader>
                 <div className="py-3 pl-[51px]">
                   {cats.map((cat) => {
                     const checked = localSelected.includes(cat);
@@ -143,7 +132,7 @@ export default function CategoryPicker({ selected, onSelect, onClose }: Category
 
         <div className="flex shrink-0 items-center gap-4 border-t border-[#c6c2c2] px-[50px] py-4">
           <Button
-            variant="outline-purple"
+            variant="secondary"
             type="button"
             onClick={handleCancel}
             className="h-10 w-[110px]"
@@ -151,7 +140,7 @@ export default function CategoryPicker({ selected, onSelect, onClose }: Category
             Cancel
           </Button>
           <Button
-            variant="purple"
+            variant="primary"
             type="button"
             onClick={handleDone}
             className="h-10 w-[110px]"

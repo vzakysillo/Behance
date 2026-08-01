@@ -6,11 +6,11 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 const variantClasses: Record<string, string> = {
   "auth-dark":
-    "w-full h-[45px] px-[15px] py-[10px] box-border border border-[#575656] rounded-none bg-white text-[#575656] text-sm font-medium font-['Inter',system-ui,sans-serif] leading-[1.2] outline-none placeholder:text-[#575656] placeholder:opacity-100 focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]",
-  auth: "w-full h-[44px] px-[14px] py-[10px] box-border border border-[#525252] rounded-none bg-white text-[#525252] text-sm font-medium font-['Inter',system-ui,sans-serif] leading-[1.2] outline-none placeholder:text-[#525252] placeholder:opacity-100 focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]",
-  edit: "h-10 px-2.5 border border-[#676767] text-sm text-black font-['Inter'] bg-white w-full outline-none focus:border-black placeholder:text-[#676767]",
+    "w-full h-[45px] px-[15px] py-[10px] box-border border border-[#575656] rounded-none bg-white text-[#575656] text-sm font-medium font-sans leading-[1.2] outline-none placeholder:text-[#575656] placeholder:opacity-100 focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]",
+  auth: "w-full h-[44px] px-[14px] py-[10px] box-border border border-[#525252] rounded-none bg-white text-[#525252] text-sm font-medium font-sans leading-[1.2] outline-none placeholder:text-[#525252] placeholder:opacity-100 focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]",
+  edit: "h-10 px-2.5 border border-[#676767] text-sm text-black font-sans bg-white w-full outline-none focus:border-black placeholder:text-[#676767]",
   project:
-    "w-full h-11 px-2.5 border border-[#a2a0a0] text-sm font-normal font-['Inter'] leading-5 text-black bg-white outline-none placeholder:text-[#676767] focus:border-black",
+    "w-full h-11 px-2.5 border border-[#a2a0a0] text-sm font-normal font-sans leading-5 text-black bg-white outline-none placeholder:text-[#676767] focus:border-black",
 };
 
 export function TextInput({ variant = "edit", className = "", ...props }: TextInputProps) {
@@ -28,9 +28,9 @@ interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 }
 
 const textareaVariantClasses: Record<string, string> = {
-  edit: "h-10 px-2.5 border border-[#676767] text-sm text-black font-['Inter'] bg-white w-full outline-none focus:border-black placeholder:text-[#676767]",
+  edit: "h-10 px-2.5 border border-[#676767] text-sm text-black font-sans bg-white w-full outline-none focus:border-black placeholder:text-[#676767]",
   project:
-    "w-full h-11 px-2.5 border border-[#a2a0a0] text-sm font-normal font-['Inter'] leading-5 text-black bg-white outline-none placeholder:text-[#676767] focus:border-black",
+    "w-full h-11 px-2.5 border border-[#a2a0a0] text-sm font-normal font-sans leading-5 text-black bg-white outline-none placeholder:text-[#676767] focus:border-black",
 };
 
 export function TextArea({ variant = "edit", className = "", ...props }: TextAreaProps) {

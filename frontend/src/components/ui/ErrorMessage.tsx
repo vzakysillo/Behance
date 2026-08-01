@@ -7,7 +7,7 @@ export function ErrorMessage({
 }) {
   return (
     <div
-      className={`flex justify-center items-center min-h-[200px] text-[#d32f2f] text-base font-['Inter',sans-serif] ${className}`}
+      className={`flex justify-center items-center min-h-[200px] text-[#d32f2f] text-base font-sans ${className}`}
     >
       {message}
     </div>

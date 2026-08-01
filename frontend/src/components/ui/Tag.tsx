@@ -8,16 +8,23 @@ interface TagProps {
 
 export function Tag({ label, dismissible, onDismiss }: TagProps) {
   return (
-    <span className={`inline-flex h-7 items-center gap-1.5 bg-[#e8e5e5] text-xs ${dismissible ? "pl-3 pr-1.5" : "px-3"}`}>
-      {label}
+    <span
+      className={`inline-flex h-7 items-center gap-1.5 rounded-full bg-brand-100 text-brand-600 ${
+        dismissible ? "pl-3 pr-1.5" : "px-3"
+      }`}
+    >
+      <span className="text-sm font-medium leading-[1.2]">{label}</span>
       {dismissible && (
         <button
           type="button"
-          onClick={onDismiss}
-          className="text-neutral-500 hover:text-black"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDismiss?.();
+          }}
+          className="text-brand-600 transition-colors hover:text-brand-700"
           aria-label={`Remove ${label}`}
         >
-          <X size={12} />
+          <X size={13} strokeWidth={2} />
         </button>
       )}
     </span>
