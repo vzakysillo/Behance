@@ -30,10 +30,10 @@ export default function ProfileSidebar({
   const parsedSocials = parseSocials(user.socials ?? []);
 
   return (
-    <aside className="w-[340px] shrink-0 border-r border-stone-200 flex flex-col px-[50px] py-10 gap-0">
+    <aside className="w-[340px] shrink-0 flex flex-col px-[50px] pt-[177px] pb-10 gap-0">
 
       {/* Avatar */}
-      <div className="w-[144px] h-[144px] rounded-full bg-zinc-300 overflow-hidden mb-4 self-start">
+      <div className="w-[176px] h-[176px] rounded-full bg-zinc-300 overflow-hidden mb-4 self-start">
         {user.avatar
           ? <img src={user.avatar} alt={fullName} className="w-full h-full object-cover" />
           : <div className="w-full h-full bg-zinc-300" />}
@@ -45,19 +45,19 @@ export default function ProfileSidebar({
 
       {/* Location */}
       <div className="flex items-center gap-2.5 py-2.5 text-sm text-black">
-        <MapPin size={24} className="text-zinc-400 shrink-0" />
+        <MapPin size={24} className="text-black shrink-0" />
         <span>{user.location ?? "Location"}</span>
       </div>
 
       {/* Available for freelance */}
       <div className="flex items-center gap-2.5 py-2.5 text-sm text-black">
-        <Briefcase size={24} className="text-zinc-400 shrink-0" />
+        <Briefcase size={24} className="text-black shrink-0" />
         <span>{user.availableForFreelance ? "Available for freelance" : "Not available for freelance"}</span>
       </div>
 
       {/* Username / link */}
       <div className="flex items-center gap-2.5 py-2.5 text-sm text-black">
-        <LinkIcon size={24} className="text-zinc-400 shrink-0" />
+        <LinkIcon size={24} className="text-black shrink-0" />
         <span>{user.userName}</span>
       </div>
 
@@ -70,7 +70,7 @@ export default function ProfileSidebar({
       <p className="text-base font-normal text-black mb-2">Statistics</p>
       <div className="flex flex-col">
         {[
-          { label: "Likes", value: likesCount },
+          { label: "Appreciations", value: likesCount },
           { label: "Followers", value: followersCount },
           { label: "Following", value: followingCount },
         ].map((s) => (
@@ -98,7 +98,7 @@ export default function ProfileSidebar({
               {SOCIAL_ICONS[s.platform]}
             </div>
             <span className="flex-1 text-sm font-normal">{s.platform}</span>
-            <ChevronRight size={12} />
+            <ChevronRight size={12} className="text-black" />
           </a>
         ))}
         {parsedSocials.length === 0 && (

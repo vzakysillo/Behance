@@ -22,7 +22,7 @@ export default function ProjectCreatePage() {
   });
 
   return (
-    <div className="h-svh overflow-hidden bg-white font-sans text-black">
+    <div className="h-svh overflow-hidden bg-[#f8f8f8] font-sans text-black">
       <div className="px-[50px] pt-10 flex items-center justify-between">
         <BackLarge to={routes.profile.projectAssets()} />
         <Button

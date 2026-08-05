@@ -44,7 +44,7 @@ export default function HomePage() {
   if (isError) return <ErrorMessage message={error.message} className="ml-[200px]" />;
 
   return (
-    <div className="min-h-screen bg-white p-0 flex-1">
+    <div className="min-h-screen bg-[#f8f8f8] p-0 flex-1">
       {/* Top Bar */}
       <div className="flex justify-between items-center px-[50px] pt-[50px] gap-5
                       max-[1024px]:flex-col max-[1024px]:items-stretch

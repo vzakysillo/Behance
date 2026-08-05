@@ -6,7 +6,7 @@ interface TabBarProps {
 
 export default function TabBar({ tabs, activeTab, onTabChange }: TabBarProps) {
   return (
-    <div className="flex items-center border-b border-stone-200 px-[50px]">
+    <div className="flex items-center px-[50px]">
       {tabs.map((tab) => (
         <button
           key={tab}

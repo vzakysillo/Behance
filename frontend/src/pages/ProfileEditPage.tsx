@@ -109,7 +109,7 @@ export default function ProfileEditPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans">
+    <div className="min-h-screen bg-[#f8f8f8] font-sans">
 
       {/* Top bar */}
       <div className="flex items-center justify-between h-16 px-8 border-b border-[#dadada]">

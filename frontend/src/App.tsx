@@ -22,7 +22,7 @@ function SidebarLayout() {
   return (
     <div className="flex h-screen">
       <Sidebar />
-      <main className="ml-[200px] flex-1 min-h-0">
+      <main className="ml-[64px] flex-1 min-h-0 transition-[margin] duration-200 ease-out peer-hover:ml-[200px]">
         <Outlet />
       </main>
     </div>

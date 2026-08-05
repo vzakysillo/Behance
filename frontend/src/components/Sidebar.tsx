@@ -37,13 +37,13 @@ export default function Sidebar() {
   const location = useLocation();
 
   return (
-    <aside className="fixed left-0 top-0 w-[200px] h-screen bg-[#e7e7e7] overflow-y-auto overflow-x-hidden">
+    <aside className="peer group fixed left-0 top-0 h-screen bg-white overflow-y-auto overflow-x-hidden transition-[width] duration-200 ease-out w-[64px] hover:w-[200px]">
       {/* Logo */}
       <Link
         to={routes.home()}
-        className="absolute top-[10px] left-0 w-[240px] px-[10px] pr-5 py-[10px] flex items-center gap-[10px] no-underline focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]"
+        className="absolute top-[10px] left-0 w-full pl-5 pr-2.5 py-2.5 flex items-center gap-[10px] no-underline focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:outline-offset-[3px]"
       >
-        <Logo size="md" />
+        <Logo size="md" wordClassName="hidden group-hover:inline" />
       </Link>
 
       {/* Nav */}
@@ -58,12 +58,12 @@ export default function Sidebar() {
               key={item.label}
               to={item.path}
               className={[
-                "flex items-center gap-[10px] px-5 py-[10px] no-underline text-black/80 transition-colors w-[240px] box-border focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:-outline-offset-2",
-                isActive ? "bg-[#b4b4b4]" : "hover:bg-[#d8d7d7]",
+                "flex items-center gap-[10px] px-5 py-2.5 no-underline transition-colors w-full box-border focus-visible:outline-2 focus-visible:outline-[#525252] focus-visible:-outline-offset-2 rounded-tr-[15px] rounded-br-[15px]",
+                isActive ? "bg-[#6146ea] text-white" : "text-[#1b1b1b] hover:bg-[#f0f0f0]",
               ].join(" ")}
             >
-              <Icon size={18} strokeWidth={2} className="shrink-0 text-black" />
-              <span className="text-base font-medium font-sans leading-6 whitespace-nowrap">
+              <Icon size={24} strokeWidth={2} className={`shrink-0 ${isActive ? "text-white" : "text-[#1b1b1b]"}`} />
+              <span className="hidden group-hover:inline text-base font-medium font-sans leading-6 whitespace-nowrap">
                 {item.label}
               </span>
             </Link>

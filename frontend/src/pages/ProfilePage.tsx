@@ -5,10 +5,9 @@ import { getProjects } from "../api/project.api";
 import { getFollowers, getFollowing } from "../api/follow.api";
 import { useAuth } from "../hooks/useAuth";
 import { routes } from "../routes";
-import { Plus } from "lucide-react";
 import ProfileSidebar from "../components/ProfileSidebar";
 import TabBar from "../components/TabBar";
-import { Button, Spinner, ErrorMessage, EmptyState } from "../components/ui";
+import { Button, LinkButton, Spinner, ErrorMessage, EmptyState, ProfileHeaderGradient } from "../components/ui";
 import { ProfileProjectCard } from "../components/layout/ProfileProjectCard";
 
 const TABS = ["Work", "Moodboards", "For sale", "Appreciations", "Your stats", "Drafts"] as const;
@@ -40,7 +39,12 @@ export default function ProfilePage() {
   const likesCount = (projects ?? []).reduce((sum, p) => sum + (p.likesCount ?? 0), 0);
 
   return (
-    <div className="flex min-h-screen bg-white font-sans">
+    <div className="relative min-h-screen bg-[#f8f8f8] font-sans">
+
+      {/* Gradient header */}
+      <ProfileHeaderGradient className="h-[300px]" />
+
+      <div className="relative flex">
 
       {/* Left info panel */}
       <ProfileSidebar
@@ -49,14 +53,11 @@ export default function ProfilePage() {
         followersCount={followers?.length ?? 0}
         followingCount={following?.length ?? 0}
         actionButtons={
-          <div className="flex flex-col gap-[18px] mt-6">
-            <Link
-              to={routes.profile.edit()}
-              className="w-full h-10 flex items-center justify-center bg-stone-300 text-black text-sm font-normal no-underline hover:brightness-95"
-            >
+          <div className="flex flex-col gap-[12px] mt-6">
+            <LinkButton to={routes.profile.edit()} variant="primary" fullWidth>
               Edit profile info
-            </Link>
-            <Button variant="sidebar-light">
+            </LinkButton>
+            <Button variant="secondary" fullWidth>
               Customize profile PRO
             </Button>
           </div>
@@ -73,7 +74,7 @@ export default function ProfilePage() {
       />
 
       {/* Main content area */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col pt-[300px]">
 
         {/* Tabs */}
         <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
@@ -85,17 +86,30 @@ export default function ProfilePage() {
               {isLoading && <Spinner />}
               {isError && <ErrorMessage message={error.message} />}
               {!isLoading && !isError && (
-                <div className="grid grid-cols-3 gap-[22px]">
+                <div className="grid grid-cols-3 gap-[30px]">
 
                   {/* Add project card */}
                   <Link
                     to={routes.profile.projectUpload()}
-                    className="w-96 h-96 bg-zinc-300 flex flex-col items-center justify-center gap-3 no-underline hover:brightness-95"
+                    className="relative w-full h-[307px] no-underline"
                   >
-                    <div className="w-12 h-12 flex items-center justify-center">
-                      <Plus size={48} strokeWidth={3} className="text-black" />
-                    </div>
-                    <span className="text-base font-medium text-black">Add project</span>
+                    <div className="w-full h-[307px] absolute left-[-2px] top-[-2px] rounded-[15px] border-[3px] border-brand-600" />
+                    <svg
+                      width={137}
+                      height={137}
+                      viewBox="0 0 137 137"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-[137px] h-[137px] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+                      preserveAspectRatio="none"
+                    >
+                      <circle cx="68.5" cy="68.5" r={67} stroke="#6146EA" strokeWidth={3} />
+                      <path d="M44 68H94" stroke="#6146EA" strokeWidth={3} strokeLinecap="round" />
+                      <path d="M68 93L68 43" stroke="#6146EA" strokeWidth={3} strokeLinecap="round" />
+                    </svg>
+                    <p className="absolute left-1/2 -translate-x-1/2 top-[235px] text-base font-medium text-center whitespace-nowrap text-brand-600">
+                      Add project
+                    </p>
                   </Link>
 
                   {/* Project cards */}
@@ -116,6 +130,7 @@ export default function ProfilePage() {
           )}
         </div>
       </main>
+      </div>
     </div>
   );
 }

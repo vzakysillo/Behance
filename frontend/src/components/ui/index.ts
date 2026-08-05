@@ -23,4 +23,7 @@ export { ContinueWith } from "./ContinueWith";
 export { BackLarge } from "./BackLarge";
 export { Search } from "./Search";
 export { CategoryHeader } from "./CategoryHeader";
+export { BackgroundGradient } from "./BackgroundGradient";
+export { AuthGradient } from "./AuthGradient";
+export { ProfileHeaderGradient } from "./ProfileHeaderGradient";
 export { FormField } from "./FormField";

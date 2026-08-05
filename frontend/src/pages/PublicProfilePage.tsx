@@ -6,10 +6,10 @@ import { getUser } from "../api/user.api";
 import { getFollowers, getFollowing, followUser, unfollowUser } from "../api/follow.api";
 import { useAuth } from "../hooks/useAuth";
 import { routes } from "../routes";
-import { MessageSquare } from "lucide-react";
+import { UserPlus, Mail, Star } from "lucide-react";
 import ProfileSidebar from "../components/ProfileSidebar";
 import TabBar from "../components/TabBar";
-import { Button, Spinner, ErrorMessage, EmptyState } from "../components/ui";
+import { Button, Spinner, ErrorMessage, EmptyState, ProfileHeaderGradient } from "../components/ui";
 import { ProfileProjectCard } from "../components/layout/ProfileProjectCard";
 
 const TABS = ["Work", "Moodboards", "For sale", "Appreciations", "Your stats"] as const;
@@ -76,7 +76,12 @@ export default function PublicProfilePage() {
   const isOwnProfile = currentUser?._id === profileUser._id;
 
   return (
-    <div className="flex min-h-screen bg-white font-sans">
+    <div className="relative min-h-screen bg-[#f8f8f8] font-sans">
+
+      {/* Gradient header */}
+      <ProfileHeaderGradient className="h-[300px]" />
+
+      <div className="relative flex">
 
       {/* Left info panel */}
       <ProfileSidebar
@@ -86,21 +91,32 @@ export default function PublicProfilePage() {
         followingCount={following?.length ?? 0}
         actionButtons={
           !isOwnProfile && token ? (
-            <div className="flex flex-col gap-[18px] mt-6">
+            <div className="flex flex-col gap-[12px] mt-6">
               <Button
-                variant={isFollowing ? "sidebar-light" : "sidebar"}
+                variant={isFollowing ? "secondary" : "primary"}
                 type="button"
                 onClick={() => followMutation.mutate()}
-                className={`transition-colors hover:brightness-95 ${
-                  isFollowing
-                    ? "bg-gray-200 text-black border border-neutral-600"
-                    : ""
-                }`}
+                icon={<UserPlus size={18} />}
+                className="inline-flex items-center justify-center gap-2"
+                fullWidth
               >
                 {isFollowing ? "Following" : "Follow"}
               </Button>
-              <Button variant="sidebar-light" icon={<MessageSquare size={14} />} className="gap-2">
+              <Button
+                variant="secondary"
+                icon={<Mail size={18} />}
+                className="inline-flex items-center justify-center gap-2"
+                fullWidth
+              >
                 Message
+              </Button>
+              <Button
+                variant="secondary"
+                icon={<Star size={18} />}
+                className="inline-flex items-center justify-center gap-2"
+                fullWidth
+              >
+                Save candidate
               </Button>
             </div>
           ) : undefined
@@ -108,7 +124,7 @@ export default function PublicProfilePage() {
       />
 
       {/* Main content area */}
-      <main className="flex-1 flex flex-col">
+      <main className="flex-1 flex flex-col pt-[300px]">
 
         {/* Tabs */}
         <TabBar tabs={TABS} activeTab={activeTab} onTabChange={setActiveTab} />
@@ -120,7 +136,7 @@ export default function PublicProfilePage() {
               {projectsLoading && <Spinner />}
               {projectsError && <ErrorMessage message={projectsError.message} />}
               {!projectsLoading && !projectsError && (
-                <div className="grid grid-cols-3 gap-[22px]">
+                <div className="grid grid-cols-3 gap-[30px]">
                   {(projects ?? []).map((project) => (
                     <ProfileProjectCard
                       key={project._id}
@@ -138,6 +154,7 @@ export default function PublicProfilePage() {
           )}
         </div>
       </main>
+      </div>
     </div>
   );
 }

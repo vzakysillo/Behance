@@ -23,7 +23,7 @@ export default function ProjectPublishedPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white overflow-hidden font-sans text-ink">
+    <div className="min-h-screen bg-[#f8f8f8] overflow-hidden font-sans text-ink">
       <section className="mx-auto flex min-h-screen w-full max-w-[1656px] flex-col items-center justify-center px-6 py-16 text-center">
         <div className="relative mb-9 flex size-40 items-center justify-center">
           <div className="flex size-28 items-center justify-center rounded-full border-[6px] border-brand-600 text-brand-600">

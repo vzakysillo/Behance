@@ -1,6 +1,8 @@
 interface LogoProps {
   size?: "sm" | "md" | "lg";
+  variant?: "default" | "white";
   className?: string;
+  wordClassName?: string;
 }
 
 const sizeClasses: Record<string, string> = {
@@ -15,16 +17,21 @@ const circleSizeClasses: Record<string, string> = {
   lg: "w-8 h-8",
 };
 
-export function Logo({ size = "md", className = "" }: LogoProps) {
+const variantClasses: Record<string, string> = {
+  default: "text-[#575656] border-[#575656]",
+  white: "text-white border-white",
+};
+
+export function Logo({ size = "md", variant = "default", className = "", wordClassName = "" }: LogoProps) {
   return (
     <span
-      className={`inline-flex items-center font-bold leading-[1.2] no-underline text-[#575656] ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center font-bold leading-[1.2] no-underline ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
     >
       <span
-        className={`shrink-0 border-4 border-[#575656] rounded-full box-border ${circleSizeClasses[size]}`}
+        className={`shrink-0 border-4 rounded-full box-border ${variantClasses[variant]} ${circleSizeClasses[size]}`}
         aria-hidden="true"
       />
-      <span>LOGO</span>
+      <span className={wordClassName}>LOGO</span>
     </span>
   );
 }

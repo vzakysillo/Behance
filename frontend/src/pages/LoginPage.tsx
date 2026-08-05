@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useAuthRedirect } from "../hooks/useAuthRedirect";
 import LoginForm from "../components/LoginForm";
 import { routes } from "../routes";
 import { AuthPageLayout } from "../components/layout/AuthPageLayout";
-import { ContinueWith } from "../components/ui";
+import { AuthGradient, ContinueWith, Logo } from "../components/ui";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -21,10 +22,22 @@ export default function LoginPage() {
     <AuthPageLayout
       visualPanel={
         <section
-          className="relative min-h-svh grid place-items-center bg-[#8b8b8b] max-[1024px]:min-h-[240px] max-[560px]:min-h-[180px]"
+          className="relative min-h-svh grid place-items-center overflow-hidden max-[1024px]:min-h-[240px] max-[560px]:min-h-[180px]"
           aria-label="Featured project preview"
         >
-          <p className="text-[#575656] text-[30px] font-normal leading-[1.2] max-[560px]:text-2xl">picture</p>
+          <AuthGradient className="absolute inset-0" />
+          <header
+            className="absolute top-[clamp(24px,4.63vw,50px)] left-[clamp(24px,4.64vw,89px)] z-10"
+            aria-label="Site header"
+          >
+            <Link
+              to={routes.home()}
+              className="inline-flex items-center gap-[clamp(16px,1.98vw,38px)] text-white text-[clamp(24px,1.67vw,32px)] font-bold leading-[1.2] no-underline focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-[3px]"
+              aria-label="Home"
+            >
+              <Logo size="lg" variant="white" />
+            </Link>
+          </header>
           <div className="absolute left-[clamp(24px,3.5vw,64px)] bottom-[clamp(24px,3.5vw,64px)] max-w-[520px] z-10 text-white max-[1024px]:hidden">
             <p className="m-0 text-base font-normal leading-[1.4] text-white">
               Log in to continue building your portfolio and finding new creative opportunities

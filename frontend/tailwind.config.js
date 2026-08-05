@@ -15,7 +15,7 @@ export default {
         error: "#f7165a",
       },
       fontFamily: {
-        sans: ["Geist", "Inter", "system-ui", "sans-serif"],
+        sans: ["Geist"],
       },
     },
   },
