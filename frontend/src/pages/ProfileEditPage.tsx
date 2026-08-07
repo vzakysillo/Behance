@@ -8,10 +8,10 @@ import { useAuth } from "../hooks/useAuth";
 import { updateMe } from "../api/user.api";
 import { routes } from "../routes";
 import { SOCIAL_ICONS, SOCIAL_PLATFORMS, getSocialUrl, setSocialUrl } from "../utils/socials";
-import { Divider, TextInput } from "../components/ui";
+import { Button, Divider, LabeledInput } from "../components/ui";
 
-type Section = "Base information" | "Work Experience" | "Teams" | "Socials" | "Links" | "Add section";
-const SECTIONS: Section[] = ["Base information", "Work Experience", "Teams", "Socials", "Links", "Add section"];
+type Section = "Base Information" | "Work Experience" | "Teams" | "Socials" | "Links" | "Add section";
+const SECTIONS: Section[] = ["Base Information", "Work Experience", "Teams", "Socials", "Links", "Add section"];
 
 import { GripHorizontal, User, ArrowLeft, Upload, Plus } from "lucide-react";
 import { uploadAvatar } from "../api/upload.api";
@@ -40,8 +40,9 @@ export default function ProfileEditPage() {
   const { user, refreshUser } = useAuth();
   const queryClient = useQueryClient();
   const [error, setError] = useState("");
-  const [activeSection, setActiveSection] = useState<Section>("Base information");
+  const [activeSection, setActiveSection] = useState<Section>("Base Information");
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [socialReset, setSocialReset] = useState<Record<string, number>>({});
 
   const { register, handleSubmit, watch, setValue, formState: { isSubmitting } } = useForm<ProfileEditValues>({
     resolver: zodResolver(profileEditSchema),
@@ -83,6 +84,11 @@ export default function ProfileEditPage() {
 
   const updateSocial = (platform: string, url: string) => {
     setValue("socials", setSocialUrl(socials, platform, url), { shouldDirty: true });
+  };
+
+  const handleRemoveSocial = (platform: string) => {
+    updateSocial(platform, "");
+    setSocialReset((prev) => ({ ...prev, [platform]: (prev[platform] ?? 0) + 1 }));
   };
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -137,32 +143,39 @@ export default function ProfileEditPage() {
       <div className="flex">
 
         {/* Left nav — sticky */}
-        <nav className="ml-[20px] w-[200px] shrink-0 pt-10 sticky top-0 h-screen flex flex-col gap-0">
-          {SECTIONS.map((section) => (
-            <button
-              key={section}
-              type="button"
-              onClick={() => {
-                setActiveSection(section);
-                const id = section.toLowerCase().replace(/\s+/g, "-");
-                document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-              className={[
-                "w-full h-10 px-2.5 text-left text-sm font-sans transition-colors",
-                activeSection === section
-                  ? "bg-[#d3d3d3] text-black"
-                  : "bg-[#f0efef] text-black hover:bg-[#e0e0e0]",
-              ].join(" ")}
-            >
-              {section}
-            </button>
-          ))}
+        <nav className="ml-[20px] w-[285px] shrink-0 pt-10 sticky top-0">
+          <div className="flex flex-col w-[285px] h-60">
+            {SECTIONS.map((section, i) => {
+              const active = activeSection === section;
+              const isFirst = i === 0;
+              const isLast = i === SECTIONS.length - 1;
+              return (
+                <button
+                  key={section}
+                  type="button"
+                  onClick={() => {
+                    setActiveSection(section);
+                    const id = section.toLowerCase().replace(/\s+/g, "-");
+                    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }}
+                  className={[
+                    "flex justify-start items-center w-full h-10 gap-2.5 p-2.5 text-base text-left font-sans transition-colors",
+                    isFirst ? "rounded-tl-[15px] rounded-tr-[15px]" : "",
+                    isLast ? "rounded-bl-[15px] rounded-br-[15px]" : "",
+                    active ? "bg-brand-600 text-white hover:bg-brand-700" : "bg-white text-ink hover:bg-brand-100",
+                  ].join(" ")}
+                >
+                  {section}
+                </button>
+              );
+            })}
+          </div>
         </nav>
 
         {/* Scrollable content */}
         <div className="flex-1 px-16 py-10 max-w-[960px]">
 
-          {/* Base information */}
+          {/* Base Information */}
           <section id="base-information">
             <div className="flex gap-10">
 
@@ -185,61 +198,42 @@ export default function ProfileEditPage() {
                     disabled={avatarUploading}
                   />
                 </label>
-                <button
+                <Button
                   type="button"
+                  variant="primary"
                   onClick={handleRemoveAvatar}
                   disabled={!user?.avatar}
-                  className="w-[137px] h-7 bg-[#e3dddd] text-sm text-black mt-1 hover:brightness-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                  className="w-[137px] mt-1"
                 >
                   {avatarUploading ? "Uploading..." : "Remove image"}
-                </button>
+                </Button>
               </div>
 
               {/* Fields column */}
               <div className="flex flex-col gap-4 flex-1">
-                <p className="text-base text-black font-normal">Base information</p>
+                <p className="text-base text-black font-normal">Base Information</p>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-sm text-black">First name</label>
-                    <TextInput variant="edit" placeholder="First name" {...register("firstName")} />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-sm text-black">Last name</label>
-                    <TextInput variant="edit" placeholder="Last name" {...register("lastName")} />
-                  </div>
+                  <LabeledInput label="First name" placeholder="First name" {...register("firstName")} />
+                  <LabeledInput label="Last name" placeholder="Last name" {...register("lastName")} />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm text-black">Headline</label>
-                  <TextInput variant="edit" placeholder="Headline" {...register("headline")} />
-                </div>
+                <LabeledInput label="Headline" placeholder="Headline" {...register("headline")} />
 
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm text-black">Company</label>
-                  <TextInput variant="edit" placeholder="Company" {...register("company")} />
-                </div>
+                <LabeledInput label="Company" placeholder="Company" {...register("company")} />
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-sm text-black">Location</label>
-                    <TextInput variant="edit" placeholder="Location" {...register("location")} />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-sm text-black">City</label>
-                    <TextInput variant="edit" placeholder="City" {...register("city")} />
-                  </div>
+                  <LabeledInput label="Location" placeholder="Location" {...register("location")} />
+                  <LabeledInput label="City" placeholder="City" {...register("city")} />
                 </div>
 
-                <div className="flex flex-col gap-1">
-                  <label className="text-sm text-black">Bio</label>
-                  <TextInput
-                    variant="edit"
-                    className="h-[100px] py-2 resize-none"
+                <LabeledInput label="Bio">
+                  <textarea
+                    className="w-full h-[100px] bg-transparent resize-none outline-none text-sm leading-[1.2] text-ink placeholder:text-line"
                     placeholder="Tell us about yourself"
                     {...register("bio")}
                   />
-                </div>
+                </LabeledInput>
               </div>
             </div>
           </section>
@@ -254,13 +248,14 @@ export default function ProfileEditPage() {
                 <button type="button" className="text-sm text-black text-left hover:underline">+ Add work history</button>
                 <button type="button" className="text-sm text-black text-left hover:underline">+ Add education</button>
               </div>
-              <button
+              <Button
                 type="button"
-                className="flex items-center justify-center gap-2 h-[30px] px-4 border border-black text-sm text-black hover:bg-gray-50 flex-1 max-w-[579px]"
+                variant="secondary"
+                icon={<Upload size={16} />}
+                className="flex-1 max-w-[579px] inline-flex items-center justify-center gap-2"
               >
-                <Upload size={16} className="text-black" />
                 Upload CV
-              </button>
+              </Button>
             </div>
           </section>
 
@@ -269,11 +264,7 @@ export default function ProfileEditPage() {
           {/* Teams */}
           <section id="teams">
             <p className="text-base text-black mb-3">Teams</p>
-            <TextInput
-              variant="edit"
-              placeholder="Team's link"
-              {...register("teamLink")}
-            />
+            <LabeledInput label="Team's link" placeholder="Team's link" {...register("teamLink")} />
           </section>
 
           <Divider className={editDividerClass} />
@@ -289,26 +280,25 @@ export default function ProfileEditPage() {
               {SOCIAL_PLATFORMS.map((platform) => {
                 const url = getSocialUrl(socials, platform);
                 return (
-                  <div key={platform} className="flex items-center gap-2.5 h-10">
+                  <div key={platform} className="flex items-start gap-2.5">
                     <DragIcon />
-                    <div className="flex items-center gap-2 w-[200px]">
-                      {SOCIAL_ICONS[platform]}
-                      <span className="text-sm text-[#a2a0a0]">{platform}</span>
-                    </div>
-                    <input
+                    <div className="shrink-0 mt-[2px]">{SOCIAL_ICONS[platform]}</div>
+                    <LabeledInput
+                      key={`${platform}-${socialReset[platform] ?? 0}`}
+                      label={platform}
                       type="url"
-                      className="flex-1 h-10 px-2.5 border border-[#a2a0a0] text-sm text-black font-sans bg-white outline-none focus:border-black placeholder:text-[#a2a0a0]"
+                      defaultValue={url}
                       placeholder="https://..."
-                      value={url}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateSocial(platform, e.target.value)}
+                      onChange={(e) => updateSocial(platform, e.target.value)}
+                      className="flex-1"
                     />
                     {url && (
                       <button
                         type="button"
-                        onClick={() => updateSocial(platform, "")}
-                        className="w-[100px] h-10 bg-[#b5b5b5] text-sm text-black shrink-0 hover:brightness-95"
+                        onClick={() => handleRemoveSocial(platform)}
+                        className="w-[100px] h-[45px] rounded-[30px] bg-brand-600 text-sm text-white shrink-0 hover:bg-brand-700 mt-[27px]"
                       >
-                        Disconnect
+                        Remove
                       </button>
                     )}
                   </div>
@@ -323,20 +313,8 @@ export default function ProfileEditPage() {
           <section id="links">
             <p className="text-base text-black mb-4">Links</p>
             <div className="flex items-end gap-3">
-              <div className="flex flex-col gap-1 flex-1">
-                <label className="text-sm text-black">Link title</label>
-                <TextInput variant="edit" placeholder="Link title" {...register("linkTitle")} />
-              </div>
-              <div className="flex flex-col gap-1 flex-1">
-                <label className="text-sm text-black">URL</label>
-                <TextInput variant="edit" placeholder="URL" {...register("linkUrl")} />
-              </div>
-              <button
-                type="button"
-                className="h-10 px-6 bg-[#b5b5b5] text-sm text-black shrink-0 hover:brightness-95"
-              >
-                Add
-              </button>
+              <LabeledInput label="Link title" placeholder="Link title" className="flex-1" {...register("linkTitle")} />
+              <LabeledInput label="URL" placeholder="URL" className="flex-1" {...register("linkUrl")} />
             </div>
           </section>
 
@@ -344,12 +322,14 @@ export default function ProfileEditPage() {
 
           {/* Add section */}
           <section id="add-section">
-            <button
+            <Button
               type="button"
-              className="w-full h-10 border border-[#676767] text-base text-black hover:bg-gray-50"
+              variant="secondary"
+              icon={<Plus size={16} />}
+              className="w-full inline-flex items-center justify-center gap-2"
             >
-              + Add a custom section
-            </button>
+              Add a custom section
+            </Button>
           </section>
 
         </div>

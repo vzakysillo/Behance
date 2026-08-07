@@ -13,9 +13,11 @@ export function FilterPill({ selected, onClick, children, className = "" }: Filt
       type="button"
       onClick={onClick}
       className={[
-        "h-[45px] px-[15px] py-[10px] border-none rounded text-base font-sans font-normal text-black cursor-pointer transition-colors whitespace-nowrap",
+        "h-[45px] px-[15px] py-[10px] rounded-full text-base font-medium leading-[1.2] cursor-pointer transition-colors whitespace-nowrap",
         "max-[768px]:text-sm max-[768px]:px-3 max-[768px]:py-2",
-        selected ? "bg-[#c3c3c3]" : "bg-[#e8e7e7] hover:bg-[#d8d7d7]",
+        selected
+          ? "bg-brand-600 text-white hover:bg-brand-700"
+          : "bg-brand-100 text-brand-600 hover:bg-[#d6c8fb]",
         className,
       ].join(" ")}
     >

@@ -4,9 +4,10 @@ import { useQuery } from "@tanstack/react-query";
 import { getFeedProjects } from "../api/project.api";
 import { useAuth } from "../hooks/useAuth";
 import { routes } from "../routes";
-import { Heart, MessageSquare, Search, SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal } from "lucide-react";
 import SearchFilterPanel, { type SortOption } from "../components/SearchFilterPanel";
-import { Spinner, ErrorMessage, FilterPill, Stat } from "../components/ui";
+import { Spinner, ErrorMessage, FilterPill, Search } from "../components/ui";
+import { ProfileProjectCard } from "../components/layout/ProfileProjectCard";
 
 type Category = "All" | "Logo design" | "Branding" | "Illustration" | "Social media design" | "UI/UX";
 
@@ -19,9 +20,9 @@ export default function HomePage() {
     queryFn: getFeedProjects,
   });
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<Category>("All");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<SortOption>("Oldest First");
-  const [selectedTool, setSelectedTool] = useState("");
+  const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const [showFilter, setShowFilter] = useState(false);
   const filterRef = useRef<HTMLDivElement>(null);
 
@@ -29,9 +30,15 @@ export default function HomePage() {
     .filter((project) => {
       const matchesSearch = project.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory =
-        selectedCategory === "All" || project.categories?.some((c) => c.toLowerCase().includes(selectedCategory.toLowerCase()));
+        selectedCategories.length === 0 ||
+        project.categories?.some((c) =>
+          selectedCategories.some((sc) => c.toLowerCase().includes(sc.toLowerCase()))
+        );
       const matchesTool =
-        !selectedTool || project.toolsUsed?.some((t) => t.toLowerCase() === selectedTool.toLowerCase());
+        selectedTools.length === 0 ||
+        project.toolsUsed?.some((t) =>
+          selectedTools.some((st) => t.toLowerCase() === st.toLowerCase())
+        );
       return matchesSearch && matchesCategory && matchesTool;
     })
     .sort((a, b) => {
@@ -39,6 +46,12 @@ export default function HomePage() {
       const dateB = new Date(b.createdAt ?? 0).getTime();
       return sortBy === "Newest First" ? dateB - dateA : dateA - dateB;
     });
+
+  const handleCategoryClick = (cat: Category) => {
+    setSelectedCategories((prev) =>
+      cat === "All" ? [] : prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+    );
+  };
 
   if (isLoading) return <Spinner className="ml-[200px]" />;
   if (isError) return <ErrorMessage message={error.message} className="ml-[200px]" />;
@@ -50,11 +63,11 @@ export default function HomePage() {
                       max-[1024px]:flex-col max-[1024px]:items-stretch
                       max-[768px]:px-5">
         {/* Search */}
-        <div className="flex items-center gap-[10px] flex-1 max-w-[873px] max-[1024px]:max-w-full">
+        <div className="flex items-center gap-[10px] flex-1 max-[1024px]:max-w-full">
           <div className="relative" ref={filterRef}>
             <button
               onClick={() => setShowFilter((v) => !v)}
-              className="h-[45px] px-[15px] py-[10px] border-none rounded text-base font-sans font-normal text-black bg-[#c6c2c2] cursor-pointer transition-colors hover:bg-[#b8b8b8] shrink-0 flex items-center gap-2"
+              className="h-[45px] px-[15px] py-[10px] border-none rounded-full text-base font-medium text-brand-600 bg-brand-100 cursor-pointer transition-colors hover:bg-[#d6c8fb] shrink-0 flex items-center gap-2"
             >
               Search filter
               <SlidersHorizontal size={18} />
@@ -64,36 +77,37 @@ export default function HomePage() {
                 <div className="fixed inset-0 z-40" onClick={() => setShowFilter(false)} />
                 <div className="absolute left-0 top-full mt-2 z-50 border border-[#d9d9d9] shadow-lg">
                   <SearchFilterPanel
-                    selectedCategory={selectedCategory}
-                    onCategoryChange={(cat) => setSelectedCategory(cat as Category)}
+                    selectedCategories={selectedCategories}
+                    onCategoryChange={setSelectedCategories}
                     sortBy={sortBy}
                     onSortChange={setSortBy}
-                    selectedTool={selectedTool}
-                    onToolChange={setSelectedTool}
+                    selectedTools={selectedTools}
+                    onToolChange={setSelectedTools}
+                    onClose={() => setShowFilter(false)}
+                    onReset={() => {
+                      setSelectedCategories([]);
+                      setSortBy("Oldest First");
+                      setSelectedTools([]);
+                      setSearchQuery("");
+                    }}
                   />
                 </div>
               </>
             )}
           </div>
-          <div className="flex items-center gap-[10px] px-5 py-[10px] bg-[#c6c2c2] rounded h-[45px] flex-1">
-            <div className="flex items-center justify-center w-6 h-6 shrink-0">
-              <Search size={24} className="text-black" />
-            </div>
-            <input
-              type="text"
-              placeholder="Search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="flex-1 border-none bg-transparent text-base font-sans font-normal text-black outline-none placeholder:text-black"
-            />
-          </div>
+          <Search
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search"
+            className="flex-1"
+          />
         </div>
 
         {/* Action buttons */}
         <div className="flex gap-[15px] max-[1024px]:flex-col">
         {token && (
           <span
-            className="px-[10px] h-[45px] flex items-center justify-center text-base font-sans font-normal no-underline rounded bg-[#e8e7e7] text-black min-w-[285px] cursor-pointer
+            className="px-[10px] h-[45px] flex items-center justify-center text-base font-medium no-underline rounded-full bg-brand-600 text-white min-w-[285px] cursor-pointer transition-colors hover:bg-brand-700
                        max-[1024px]:w-full max-[768px]:w-full"
           >
             Start free trial
@@ -101,7 +115,7 @@ export default function HomePage() {
         )}
           <Link
             to={routes.profile.projectUpload()}
-            className="px-[10px] h-[45px] flex items-center justify-center text-base font-sans font-normal no-underline rounded bg-[#e8e7e7] text-black min-w-[284px] transition-colors hover:bg-[#d8d7d7]
+            className="px-[10px] h-[45px] flex items-center justify-center text-base font-medium no-underline rounded-full bg-brand-100 text-brand-600 min-w-[284px] transition-colors hover:bg-[#d6c8fb]
                        max-[1024px]:w-full max-[768px]:w-full"
           >
             Share work
@@ -114,8 +128,10 @@ export default function HomePage() {
         {categories.map((category) => (
           <FilterPill
             key={category}
-            selected={selectedCategory === category}
-            onClick={() => setSelectedCategory(category)}
+            selected={
+              category === "All" ? selectedCategories.length === 0 : selectedCategories.includes(category)
+            }
+            onClick={() => handleCategoryClick(category)}
           >
             {category}
           </FilterPill>
@@ -136,50 +152,11 @@ export default function HomePage() {
           </div>
         ) : (
           filteredProjects.map((project) => (
-            <Link
+            <ProfileProjectCard
               key={project._id}
-              to={routes.projectDetail(project._id)}
-              className="no-underline text-inherit block group"
-            >
-              {/* Image */}
-              <div className="relative w-full h-[380px] bg-[#a39f9f] rounded overflow-hidden">
-                {project.cover ? (
-                  <img src={project.cover} alt={project.name} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-[#a39f9f]" />
-                )}
-                {/* Hover overlay (decorative "..." menu only) */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="absolute top-5 right-5">
-                    <span className="text-white text-[32px] font-semibold font-sans cursor-pointer select-none">...</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Info — always visible, dark text on white background (fixes prior white-on-white bug) */}
-              <div className="pt-[15px]">
-                <div className="flex items-center gap-[10px] mb-2">
-                  <div className="w-[46px] h-[46px] rounded-full bg-[#e2e2e2] shrink-0 overflow-hidden">
-                    {project.author?.avatar && (
-                      <img src={project.author.avatar} alt="" className="w-full h-full object-cover" />
-                    )}
-                  </div>
-                  <span className="text-base font-sans font-medium text-gray-800">
-                    {[project.author?.firstName, project.author?.lastName].filter(Boolean).join(" ") || project.author?.userName || "User"}
-                  </span>
-                </div>
-                <h3 className="text-xl font-sans font-semibold text-gray-900 m-0 mb-2">{project.name}</h3>
-                <p className="text-base font-sans font-normal text-gray-600 m-0 mb-[15px] leading-[1.4] line-clamp-2">
-                  {project.description || "No description available"}
-                </p>
-                <div className="flex gap-[30px]">
-                  <Stat icon={Heart} value={project.likesCount ?? 0} />
-                  {!project.disableComments && (
-                    <Stat icon={MessageSquare} value={project.commentsCount ?? 0} />
-                  )}
-                </div>
-              </div>
-            </Link>
+              project={project}
+              linkTo={routes.projectDetail(project._id)}
+            />
           ))
         )}
       </div>
