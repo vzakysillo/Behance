@@ -24,6 +24,7 @@ import {
   removeProjectComment,
   removeProjectLike,
 } from "../api/project.api";
+import { followUser, getFollowing, unfollowUser } from "../api/follow.api";
 import { useAuth } from "../hooks/useAuth";
 import { Spinner, ErrorMessage, Button, Tag, EmptyState, BackLarge, LabeledInput } from "../components/ui";
 import ProjectPreview from "../components/ProjectPreview";
@@ -59,6 +60,7 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
 
   const [commentText, setCommentText] = useState("");
   const [reactionError, setReactionError] = useState("");
+  const [followError, setFollowError] = useState("");
 
   const { data: project, isLoading, error } = useQuery({
     queryKey: ["project", id, publicView],
@@ -145,6 +147,28 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
     return undefined;
   }, [currentUser, project]);
 
+  const isOwnProfile = !!author && author._id === currentUser?._id;
+
+  const { data: currentUserFollowing } = useQuery({
+    queryKey: ["following", currentUser?._id],
+    queryFn: () => getFollowing(currentUser!._id),
+    enabled: !!currentUser && !!author?._id && !isOwnProfile,
+  });
+
+  const isFollowing =
+    currentUserFollowing?.some((u) => u.followingId._id === author?._id) ?? false;
+
+  const followMutation = useMutation({
+    mutationFn: () => {
+      if (!author?._id) throw new Error("No author id");
+      return isFollowing ? unfollowUser(author._id) : followUser(author._id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["followers", author?._id] });
+      queryClient.invalidateQueries({ queryKey: ["following", currentUser?._id] });
+    },
+  });
+
   const gallery = useMemo(() => {
     if (!project) return [];
     return [project.cover, ...(project.assets ?? [])].filter((image): image is string => Boolean(image));
@@ -218,24 +242,41 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
         {/* Author header */}
         <section className="mb-8 flex items-center justify-between gap-10 max-[768px]:flex-col max-[768px]:items-start">
           <div className="relative h-[108px] w-[298px] shrink-0">
-            <div className="relative h-[90px] w-[90px]">
+            <Link
+              to={author ? routes.publicProfile(author._id) : routes.home()}
+              className="block h-[90px] w-[90px] no-underline"
+            >
               {author?.avatar ? (
                 <img src={author.avatar} alt={authorName} className="h-full w-full rounded-full object-cover" />
               ) : (
                 <div className="h-full w-full rounded-full bg-[#d9d9d9]" />
               )}
-            </div>
-            <p className="absolute left-32 top-[23px] text-2xl font-medium text-[#1b1b1b]">{authorName}</p>
+            </Link>
+            <Link
+              to={author ? routes.publicProfile(author._id) : routes.home()}
+              className="absolute left-32 top-[23px] text-2xl font-medium text-[#1b1b1b] no-underline hover:underline"
+            >
+              {authorName}
+            </Link>
             <p className="absolute left-32 top-[61px] text-xl text-[#878787]">{authorSpecialization}</p>
           </div>
-          {publicView && (
-            <Button
-              variant="primary"
-              icon={<UserPlus size={16} />}
-              className="inline-flex w-[284px] items-center justify-center gap-2.5 px-6"
-            >
-              Follow
-            </Button>
+          {publicView && author && !isOwnProfile && token && currentUser && (
+            <div className="flex flex-col items-end gap-1">
+              <Button
+                variant={isFollowing ? "secondary" : "primary"}
+                icon={<UserPlus size={16} />}
+                onClick={() =>
+                  followMutation.mutate(undefined, {
+                    onError: (err) =>
+                      setFollowError(err instanceof Error ? err.message : "Could not update follow."),
+                  })
+                }
+                className="inline-flex w-[284px] items-center justify-center gap-2.5 px-6"
+              >
+                {isFollowing ? "Following" : "Follow"}
+              </Button>
+              {followError && <p className="text-sm text-red-600">{followError}</p>}
+            </div>
           )}
         </section>
 
