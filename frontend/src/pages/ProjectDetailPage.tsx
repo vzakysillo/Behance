@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-  ArrowLeft,
   Bookmark,
   CalendarDays,
   Heart,
@@ -10,6 +9,7 @@ import {
   Send,
   Share2,
   Trash2,
+  UserPlus,
 } from "lucide-react";
 import {
   addProjectComment,
@@ -25,8 +25,7 @@ import {
   removeProjectLike,
 } from "../api/project.api";
 import { useAuth } from "../hooks/useAuth";
-import { Spinner, ErrorMessage, Button, Tag, EmptyState } from "../components/ui";
-import AuthorPanel from "../components/AuthorPanel";
+import { Spinner, ErrorMessage, Button, Tag, EmptyState, BackLarge, LabeledInput } from "../components/ui";
 import ProjectPreview from "../components/ProjectPreview";
 import { routes } from "../routes";
 import type { IUser } from "../types";
@@ -34,9 +33,6 @@ import type { IUser } from "../types";
 interface ProjectDetailPageProps {
   publicView?: boolean;
 }
-
-const chipButtonClass =
-  "h-7 px-3 bg-[#e8e5e5] text-black text-xs font-normal inline-flex items-center justify-center gap-2 transition-colors hover:bg-[#d8d5d5] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black";
 
 const dividerClass = "border-t border-[#b8b8b8]";
 
@@ -161,21 +157,6 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
       .slice(0, 4);
   }, [project, relatedProjects]);
 
-  const authorProjects = useMemo(() => {
-    if (!project) return [];
-    const seen = new Set<string>();
-    return (project.authorProjects?.length
-      ? project.authorProjects
-      : relatedProjects.filter((item) => item.userId === project.userId)
-    )
-      .filter((item) => {
-        if (item._id === project._id || seen.has(item._id)) return false;
-        seen.add(item._id);
-        return true;
-      })
-      .slice(0, 4);
-  }, [project, relatedProjects]);
-
   const handleLike = () => {
     if (!currentUser) {
       setReactionError("Please login to like projects.");
@@ -225,40 +206,59 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
   const likesCount = likes.length || project.likesCount || 0;
   const commentsCount = comments.length || project.commentsCount || 0;
 
+  const scrollToComments = () => {
+    document.getElementById("comments")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <div className="min-h-screen bg-[#f8f8f8] font-sans text-black">
-      <div className="mx-auto grid min-h-screen max-w-[1756px] grid-cols-[minmax(0,1fr)_494px] max-[1280px]:grid-cols-1">
-        <main className="min-w-0 px-[50px] pb-20 pt-[30px] max-[768px]:px-5">
-          <Link
-            to={publicView ? routes.home() : routes.profile.root()}
-            className="mb-5 inline-flex h-5 items-center gap-2 text-xs font-medium text-black no-underline hover:underline"
-          >
-            <ArrowLeft size={12} strokeWidth={2} />
-            Back
-          </Link>
+      <main className="mx-auto min-h-screen max-w-[1756px] px-[50px] pb-20 pt-[30px] max-[768px]:px-5">
+        <BackLarge to={publicView ? routes.home() : routes.profile.root()} className="mb-5" />
 
-          <section className="relative mb-8 aspect-[1262/819] w-full bg-[#a7a7a7] max-[768px]:aspect-[4/3]">
-            {gallery[0] ? (
-              <img src={gallery[0]} alt={project.name} className="h-full w-full object-cover" />
-            ) : (
-              <div className="flex h-full w-full items-center justify-center text-base text-neutral-600">
-                project
-              </div>
-            )}
-          </section>
-
-          {(project.assets ?? []).length > 0 && (
-            <section className="mb-8 flex flex-col">
-              {project.assets!.map((asset, index) => (
-                <img
-                  key={`${asset}-${index}`}
-                  src={asset}
-                  alt={`${project.name} asset ${index + 1}`}
-                  className="w-full object-cover"
-                />
-              ))}
-            </section>
+        {/* Author header */}
+        <section className="mb-8 flex items-center justify-between gap-10 max-[768px]:flex-col max-[768px]:items-start">
+          <div className="relative h-[108px] w-[298px] shrink-0">
+            <div className="relative h-[90px] w-[90px]">
+              {author?.avatar ? (
+                <img src={author.avatar} alt={authorName} className="h-full w-full rounded-full object-cover" />
+              ) : (
+                <div className="h-full w-full rounded-full bg-[#d9d9d9]" />
+              )}
+            </div>
+            <p className="absolute left-32 top-[23px] text-2xl font-medium text-[#1b1b1b]">{authorName}</p>
+            <p className="absolute left-32 top-[61px] text-xl text-[#878787]">{authorSpecialization}</p>
+          </div>
+          {publicView && (
+            <Button
+              variant="primary"
+              icon={<UserPlus size={16} />}
+              className="inline-flex w-[284px] items-center justify-center gap-2.5 px-6"
+            >
+              Follow
+            </Button>
           )}
+        </section>
+
+          {/* Cover + assets: one rounded rect */}
+          <section className="mb-8 flex w-full flex-col overflow-hidden rounded-[15px]">
+            <div className="aspect-[1262/819] w-full bg-[#a7a7a7] max-[768px]:aspect-[4/3]">
+              {gallery[0] ? (
+                <img src={gallery[0]} alt={project.name} className="h-full w-full object-cover" />
+              ) : (
+                <div className="flex h-full w-full items-center justify-center text-base text-neutral-600">
+                  project
+                </div>
+              )}
+            </div>
+            {(project.assets ?? []).map((asset, index) => (
+              <img
+                key={`${asset}-${index}`}
+                src={asset}
+                alt={`${project.name} asset ${index + 1}`}
+                className="w-full object-cover"
+              />
+            ))}
+          </section>
 
           <section className="space-y-7">
             <div>
@@ -270,31 +270,33 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
 
             <div className="flex flex-wrap items-center gap-2">
               <Button
-                variant="chip"
-                className={`${chipButtonClass} min-w-24 ${isLiked ? "bg-black text-white hover:bg-neutral-800" : ""}`}
+                variant="secondary"
+                icon={<Heart size={16} fill={isLiked ? "currentColor" : "none"} />}
                 onClick={handleLike}
+                className="inline-flex items-center justify-center gap-2 px-6"
               >
-                <Heart size={12} fill={isLiked ? "currentColor" : "none"} />
                 {isLiked ? "Liked" : "Like"}
               </Button>
-              <Button variant="chip" className={`${chipButtonClass} min-w-24`}>
-                <Bookmark size={12} />
+              <Button variant="secondary" icon={<Bookmark size={16} />} className="inline-flex items-center justify-center gap-2 px-6">
                 Save
               </Button>
-              <Button variant="chip" className={`${chipButtonClass} min-w-24`}>
-                <Share2 size={12} />
+              <Button variant="secondary" icon={<Share2 size={16} />} className="inline-flex items-center justify-center gap-2 px-6">
                 Share
               </Button>
               {!project.disableComments && (
-                <a href="#comments" className={`${chipButtonClass} min-w-40 no-underline`}>
-                  <MessageSquare size={12} />
+                <Button
+                  variant="secondary"
+                  icon={<MessageSquare size={16} />}
+                  onClick={scrollToComments}
+                  className="inline-flex items-center justify-center gap-2 px-6"
+                >
                   Add comment
-                </a>
+                </Button>
               )}
-              <div className={`${chipButtonClass} ml-auto min-w-52 max-[768px]:ml-0 max-[768px]:min-w-0`}>
-                <CalendarDays size={12} />
+              <span className="ml-auto inline-flex items-center gap-2 text-base font-normal text-brand-600">
+                <CalendarDays size={16} />
                 {formatDate(project.createdAt)}
-              </div>
+              </span>
             </div>
 
             {reactionError && <p className="text-sm text-red-600">{reactionError}</p>}
@@ -329,22 +331,6 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
               )}
             </section>
 
-            {gallery.length > 1 && (
-              <>
-                <div className={dividerClass} />
-                <section className="grid grid-cols-2 gap-5 max-[768px]:grid-cols-1">
-                  {gallery.slice(1).map((photo, index) => (
-                    <img
-                      key={`${photo}-${index}`}
-                      src={photo}
-                      alt={`${project.name} asset ${index + 1}`}
-                      className="aspect-[626/384] w-full bg-[#a7a7a7] object-cover"
-                    />
-                  ))}
-                </section>
-              </>
-            )}
-
             <div className={dividerClass} />
 
             <section id="comments">
@@ -374,15 +360,22 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
                       <img src={currentUser.avatar} alt={currentUser.userName} className="h-full w-full object-cover" />
                     )}
                   </div>
-                  <div className="flex flex-1 gap-3">
-                    <textarea
-                      className="min-h-20 flex-1 resize-y border border-neutral-400 px-3 py-2 text-xs leading-4 outline-none focus:border-black"
-                      value={commentText}
-                      onChange={(e) => setCommentText(e.target.value)}
-                      placeholder="Write a comment"
-                    />
-                    <Button variant="chip" className={`${chipButtonClass} w-10 px-0`} type="submit" aria-label="Post comment">
-                      <Send size={12} />
+                  <div className="flex flex-1 items-end gap-3 max-[768px]:flex-col">
+                    <LabeledInput label="Write a comment" className="flex-1 w-full">
+                      <textarea
+                        className="w-full h-[100px] resize-none bg-transparent text-sm leading-[1.2] text-ink outline-none placeholder:text-line"
+                        value={commentText}
+                        onChange={(e) => setCommentText(e.target.value)}
+                        placeholder="Write a comment"
+                      />
+                    </LabeledInput>
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      icon={<Send size={16} />}
+                      className="shrink-0 inline-flex items-center justify-center gap-2 px-6"
+                    >
+                      Send
                     </Button>
                   </div>
                 </form>
@@ -464,16 +457,6 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
             )}
           </section>
         </main>
-
-        <aside className="h-screen overflow-y-auto bg-[#e7e7e7] px-[50px] py-[50px] max-[1280px]:static max-[1280px]:h-auto max-[768px]:px-5">
-          <AuthorPanel
-            author={author}
-            authorName={authorName}
-            authorSpecialization={authorSpecialization}
-            projects={authorProjects}
-          />
-        </aside>
-      </div>
     </div>
   );
 }

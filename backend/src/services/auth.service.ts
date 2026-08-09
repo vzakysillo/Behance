@@ -49,7 +49,12 @@ export const registerUser = async (body: RegisterInput) => {
   }
 
   const token = await createVerificationToken(user._id);
-  await sendVerificationEmail(email, token);
+
+  try {
+    await sendVerificationEmail(email, token);
+  } catch (err) {
+    console.error("Failed to send verification email:", err);
+  }
 
   return {
     id: user._id,

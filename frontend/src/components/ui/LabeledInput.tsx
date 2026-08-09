@@ -48,8 +48,8 @@ export function LabeledInput({
   const Wrapper = children ? "div" : "label";
 
   return (
-    <div className="flex flex-col gap-2">
-      <Wrapper className={`group flex flex-col gap-2 ${className}`}>
+    <div className={`flex flex-col gap-2 ${className}`}>
+      <Wrapper className="group flex flex-col gap-2">
         <span className={`text-base font-normal leading-[1.2] text-left ${labelClasses}`}>{label}</span>
         <div
           className={`flex items-center min-h-[45px] gap-2.5 px-[15px] py-2.5 rounded-[22.5px] border ${boxClasses}`}
