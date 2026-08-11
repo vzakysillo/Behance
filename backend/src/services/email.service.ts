@@ -17,18 +17,21 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Verify your email</title>
+        <style>
+          .btn:hover { background:#4a28c4 !important; }
+        </style>
       </head>
-      <body style="margin:0;padding:0;background:#f5f5f5;font-family:'Inter',system-ui,-apple-system,sans-serif;">
-        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f5;padding:60px 20px;">
+      <body style="margin:0;padding:0;background:#f8f8f8;font-family:Geist,'Inter',system-ui,-apple-system,sans-serif;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background:#f8f8f8;padding:60px 20px;">
           <tr>
             <td align="center">
-              <table width="480" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+              <table width="480" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,0.06);">
                 <!-- Header -->
                 <tr>
                   <td style="padding:40px 40px 0 40px;text-align:center;">
                     <div style="display:inline-flex;align-items:center;gap:10px;">
-                      <div style="width:32px;height:32px;border-radius:50%;border:3px solid #575656;"></div>
-                      <span style="font-size:18px;font-weight:600;color:#525252;letter-spacing:-0.01em;">LOGO</span>
+                      <div style="width:32px;height:32px;border-radius:50%;border:3px solid #6146ea;box-sizing:border-box;"></div>
+                      <span style="font-size:18px;font-weight:700;color:#525252;letter-spacing:-0.01em;">Moddo</span>
                     </div>
                   </td>
                 </tr>
@@ -49,9 +52,9 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
                 <!-- Button -->
                 <tr>
                   <td style="padding:0 40px 40px 40px;text-align:center;">
-                    <a href="${verifyUrl}"
-                       style="display:inline-block;padding:14px 40px;background:#525252;color:#ffffff;
-                              text-decoration:none;border-radius:0;font-weight:500;font-size:15px;
+                    <a href="${verifyUrl}" class="btn"
+                       style="display:inline-block;padding:14px 44px;background:#6146ea;color:#ffffff;
+                              text-decoration:none;border-radius:30px;font-weight:500;font-size:15px;
                               letter-spacing:0.01em;">
                       Verify Email
                     </a>
@@ -65,7 +68,7 @@ export async function sendVerificationEmail(to: string, token: string): Promise<
                       If the button doesn't work, copy and paste this link into your browser:
                     </p>
                     <p style="margin:8px 0 0 0;font-size:13px;word-break:break-all;">
-                      <a href="${verifyUrl}" style="color:#575656;text-decoration:underline;">${verifyUrl}</a>
+                      <a href="${verifyUrl}" style="color:#4a28c4;text-decoration:underline;">${verifyUrl}</a>
                     </p>
                   </td>
                 </tr>

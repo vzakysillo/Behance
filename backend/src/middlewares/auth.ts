@@ -47,6 +47,11 @@ export const authMiddleware = async (ctx: AuthContext, next: Next): Promise<void
     socials: user.socials,
     skills: user.skills,
     avatar: user.avatar,
+    bio: user.bio,
+    specialization: user.specialization,
+    location: user.location,
+    company: user.company,
+    city: user.city,
     isVerified: user.isVerified,
   };
 

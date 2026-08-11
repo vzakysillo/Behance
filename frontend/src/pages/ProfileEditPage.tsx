@@ -44,26 +44,37 @@ export default function ProfileEditPage() {
   const [avatarUploading, setAvatarUploading] = useState(false);
   const [socialReset, setSocialReset] = useState<Record<string, number>>({});
 
+  const formDefaults: ProfileEditValues = {
+    firstName: user?.firstName ?? "",
+    lastName: user?.lastName ?? "",
+    headline: user?.specialization ?? "",
+    company: user?.company ?? "",
+    location: user?.location ?? "",
+    city: user?.city ?? "",
+    bio: user?.bio ?? "",
+    teamLink: "",
+    socials: user?.socials ?? [],
+    linkTitle: "",
+    linkUrl: "",
+  };
+
   const { register, handleSubmit, watch, setValue, formState: { isSubmitting } } = useForm<ProfileEditValues>({
     resolver: zodResolver(profileEditSchema),
-    defaultValues: {
-      firstName: user?.firstName ?? "",
-      lastName: user?.lastName ?? "",
-      headline: user?.specialization ?? "",
-      company: "",
-      location: user?.location ?? "",
-      city: "",
-      bio: user?.bio ?? "",
-      teamLink: "",
-      socials: user?.socials ?? [],
-      linkTitle: "",
-      linkUrl: "",
-    },
+    defaultValues: formDefaults,
   });
 
   const saveMutation = useMutation({
     mutationFn: (data: ProfileEditValues) =>
-      updateMe({ firstName: data.firstName, lastName: data.lastName, specialization: data.headline, location: data.location, socials: data.socials, bio: data.bio }),
+      updateMe({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        specialization: data.headline,
+        company: data.company,
+        location: data.location,
+        city: data.city,
+        socials: data.socials,
+        bio: data.bio,
+      }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["projects"] });
       queryClient.invalidateQueries({ queryKey: ["user", user?._id] });
@@ -129,14 +140,15 @@ export default function ProfileEditPage() {
 
         <div className="flex items-center gap-4">
           {error && <p className="text-sm text-red-500">{error}</p>}
-          <button
+          <Button
             type="button"
+            variant="primary"
             onClick={handleSubmit(handleSave)}
             disabled={isSubmitting}
-            className="h-10 px-8 bg-[#b5b5b5] text-black text-sm hover:brightness-95 disabled:opacity-50"
+            className="px-8"
           >
             {isSubmitting ? "Saving..." : "Save"}
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -214,17 +226,17 @@ export default function ProfileEditPage() {
                 <p className="text-base text-black font-normal">Base Information</p>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <LabeledInput label="First name" placeholder="First name" {...register("firstName")} />
-                  <LabeledInput label="Last name" placeholder="Last name" {...register("lastName")} />
+                  <LabeledInput label="First name" placeholder="First name" {...register("firstName")} defaultValue={formDefaults.firstName} />
+                  <LabeledInput label="Last name" placeholder="Last name" {...register("lastName")} defaultValue={formDefaults.lastName} />
                 </div>
 
-                <LabeledInput label="Headline" placeholder="Headline" {...register("headline")} />
+                <LabeledInput label="Headline" placeholder="Headline" {...register("headline")} defaultValue={formDefaults.headline} />
 
-                <LabeledInput label="Company" placeholder="Company" {...register("company")} />
+                <LabeledInput label="Company" placeholder="Company" {...register("company")} defaultValue={formDefaults.company} />
 
                 <div className="grid grid-cols-2 gap-3">
-                  <LabeledInput label="Location" placeholder="Location" {...register("location")} />
-                  <LabeledInput label="City" placeholder="City" {...register("city")} />
+                  <LabeledInput label="Location" placeholder="Location" {...register("location")} defaultValue={formDefaults.location} />
+                  <LabeledInput label="City" placeholder="City" {...register("city")} defaultValue={formDefaults.city} />
                 </div>
 
                 <LabeledInput label="Bio">
@@ -264,7 +276,7 @@ export default function ProfileEditPage() {
           {/* Teams */}
           <section id="teams">
             <p className="text-base text-black mb-3">Teams</p>
-            <LabeledInput label="Team's link" placeholder="Team's link" {...register("teamLink")} />
+            <LabeledInput label="Team's link" placeholder="Team's link" {...register("teamLink")} defaultValue={formDefaults.teamLink} />
           </section>
 
           <Divider className={editDividerClass} />
@@ -313,8 +325,8 @@ export default function ProfileEditPage() {
           <section id="links">
             <p className="text-base text-black mb-4">Links</p>
             <div className="flex items-end gap-3">
-              <LabeledInput label="Link title" placeholder="Link title" className="flex-1" {...register("linkTitle")} />
-              <LabeledInput label="URL" placeholder="URL" className="flex-1" {...register("linkUrl")} />
+              <LabeledInput label="Link title" placeholder="Link title" className="flex-1" {...register("linkTitle")} defaultValue={formDefaults.linkTitle} />
+              <LabeledInput label="URL" placeholder="URL" className="flex-1" {...register("linkUrl")} defaultValue={formDefaults.linkUrl} />
             </div>
           </section>
 

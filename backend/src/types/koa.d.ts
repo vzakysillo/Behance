@@ -12,6 +12,11 @@ export interface AuthState extends DefaultState {
     socials: string[];
     skills: string[];
     avatar: string;
+    bio?: string;
+    specialization?: string;
+    location?: string;
+    company?: string;
+    city?: string;
     isVerified: boolean;
   };
 }

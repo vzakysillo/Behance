@@ -11,6 +11,11 @@ export interface IUser {
   skills: string[];
   bio: string;
 
+  specialization: string;
+  location: string;
+  company: string;
+  city: string;
+
   avatar: string;
   isVerified: boolean;
 }
@@ -27,6 +32,11 @@ const userSchema = new mongoose.Schema<IUser>(
     socials: { type: [String], default: [] },
     skills: { type: [String], default: [] },
     bio: { type: String, default: null },
+
+    specialization: { type: String, default: null },
+    location: { type: String, default: null },
+    company: { type: String, default: null },
+    city: { type: String, default: null },
 
     avatar: { type: String, default: null },
 

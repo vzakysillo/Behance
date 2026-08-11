@@ -12,6 +12,8 @@ export interface IUser {
   // new — wire to backend later
   specialization?: string;
   location?: string;
+  company?: string;
+  city?: string;
   availableForFreelance?: boolean;
   aboutMe?: string;
   memberSince?: string;

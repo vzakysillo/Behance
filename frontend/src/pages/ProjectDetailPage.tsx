@@ -171,7 +171,10 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
 
   const gallery = useMemo(() => {
     if (!project) return [];
-    return [project.cover, ...(project.assets ?? [])].filter((image): image is string => Boolean(image));
+    const assets = (project.assets ?? []).filter(
+      (asset): asset is string => Boolean(asset) && asset !== project.cover
+    );
+    return [project.cover, ...assets].filter((image): image is string => Boolean(image));
   }, [project]);
 
   const similarProjects = useMemo(() => {
@@ -291,7 +294,7 @@ export default function ProjectDetailPage({ publicView = false }: ProjectDetailP
                 </div>
               )}
             </div>
-            {(project.assets ?? []).map((asset, index) => (
+            {gallery.slice(1).map((asset, index) => (
               <img
                 key={`${asset}-${index}`}
                 src={asset}

@@ -59,7 +59,14 @@ const getProjectPayload = (
   }
 
   if (body.assets !== undefined) {
-    payload.assets = body.assets;
+    const cover = body.cover;
+    payload.assets = body.assets.filter(
+      (asset, index) =>
+        typeof asset === "string" &&
+        asset.length > 0 &&
+        asset !== cover &&
+        body.assets!.indexOf(asset) === index
+    );
   }
 
   if (body.tags !== undefined) {

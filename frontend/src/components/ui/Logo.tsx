@@ -31,7 +31,7 @@ export function Logo({ size = "md", variant = "default", className = "", wordCla
         className={`shrink-0 border-4 rounded-full box-border ${variantClasses[variant]} ${circleSizeClasses[size]}`}
         aria-hidden="true"
       />
-      <span className={wordClassName}>LOGO</span>
+      <span className={`font-sans ${wordClassName}`}>Moddo</span>
     </span>
   );
 }

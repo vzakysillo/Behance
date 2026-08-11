@@ -51,7 +51,9 @@ export default function ProjectCreatePage() {
             coverUrl = uploadedAssets.shift()!;
           }
 
-          const project = await createMutation.mutateAsync({ ...data, cover: coverUrl, assets: uploadedAssets });
+          const assets = uploadedAssets.filter((asset) => asset !== coverUrl);
+
+          const project = await createMutation.mutateAsync({ ...data, cover: coverUrl, assets });
           console.log(project);
         }}
       />
