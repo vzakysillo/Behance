@@ -34,6 +34,58 @@ export const getLikesForProject = async (projectId: string) => {
   return Like.find({ projectId });
 };
 
+export const getAppreciatedProjectsForUser = async (userId: Types.ObjectId) => {
+  const likes = await Like.find({ userId }).select("projectId").lean();
+  const projectIds = likes.map((l) => l.projectId);
+
+  if (projectIds.length === 0) return [];
+
+  const { default: Project } = await import("../models/project.model.js");
+
+  return Project.aggregate([
+    { $match: { _id: { $in: projectIds } } },
+    {
+      $lookup: {
+        from: "likes",
+        localField: "_id",
+        foreignField: "projectId",
+        as: "likes",
+      },
+    },
+    {
+      $lookup: {
+        from: "comments",
+        localField: "_id",
+        foreignField: "projectId",
+        as: "comments",
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "userId",
+        foreignField: "_id",
+        as: "author",
+      },
+    },
+    {
+      $addFields: {
+        likesCount: { $size: "$likes" },
+        commentsCount: { $size: "$comments" },
+        author: { $first: "$author" },
+      },
+    },
+    {
+      $project: {
+        likes: 0,
+        comments: 0,
+        "author.password": 0,
+      },
+    },
+    { $sort: { _id: -1 } },
+  ]);
+};
+
 export const removeLikeFromProject = async (
   userId: Types.ObjectId,
   projectId: string,

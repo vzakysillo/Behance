@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getUserProjects } from "../api/project.api";
+import { getUserProjects, getUserAppreciatedProjects } from "../api/project.api";
 import { getUser } from "../api/user.api";
 import { getFollowers, getFollowing, followUser, unfollowUser } from "../api/follow.api";
 import { useAuth } from "../hooks/useAuth";
@@ -38,6 +38,17 @@ export default function PublicProfilePage() {
     queryKey: ["userProjects", id],
     queryFn: () => getUserProjects(id!),
     enabled: !!id,
+  });
+
+  const {
+    data: appreciatedProjects,
+    isLoading: appreciationsLoading,
+    isError: appreciationsError,
+    error: appreciationsFetchError,
+  } = useQuery({
+    queryKey: ["userAppreciations", id],
+    queryFn: () => getUserAppreciatedProjects(id!),
+    enabled: !!id && activeTab === "Appreciations",
   });
 
   const { data: followers } = useQuery({
@@ -149,7 +160,31 @@ export default function PublicProfilePage() {
             </>
           )}
 
-          {activeTab !== "Work" && (
+          {activeTab === "Appreciations" && (
+            <>
+              {appreciationsLoading && <Spinner />}
+              {appreciationsError && <ErrorMessage message={appreciationsFetchError?.message ?? "Failed to load appreciations"} />}
+              {!appreciationsLoading && !appreciationsError && (
+                <>
+                  {(appreciatedProjects ?? []).length === 0 ? (
+                    <EmptyState variant="centered" message="No appreciated projects yet" />
+                  ) : (
+                    <div className="grid grid-cols-3 gap-[30px]">
+                      {(appreciatedProjects ?? []).map((project) => (
+                        <ProfileProjectCard
+                          key={project._id}
+                          project={project}
+                          linkTo={routes.projectDetail(project._id)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+            </>
+          )}
+
+          {activeTab !== "Work" && activeTab !== "Appreciations" && (
             <EmptyState variant="centered" message={`${activeTab} — coming soon`} />
           )}
         </div>

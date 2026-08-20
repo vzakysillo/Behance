@@ -107,3 +107,17 @@ export const getUserProjects = async (userId: string): Promise<IProject[]> => {
   );
   return res.data.data?.projects ?? [];
 };
+
+export const getAppreciatedProjects = async (): Promise<IProject[]> => {
+  const res = await AxiosApi.get<ApiResponse<{ projects: IProject[] }>>(
+    "/users/me/appreciations"
+  );
+  return res.data.data?.projects ?? [];
+};
+
+export const getUserAppreciatedProjects = async (userId: string): Promise<IProject[]> => {
+  const res = await AxiosApi.get<ApiResponse<{ projects: IProject[] }>>(
+    `/users/${userId}/appreciations`
+  );
+  return res.data.data?.projects ?? [];
+};
